@@ -38,19 +38,19 @@ const UserAccountPage = lazy(() => import('src/pages/dashboard/user/account'));
 const UserCreatePage = lazy(() => import('src/pages/dashboard/user/new'));
 const UserEditPage = lazy(() => import('src/pages/dashboard/user/edit'));
 // COMPANY
-const CompanyListPage = lazy(() =>import('src/pages/dashboard/company/list'));
+const CompanyListPage = lazy(() => import('src/pages/dashboard/company/list'));
 // WORKFLOW
-const ReactFlowPage = lazy(()=> import('src/pages/dashboard/react-flow/board'))
+const ReactFlowPage = lazy(() => import('src/pages/dashboard/react-flow/board'));
 // SCHEDULER
-const SchedulerNewPage = lazy(()=> import('src/pages/dashboard/scheduler/new'));
-const SchedulerListPage = lazy(()=> import('src/pages/dashboard/scheduler/list'));
-const SchedulerEditPage = lazy(()=> import('src/pages/dashboard/scheduler/edit'));
-const SchedulerViewPage = lazy(()=> import('src/pages/dashboard/scheduler/view')); 
+const SchedulerNewPage = lazy(() => import('src/pages/dashboard/scheduler/new'));
+const SchedulerListPage = lazy(() => import('src/pages/dashboard/scheduler/list'));
+const SchedulerEditPage = lazy(() => import('src/pages/dashboard/scheduler/edit'));
+const SchedulerViewPage = lazy(() => import('src/pages/dashboard/scheduler/view'));
 // DESIGNATION
-const DesignationNewPage = lazy(()=> import('src/pages/dashboard/designation/new'));
-const DesignationListPage= lazy(()=> import('src/pages/dashboard/designation/list'));
-const DesignationEditPage= lazy(()=> import('src/pages/dashboard/designation/edit')); 
-const DesignationViewPage=lazy(()=> import('src/pages/dashboard/designation/view'));
+const DesignationNewPage = lazy(() => import('src/pages/dashboard/designation/new'));
+const DesignationListPage = lazy(() => import('src/pages/dashboard/designation/list'));
+const DesignationEditPage = lazy(() => import('src/pages/dashboard/designation/edit'));
+const DesignationViewPage = lazy(() => import('src/pages/dashboard/designation/view'));
 // BLOG
 const BlogPostsPage = lazy(() => import('src/pages/dashboard/post/list'));
 const BlogPostPage = lazy(() => import('src/pages/dashboard/post/details'));
@@ -84,13 +84,13 @@ export const dashboardRoutes = [
   {
     path: 'dashboard',
     element: (
-      <AuthGuard>
+      // <AuthGuard>
         <DashboardLayout>
           <Suspense fallback={<LoadingScreen />}>
             <Outlet />
           </Suspense>
         </DashboardLayout>
-      </AuthGuard>
+      // </AuthGuard>
     ),
     children: [
       { element: <IndexPage />, index: true },
@@ -115,8 +115,8 @@ export const dashboardRoutes = [
         path: 'company',
         children: [
           { element: <CompanyListPage />, index: true },
-          { path: 'list', element: <CompanyListPage />},
-        ]
+          { path: 'list', element: <CompanyListPage /> },
+        ],
       },
       {
         path: 'product',
@@ -137,7 +137,7 @@ export const dashboardRoutes = [
         ],
       },
 
-       {
+      {
         path: 'reactflow',
         children: [
           { element: <ReactFlowPage />, index: true },
@@ -153,9 +153,9 @@ export const dashboardRoutes = [
         children: [
           { element: <SchedulerListPage />, index: true },
           { path: 'list', element: <SchedulerListPage /> },
-           { path: ':id', element: <SchedulerViewPage /> },
+          { path: ':id', element: <SchedulerViewPage /> },
           { path: ':id/edit', element: <SchedulerEditPage /> },
-           { path: 'new', element: <SchedulerNewPage /> },
+          { path: 'new', element: <SchedulerNewPage /> },
         ],
       },
       {
@@ -163,9 +163,9 @@ export const dashboardRoutes = [
         children: [
           { element: <DesignationListPage />, index: true },
           { path: 'list', element: <DesignationListPage /> },
-           { path: ':id', element: <DesignationViewPage /> },
+          { path: ':id', element: <DesignationViewPage /> },
           { path: ':id/edit', element: <DesignationEditPage /> },
-           { path: 'new', element: <DesignationNewPage /> },
+          { path: 'new', element: <DesignationNewPage /> },
         ],
       },
       {

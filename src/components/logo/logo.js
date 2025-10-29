@@ -23,8 +23,8 @@ const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
   const logo = (
     <Box
       component="img"
-      src="/logo/altiv_logo.png"
-      sx={{ width: 80, cursor: 'pointer', ...sx }}
+      src="/logo/logo.png"
+      sx={{ width: 40, cursor: 'pointer', ...sx }}
     />
   );
 

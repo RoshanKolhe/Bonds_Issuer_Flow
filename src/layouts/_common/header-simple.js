@@ -29,6 +29,7 @@ export default function HeaderSimple() {
     <AppBar>
       <Toolbar
         sx={{
+          backgroundColor: '#FFFFFF',
           justifyContent: 'space-between',
           height: {
             xs: HEADER.H_MOBILE,

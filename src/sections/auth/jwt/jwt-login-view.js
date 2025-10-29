@@ -22,7 +22,7 @@ import { useBoolean } from 'src/hooks/use-boolean';
 import { useAuthContext } from 'src/auth/hooks';
 // components
 import Iconify from 'src/components/iconify';
-import FormProvider, { RHFTextField } from 'src/components/hook-form';
+import FormProvider, { RHFTextField, RHFCheckbox } from 'src/components/hook-form';
 import { useSnackbar } from 'notistack';
 
 // ----------------------------------------------------------------------
@@ -32,7 +32,7 @@ export default function JwtLoginView() {
 
   const router = useRouter();
 
-  const {enqueueSnackbar}=useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
 
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -45,13 +45,18 @@ export default function JwtLoginView() {
   const LoginSchema = Yup.object().shape({
     email: Yup.string().required('Email is required').email('Email must be a valid email address'),
     password: Yup.string().required('Password is required'),
+    remember: Yup.boolean(),
   });
-
-
+  
+  const defaultValues = {
+    email: '',
+    password: '',
+    remember: false,
+  };
 
   const methods = useForm({
     resolver: yupResolver(LoginSchema),
-    
+    defaultValues,
   });
 
   const {
@@ -66,23 +71,23 @@ export default function JwtLoginView() {
 
       router.push(returnTo || PATH_AFTER_LOGIN);
     } catch (error) {
-  console.error(error);
+      console.error(error);
 
-  const message =
-    typeof error === 'string'
-      ? error
-      : error?.error?.message || error?.message || 'Login failed';
+      const message =
+        typeof error === 'string'
+          ? error
+          : error?.error?.message || error?.message || 'Login failed';
 
-  if (message.toLowerCase().includes('email')) {
-    setErrorMsg('Email address not found');
-  } else if (message.toLowerCase().includes('password')) {
-    setErrorMsg('Incorrect password');
-  } else {
-    setErrorMsg(message);
-  }
+      if (message.toLowerCase().includes('email')) {
+        setErrorMsg('Email address not found');
+      } else if (message.toLowerCase().includes('password')) {
+        setErrorMsg('Incorrect password');
+      } else {
+        setErrorMsg(message);
+      }
 
-  reset();
-}
+      reset();
+    }
   });
 
   const renderHead = (
@@ -103,6 +108,8 @@ export default function JwtLoginView() {
     <Stack spacing={2.5}>
       {!!errorMsg && <Alert severity="error">{errorMsg}</Alert>}
 
+      <Typography variant="h4">Login</Typography>
+
       <RHFTextField name="email" label="Email address" />
 
       <RHFTextField
@@ -119,10 +126,23 @@ export default function JwtLoginView() {
           ),
         }}
       />
-
-      <Link variant="body2" color="inherit" underline="always" sx={{ alignSelf: 'flex-end' }}>
-        Forgot password?
-      </Link>
+      <Stack direction="row" alignItems="center" justifyContent="space-between">
+        <RHFCheckbox name="remember" label="Remember me" sx={{ m: 0 }} />
+        <Link
+          variant="body2"
+          color="inherit"
+          underline="always"
+          sx={{
+            cursor: 'pointer',
+            '&:hover': {
+              textDecoration: 'underline',
+            },
+          }}
+          onClick={() => router.push(paths.auth.jwt.forgotPassword)}
+        >
+          Forgot password?
+        </Link>
+      </Stack>
 
       <LoadingButton
         fullWidth
@@ -139,7 +159,6 @@ export default function JwtLoginView() {
 
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
-      
       {/* {renderHead}
 
       <Alert severity="info" sx={{ mb: 3 }}>
