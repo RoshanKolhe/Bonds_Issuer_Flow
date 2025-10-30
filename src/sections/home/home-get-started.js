@@ -9,7 +9,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 
 export default function HomeGetStarted() {
   return (
-    <Container maxWidth="lg" sx={{ pt: { xs: 10, md: 15 } }}>
+    <Container maxWidth="lg" sx={{ pt: { xs: 6, md: 15 } }}>
       <Box
         sx={{
           background: 'linear-gradient(180deg, #AFCBFF 0%, #8979FF 100%)',

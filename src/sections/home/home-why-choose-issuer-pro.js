@@ -43,9 +43,9 @@ const BOND_TYPES = [
 ];
 
 const StyledSection = styled('div')(({ theme }) => ({
-  padding: theme.spacing(10, 0),
+  padding: theme.spacing(10, 0, 0, 0),
   [theme.breakpoints.up('md')]: {
-    padding: theme.spacing(15, 0),
+    padding: theme.spacing(15, 0, 0, 0),
   },
 }));
 
@@ -142,11 +142,7 @@ export default function HomeWhyChooseIssuerPro() {
                   <Typography variant="h5" sx={{ fontWeight: 500 }}>
                     {item.title}
                   </Typography>
-                  <Typography
-                    variant="subtitle1"
-                    color="#637381"
-                    sx={{ mt: 1.2, fontWeight: 300 }}
-                  >
+                  <Typography variant="subtitle1" color="#637381" sx={{ mt: 1.2, fontWeight: 300 }}>
                     {item.description}
                   </Typography>
                 </Box>
