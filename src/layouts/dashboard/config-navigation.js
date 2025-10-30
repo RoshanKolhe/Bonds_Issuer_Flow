@@ -89,11 +89,11 @@ export function useNavData() {
 
           // COMPANY
           {
-            title: t('company'),
-            path: paths.dashboard.company.root,
+            title: t('issure services'),
+            path: paths.dashboard.issureservices.root,
             icon: ICONS.company,
             children: [
-              { title: t('list'), path: paths.dashboard.company.list },
+              { title: t('ROI guidance'), path: paths.dashboard.issureservices.roi },
             ],
 
           },
