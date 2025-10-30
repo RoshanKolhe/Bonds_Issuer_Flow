@@ -4,6 +4,7 @@ import { useScroll } from 'framer-motion';
 import ScrollProgress from 'src/components/scroll-progress';
 //
 import HomeHero from '../home-hero';
+import HomeWhyChooseIssuerPro from '../home-why-choose-issuer-pro';
 
 // ----------------------------------------------------------------------
 
@@ -15,6 +16,7 @@ export default function HomeView() {
       <ScrollProgress scrollYProgress={scrollYProgress} />
 
       <HomeHero />
+      <HomeWhyChooseIssuerPro />
     </>
   );
 }
