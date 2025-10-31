@@ -143,12 +143,9 @@ export default function FundPositionForm({ currentFund, setActiveStep }) {
   //   }
   // });
   const onSubmit = (data) => {
-    console.log('Full Form Data:', data);
-    setActiveStep(1);
+    console.log('Form Data:', data);
+    setActiveStep(1)
   };
-  // const onSubmit = (data) => {
-  //   console.log('Form Data:', data);
-  // };
 
   const agencies = [
     'CRISIL',
@@ -188,7 +185,7 @@ export default function FundPositionForm({ currentFund, setActiveStep }) {
         gap: 4,
       }}
     >
-      <FormProvider methods={methods} onSubmit={onSubmit}>
+      <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
         {/* 1. Fund Position Section */}
         <Card sx={{ p: 4, borderRadius: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', mb: 4 }}>
           <Typography variant="h3" sx={{ color: '#1565c0', fontWeight: 600 }}>
@@ -358,7 +355,7 @@ export default function FundPositionForm({ currentFund, setActiveStep }) {
           sx={{ maxWidth: 400, ml: 'auto', mt: 5 }}
         >
           <Grid item xs={6}>
-            <Button fullWidth variant="outlined" color="inherit" onClick={() => setActiveStep(0)}>
+            <Button fullWidth variant="outlined" color="inherit">
               Cancel
             </Button>
           </Grid>
