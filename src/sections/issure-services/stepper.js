@@ -3,6 +3,7 @@ import MainFile from "./stepThree/main";
 
 import { Box, Stepper, Step, StepLabel, Card, Stack, Button } from '@mui/material';
 import StepFour from "./stepFour";
+import FundPositionForm from "./fund-positions";
 
 const steps = ['1', '2', '3', '4', '5'];
 
@@ -13,26 +14,23 @@ export default function RoiStepper() {
         switch (activeSteps) {
             case 0:
                 return (
-                    <MainFile
+                    <FundPositionForm
                         setActiveStep={setActiveSteps}
                     />
                 );
             case 1:
                 return (
-                    <StepFour
+                   <MainFile
+                        setActiveStep={setActiveSteps}
+                    />
+                );
+              case 2:
+                return (
+                 <StepFour
                         activeStep={activeSteps}
                         setActiveStep={setActiveSteps}
                     />
                 );
-            //   case 2:
-            //     return (
-            //       <ProgramModule
-            //         courseId={courseId}
-            //         activeStep={activeStep}
-            //         setActiveStep={setActiveStep}
-            //         currentModules={currentPlan?.courses?.programModules}
-            //       />
-            //     );
             //   case 3:
             //     return (
             //       <Tools

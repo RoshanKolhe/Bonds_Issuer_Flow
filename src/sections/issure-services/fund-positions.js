@@ -26,7 +26,7 @@ import YupErrorMessage from 'src/components/error-field/yup-error-messages';
 
 // ----------------------------------------------------------------------
 
-export default function FundPositionForm({ currentFund }) {
+export default function FundPositionForm({ currentFund, setActiveStep }) {
   const { enqueueSnackbar } = useSnackbar();
 
   const FundSchema = Yup.object().shape({
@@ -61,9 +61,9 @@ export default function FundPositionForm({ currentFund }) {
       agencyRating: currentFund?.agencyRating || '',
       creditRatingLetter: currentFund?.creditRatingLetter
         ? {
-            fileUrl: currentFund.creditRatingLetter.fileUrl,
-            preview: currentFund.creditRatingLetter.fileUrl,
-          }
+          fileUrl: currentFund.creditRatingLetter.fileUrl,
+          preview: currentFund.creditRatingLetter.fileUrl,
+        }
         : '',
     }),
     [currentFund]
@@ -112,36 +112,40 @@ export default function FundPositionForm({ currentFund }) {
   );
 
   // ✅ OnSubmit handler (same pattern as Clinic form)
-  const onSubmit = handleSubmit(async (formData) => {
-    try {
-      const payload = {
-        cashBalance: formData.cashBalance,
-        bankBalance: formData.bankBalance,
-        hasCredit: formData.hasCredit,
-        selectedAgency: formData.selectedAgency,
-        selectedRating: formData.selectedRating,
-        vault: formData.vault,
-        agencyRating: formData.agencyRating,
-        additionalRating: formData.additionalRating,
-        creditRatingLetter: { fileUrl: formData.creditRatingLetter?.fileUrl },
-      };
+  // const onSubmit = handleSubmit(async (formData) => {
+  //   try {
+  //     const payload = {
+  //       cashBalance: formData.cashBalance,
+  //       bankBalance: formData.bankBalance,
+  //       hasCredit: formData.hasCredit,
+  //       selectedAgency: formData.selectedAgency,
+  //       selectedRating: formData.selectedRating,
+  //       vault: formData.vault,
+  //       agencyRating: formData.agencyRating,
+  //       additionalRating: formData.additionalRating,
+  //       creditRatingLetter: { fileUrl: formData.creditRatingLetter?.fileUrl },
+  //     };
 
-      if (!currentFund) {
-        await axiosInstance.post('/fund-position', payload);
-      } else {
-        await axiosInstance.patch(`/fund-position/${currentFund.id}`, payload);
-      }
+  //     if (!currentFund) {
+  //       await axiosInstance.post('/fund-position', payload);
+  //     } else {
+  //       await axiosInstance.patch(`/fund-position/${currentFund.id}`, payload);
+  //     }
 
-      enqueueSnackbar(currentFund ? 'Update success!' : 'Create success!');
-      reset();
-    } catch (error) {
-      console.error(error);
-      enqueueSnackbar(
-        typeof error === 'string' ? error : error.error?.message || 'Something went wrong!',
-        { variant: 'error' }
-      );
-    }
-  });
+  //     enqueueSnackbar(currentFund ? 'Update success!' : 'Create success!');
+  //     reset();
+  //   } catch (error) {
+  //     console.error(error);
+  //     enqueueSnackbar(
+  //       typeof error === 'string' ? error : error.error?.message || 'Something went wrong!',
+  //       { variant: 'error' }
+  //     );
+  //   }
+  // });
+  const onSubmit = (data) => {
+    console.log('Full Form Data:', data);
+    setActiveStep(1);
+  };
   // const onSubmit = (data) => {
   //   console.log('Form Data:', data);
   // };
@@ -354,7 +358,7 @@ export default function FundPositionForm({ currentFund }) {
           sx={{ maxWidth: 400, ml: 'auto', mt: 5 }}
         >
           <Grid item xs={6}>
-            <Button fullWidth variant="outlined" color="inherit">
+            <Button fullWidth variant="outlined" color="inherit" onClick={() => setActiveStep(0)}>
               Cancel
             </Button>
           </Grid>
@@ -405,4 +409,5 @@ CreditRatingCard.propTypes = {
   imageSrc: PropTypes.string,
   label: PropTypes.string,
   onClick: PropTypes.func,
+  setActiveStep: PropTypes.func,
 };

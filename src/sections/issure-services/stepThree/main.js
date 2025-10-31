@@ -72,7 +72,7 @@ const defaultValues = useMemo(()=> ({
 
   const onSubmit = (data) => {
     console.log('Full Form Data:', data);
-    setActiveStep(1);
+    setActiveStep(2);
   };
 
   return (

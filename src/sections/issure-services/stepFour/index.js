@@ -52,7 +52,7 @@ const MainSchema = Yup.object().shape({
 
   const onSubmit = (data) => {
     console.log('Full Form Data:', data);
-    setActiveStep(1);
+    setActiveStep(2);
   };
 
   return (
@@ -79,7 +79,7 @@ const MainSchema = Yup.object().shape({
         
                  
                 }}
-                onClick={()=> setActiveStep(0)}
+                onClick={()=> setActiveStep(1)}
               >
                 Cancel
               </Button>
