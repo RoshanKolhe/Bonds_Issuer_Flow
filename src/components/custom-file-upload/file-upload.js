@@ -1,45 +1,36 @@
 import React, { useState, useRef } from 'react';
-import { Box, Card, Typography, useMediaQuery, useTheme } from '@mui/material';
+import PropTypes from 'prop-types';
+import { Controller, useFormContext } from 'react-hook-form';
+import { Box, Card, Typography, useMediaQuery, useTheme, FormHelperText } from '@mui/material';
 import { Icon } from '@iconify/react';
 
-export default function FileUploadBox({
-  label = 'Upload File',
-  icon = 'mdi:file-document-outline',
-  color = '#1976d2',
-  acceptedTypes = '.pdf,.xls,.xlsx,.jpg,.jpeg,.docx',
-  maxSizeMB = 10,
-  onFileSelect,
+
+function UploadBox({
+  label,
+  icon,
+  color,
+  acceptedTypes,
+  maxSizeMB,
+  onChange,
+  value,
+  error,
+  helperText,
 }) {
-  const [selectedFile, setSelectedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
-
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // mobile breakpoint
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      onFileSelect?.(file);
-    }
+    if (file) onChange(file);
   };
-
-  const handleDragOver = (event) => {
-    event.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => setIsDragging(false);
 
   const handleDrop = (event) => {
     event.preventDefault();
     setIsDragging(false);
     const file = event.dataTransfer.files[0];
-    if (file) {
-      setSelectedFile(file);
-      onFileSelect?.(file);
-    }
+    if (file) onChange(file);
   };
 
   const handleClick = () => fileInputRef.current?.click();
@@ -66,7 +57,7 @@ export default function FileUploadBox({
       <Box
         sx={{
           display: 'flex',
-          flexDirection: { xs: 'column', md: 'row' }, // column for mobile, row for desktop
+          flexDirection: { xs: 'column', md: 'row' },
           alignItems: 'center',
           justifyContent: { xs: 'center', md: 'flex-start' },
           gap: 1.5,
@@ -74,7 +65,6 @@ export default function FileUploadBox({
         }}
       >
         <Icon icon="mdi:cloud-upload-outline" color={color} width="24" height="24" />
-
         <Box>
           <Typography variant="body2">
             <Typography
@@ -88,13 +78,19 @@ export default function FileUploadBox({
             </Typography>{' '}
             Drop files here to upload
           </Typography>
-          <Typography variant="caption" color="primary" display="block" mt={0.5} fontStyle="italic">
-            Maximum allowed file size is {maxSizeMB}MB / Supported types: {acceptedTypes}
+          <Typography
+            variant="caption"
+            color="primary"
+            display="block"
+            mt={0.5}
+            fontStyle="italic"
+          >
+            Maximum size: {maxSizeMB}MB / Supported: {acceptedTypes}
           </Typography>
         </Box>
       </Box>
 
-      {selectedFile && (
+      {value && (
         <Card
           sx={{
             mt: 3,
@@ -106,12 +102,18 @@ export default function FileUploadBox({
           }}
         >
           <Typography variant="body2">
-            <strong>Selected file:</strong> {selectedFile.name}
+            <strong>Selected file:</strong> {value.name}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Size: {(selectedFile.size / 1024).toFixed(2)} KB
+            Size: {(value.size / 1024).toFixed(2)} KB
           </Typography>
         </Card>
+      )}
+
+      {helperText && (
+        <FormHelperText error={!!error} sx={{ textAlign: 'center', mt: 1 }}>
+          {helperText}
+        </FormHelperText>
       )}
     </Box>
   );
@@ -133,8 +135,11 @@ export default function FileUploadBox({
           width: '100%',
         }}
         onClick={handleClick}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragging(true);
+        }}
+        onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -181,13 +186,16 @@ export default function FileUploadBox({
       {/* Right Upload Area */}
       <Box
         onClick={handleClick}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragging(true);
+        }}
+        onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
         sx={{
           height: 110,
           border: 2,
-          borderColor: isDragging ? '#CFE4FF' : '#CFE4FF',
+          borderColor: isDragging ? '#1976d2' : '#CFE4FF',
           borderRadius: 0,
           cursor: 'pointer',
         }}
@@ -197,3 +205,41 @@ export default function FileUploadBox({
     </Box>
   );
 }
+
+UploadBox.propTypes = {
+  label: PropTypes.string,
+  icon: PropTypes.string,
+  color: PropTypes.string,
+  acceptedTypes: PropTypes.string,
+  maxSizeMB: PropTypes.number,
+  onChange: PropTypes.func,
+  value: PropTypes.any,
+  error: PropTypes.bool,
+  helperText: PropTypes.string,
+};
+
+// --- Hook Form Integrated Wrapper ---
+export default function RHFFileUploadBox({ name, helperText, ...props }) {
+  const { control } = useFormContext();
+
+  return (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field, fieldState: { error } }) => (
+        <UploadBox
+          {...props}
+          value={field.value}
+          onChange={(file) => field.onChange(file)}
+          error={!!error}
+          helperText={error ? error.message : helperText}
+        />
+      )}
+    />
+  );
+}
+
+RHFFileUploadBox.propTypes = {
+  name: PropTypes.string.isRequired,
+  helperText: PropTypes.string,
+};
