@@ -1,17 +1,16 @@
 import { Helmet } from 'react-helmet-async';
 // sections
-import CompanyListView from 'src/sections/company/view/company-list-view';
-
+import FundPositionForm from 'src/sections/issure-services/fund-positions';
 // ----------------------------------------------------------------------
 
-export default function CompanyListPage() {
+export default function ROIFundFormPage() {
   return (
     <>
       <Helmet>
-        <title> Dashboard: Company List</title>
+        <title> Dashboard: ROI Fund Form</title>
       </Helmet>
 
-      <CompanyListView />
+      <FundPositionForm />
     </>
   );
 }
