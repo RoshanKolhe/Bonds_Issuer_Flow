@@ -4,6 +4,7 @@ import MainFile from "./stepThree/main";
 import { Box, Stepper, Step, StepLabel, Card, Stack, Button } from '@mui/material';
 import StepFour from "./stepFour";
 import FundPositionForm from "./fund-positions";
+import PreliminaryBondRequirements from "./preliminary-bond-requirements";
 
 const steps = ['1', '2', '3', '4', '5'];
 
@@ -27,6 +28,13 @@ export default function RoiStepper() {
               case 2:
                 return (
                  <StepFour
+                        activeStep={activeSteps}
+                        setActiveStep={setActiveSteps}
+                    />
+                );
+            case 3:
+                return (
+                 <PreliminaryBondRequirements
                         activeStep={activeSteps}
                         setActiveStep={setActiveSteps}
                     />
