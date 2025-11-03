@@ -1,9 +1,18 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Controller, useFormContext } from 'react-hook-form';
-import { Box, Card, Typography, useMediaQuery, useTheme, FormHelperText } from '@mui/material';
+import {
+  Box,
+  Card,
+  Typography,
+  useMediaQuery,
+  useTheme,
+  FormHelperText,
+  LinearProgress,
+  Grid,
+  Stack,
+} from '@mui/material';
 import { Icon } from '@iconify/react';
-
 
 function UploadBox({
   label,
@@ -17,20 +26,56 @@ function UploadBox({
   helperText,
 }) {
   const [isDragging, setIsDragging] = useState(false);
+  const [progress, setProgress] = useState(0);
   const fileInputRef = useRef(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+  // ---- Safe file processing ----
+  const processFile = (file) => {
+    if (!file) return;
+
+    const fileType = file?.type ? file.type.split('/')[1] : 'unknown';
+    const allowedTypes = acceptedTypes ? acceptedTypes.split(',') : [];
+
+    // Validate file type
+    if (allowedTypes.length > 0 && !allowedTypes.includes(fileType)) {
+      alert(`Invalid file type. Allowed types: ${acceptedTypes}`);
+      return;
+    }
+
+    // Validate size
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+    if (file.size > maxSizeBytes) {
+      alert(`File size exceeds ${maxSizeMB}MB limit.`);
+      return;
+    }
+
+    // Simulate upload progress
+    setProgress(0);
+    const interval = setInterval(() => {
+      setProgress((old) => {
+        if (old >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        return old + 10;
+      });
+    }, 150);
+
+    onChange(file);
+  };
+
   const handleFileSelect = (event) => {
-    const file = event.target.files[0];
-    if (file) onChange(file);
+    const file = event.target.files?.[0];
+    processFile(file);
   };
 
   const handleDrop = (event) => {
     event.preventDefault();
     setIsDragging(false);
-    const file = event.dataTransfer.files[0];
-    if (file) onChange(file);
+    const file = event.dataTransfer.files?.[0];
+    processFile(file);
   };
 
   const handleClick = () => fileInputRef.current?.click();
@@ -38,11 +83,15 @@ function UploadBox({
   const uploadContent = (
     <Box
       sx={{
-        p: 4,
         textAlign: 'center',
         height: '100%',
         borderRadius: 0,
-        backgroundColor: isDragging ? '#CFE4FF' : '#CFE4FF',
+        backgroundColor:
+          progress === 100
+            ? '#E1FFEC' // ✅ after upload complete
+            : isDragging
+            ? '#E1FFEC' // optional: keep same greenish color when dragging
+            : '#CFE4FF',
         cursor: 'pointer',
       }}
     >
@@ -54,19 +103,21 @@ function UploadBox({
         style={{ display: 'none' }}
       />
 
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: { xs: 'column', md: 'row' },
-          alignItems: 'center',
-          justifyContent: { xs: 'center', md: 'flex-start' },
-          gap: 1.5,
-          textAlign: { xs: 'center', md: 'left' },
-        }}
-      >
-        <Icon icon="mdi:cloud-upload-outline" color={color} width="24" height="24" />
-        <Box>
-          <Typography variant="body2">
+      {/* ✅ Show this when no file selected */}
+      {!value ? (
+        <Box
+          sx={{
+            p: 4,
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            alignItems: 'center',
+            justifyContent: { xs: 'center', md: 'flex-start' },
+            gap: 1.5,
+            textAlign: { xs: 'center', md: 'left' },
+          }}
+        >
+          <Icon icon="mdi:cloud-upload-outline" color={color} width="24" height="24" />
+          <Box>
             <Typography
               component="span"
               variant="body2"
@@ -74,46 +125,74 @@ function UploadBox({
               fontWeight={500}
               sx={{ cursor: 'pointer', textDecoration: 'underline' }}
             >
-              Select file...
+              Select file / Drop files here to upload
             </Typography>{' '}
-            Drop files here to upload
-          </Typography>
-          <Typography
-            variant="caption"
-            color="primary"
-            display="block"
-            mt={0.5}
-            fontStyle="italic"
-          >
-            Maximum size: {maxSizeMB}MB / Supported: {acceptedTypes}
-          </Typography>
+            <Typography
+              variant="caption"
+              color="primary"
+              display="block"
+              mt={0.5}
+              fontStyle="italic"
+            >
+              Maximum size: {maxSizeMB}MB / Supported: {acceptedTypes}
+            </Typography>
+          </Box>
         </Box>
-      </Box>
-
-      {value && (
-        <Card
-          sx={{
-            mt: 3,
-            p: 2,
-            border: '1px solid',
-            borderColor: 'grey.300',
-            backgroundColor: 'grey.50',
-            borderRadius: 2,
-          }}
-        >
-          <Typography variant="body2">
-            <strong>Selected file:</strong> {value.name}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            Size: {(value.size / 1024).toFixed(2)} KB
-          </Typography>
-        </Card>
-      )}
-
-      {helperText && (
-        <FormHelperText error={!!error} sx={{ textAlign: 'center', mt: 1 }}>
-          {helperText}
-        </FormHelperText>
+      ) : (
+        <Grid container sx={{ py: 2, px: { xs: 2, md: 4 } }}>
+          <Grid item md={12} sx={{ pb: '10px' }}>
+            <Stack
+              justifyContent="space-between"
+              sx={{
+                flexWrap: { xs: 'wrap', md: 'nowrap' },
+              }}
+            >
+              <Stack direction={{ xs: 'column', md: 'row' }}>
+                <Grid xs={12} md={4}>
+                  <Stack direction={'row'}>
+                    <Icon icon="mdi:cloud-check-outline" color="#2e7d32" width="24" height="24" />
+                    <Typography sx={{ pl: '10px' }}>Uploaded</Typography>
+                  </Stack>
+                </Grid>
+                <Grid xs={12} md={8}>
+                  <Typography variant="body2" fontWeight={500}>
+                    {value.name}
+                  </Typography>
+                </Grid>
+              </Stack>
+            </Stack>
+          </Grid>
+          <Grid item md={12}>
+            <LinearProgress variant="determinate" value={progress} fullWidth />
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'primary.main',
+                display: 'flex',
+                mt: 0.5,
+                fontStyle: 'italic',
+                justifyContent: 'start',
+              }}
+            >
+              {progress < 100 ? `${progress}% Uploading...` : 'Upload Complete (100%)'}
+            </Typography>
+            <Typography
+              variant="caption"
+              color="primary"
+              display="block"
+              mt={0.5}
+              fontStyle="italic"
+              sx={{
+                display: 'flex',
+                mt: 0.5,
+                fontStyle: 'italic',
+                justifyContent: 'start',
+              }}
+            >
+              Maximum size: {maxSizeMB}MB / Supported: {acceptedTypes}
+            </Typography>
+          </Grid>
+        </Grid>
       )}
     </Box>
   );
@@ -153,7 +232,7 @@ function UploadBox({
     );
   }
 
-  // --- Desktop layout ---
+  // --- Desktop layout (same structure, progress bar in same box) ---
   return (
     <Box
       sx={{
@@ -195,7 +274,7 @@ function UploadBox({
         sx={{
           height: 110,
           border: 2,
-          borderColor: isDragging ? '#1976d2' : '#CFE4FF',
+          borderColor: progress === 100 ? '#E1FFEC' : isDragging ? '#CFE4FF' : '#CFE4FF',
           borderRadius: 0,
           cursor: 'pointer',
         }}
@@ -219,7 +298,7 @@ UploadBox.propTypes = {
 };
 
 // --- Hook Form Integrated Wrapper ---
-export default function RHFFileUploadBox({ name, helperText, ...props }) {
+export default function RHFFileUploadBox({ name, ...props }) {
   const { control } = useFormContext();
 
   return (
@@ -232,7 +311,6 @@ export default function RHFFileUploadBox({ name, helperText, ...props }) {
           value={field.value}
           onChange={(file) => field.onChange(file)}
           error={!!error}
-          helperText={error ? error.message : helperText}
         />
       )}
     />

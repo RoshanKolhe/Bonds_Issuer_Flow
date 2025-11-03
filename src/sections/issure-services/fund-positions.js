@@ -42,12 +42,10 @@ export default function FundPositionForm({ currentFund, setActiveStep }) {
       then: (schema) => schema.required('Rating selection is required'),
     }),
     vault: Yup.string().required('Vault Till data is required'),
-    agencyRating: Yup.string().required('Agency rating is required'),
     additionalRating: Yup.string().required('Additional rating is required'),
-    creditRatingLetter: Yup.object().shape({
-      fileUrl: Yup.string().required('Upload credit rating letter'),
-    }),
+    creditRatingLetter: Yup.mixed().required("File is required")
   });
+  console.log('✅ FundSchema Initialized:', FundSchema);
 
   const defaultValues = useMemo(
     () => ({
@@ -58,21 +56,22 @@ export default function FundPositionForm({ currentFund, setActiveStep }) {
       selectedRating: currentFund?.selectedRating || '',
       vault: currentFund?.vault || '',
       additionalRating: currentFund?.additionalRating || '',
-      agencyRating: currentFund?.agencyRating || '',
       creditRatingLetter: currentFund?.creditRatingLetter
         ? {
-          fileUrl: currentFund.creditRatingLetter.fileUrl,
-          preview: currentFund.creditRatingLetter.fileUrl,
-        }
-        : '',
+            fileUrl: currentFund.creditRatingLetter.fileUrl,
+            preview: currentFund.creditRatingLetter.fileUrl,
+          }
+        : { fileUrl: '', preview: '' },
     }),
     [currentFund]
   );
+  console.log('🟢 Default Values:', defaultValues);
 
   const methods = useForm({
     resolver: yupResolver(FundSchema),
     defaultValues,
   });
+  console.log('🟣 React Hook Form methods:', methods);
 
   const {
     handleSubmit,
@@ -83,6 +82,8 @@ export default function FundPositionForm({ currentFund, setActiveStep }) {
   } = methods;
 
   const values = watch();
+  console.log('👀 Watched Values:', values);
+  console.log('⚠️ Validation Errors:', errors);
 
   // ✅ Upload Handlers (same as clinic form)
   const handleRemoveFile = useCallback(() => {
@@ -144,7 +145,7 @@ export default function FundPositionForm({ currentFund, setActiveStep }) {
   // });
   const onSubmit = (data) => {
     console.log('Form Data:', data);
-    setActiveStep(1)
+    setActiveStep(1);
   };
 
   const agencies = [
@@ -243,20 +244,6 @@ export default function FundPositionForm({ currentFund, setActiveStep }) {
 
             <Grid container spacing={4}>
               <Grid item xs={12} md={4}>
-                {/* <Select
-                  value={values.selectedAgency}
-                  onChange={(e) => setValue('selectedAgency', e.target.value)}
-                  fullWidth
-                  size="small"
-                  sx={{ mb: 2 }}
-                >
-                  <MenuItem value="agencyRating">Select the appropriate rating agency</MenuItem>
-                  {agencies.map((agency, idx) => (
-                    <MenuItem key={idx} value={agency}>
-                      {agency}
-                    </MenuItem>
-                  ))}
-                </Select> */}
                 <RHFSelect
                   name="selectedAgency"
                   label="Select Rating Agency"
@@ -344,7 +331,6 @@ export default function FundPositionForm({ currentFund, setActiveStep }) {
           name="creditRatingLetter"
           label="Upload Credit Rating Letter"
           icon="mdi:file-document-outline"
-          helperText="Upload your latest rating report"
         />
 
         {/* 6. Action Buttons */}

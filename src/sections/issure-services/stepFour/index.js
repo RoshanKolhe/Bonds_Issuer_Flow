@@ -52,7 +52,7 @@ const MainSchema = Yup.object().shape({
 
   const onSubmit = (data) => {
     console.log('Full Form Data:', data);
-    setActiveStep(2);
+    setActiveStep(3);
   };
 
   return (
