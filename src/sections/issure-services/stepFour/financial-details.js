@@ -23,7 +23,7 @@ export default function FinancialDetails() {
 
                     }}
                 >
-                    <Typography variant="h4" color="#1877F2" fontWeight={600} gutterBottom>
+                    <Typography variant="h3" color="#1877F2" fontWeight={600} gutterBottom>
                         Financial Ratios
                     </Typography>
                     <Typography variant="body1" color="#5E5E5E">

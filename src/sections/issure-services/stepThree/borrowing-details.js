@@ -66,7 +66,7 @@ export default function BorrowingDetails() {
                         border: '1px solid #e0e0e0',
                     }}
                 >
-                    <Typography variant="h5" fontWeight={600} color="#1874ED" mb={1}>
+                    <Typography variant="h3" fontWeight={600} color="#1874ED" mb={1}>
                         Borrowing Details
                     </Typography>
                     <Typography variant="body1" color="#5E5E5E" mb={3}>
