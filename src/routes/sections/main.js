@@ -31,7 +31,7 @@ const PostDetailsPage = lazy(() => import('src/pages/post/details'));
 const KYCViewPage = lazy(() => import('src/pages/kyc'));
 const KYCBasicInfoPage = lazy(() => import('src/pages/kyc-basic-info'));
 const KYCCompanyDetailsPage = lazy(() => import('src/pages/kyc-company-details'));
-
+const KYCBankDetailsPage = lazy(() => import('src/pages/kyc-bank-details'))
 // ----------------------------------------------------------------------
 
 export const mainRoutes = [
@@ -67,6 +67,7 @@ export const mainRoutes = [
       { path: 'kyc', element: <KYCViewPage /> },
       { path: 'kyc/basic-info', element: <KYCBasicInfoPage /> },
       { path: 'kyc/company-details', element: <KYCCompanyDetailsPage /> },
+      { path: 'kyc/bank-details', element: <KYCBankDetailsPage /> },
     ],
   },
   {
