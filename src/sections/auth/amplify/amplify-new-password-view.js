@@ -75,7 +75,7 @@ export default function AmplifyNewPasswordView() {
     try {
       await newPassword?.(data.email, data.code, data.password);
 
-      router.push(paths.auth.amplify.login);
+      router.push(paths.auth.jwt.login);
     } catch (error) {
       console.error(error);
     }
