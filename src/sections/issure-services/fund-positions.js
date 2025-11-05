@@ -2,7 +2,7 @@
 import React, { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
@@ -23,15 +23,18 @@ import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form'
 import axiosInstance from 'src/utils/axios';
 import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
+import { DatePicker } from '@mui/x-date-pickers';
 
 // ----------------------------------------------------------------------
 
-export default function FundPositionForm({ currentFund, setActiveStep }) {
+export default function FundPositionForm({ currentFund, setActiveStep, onSave }) {
   const { enqueueSnackbar } = useSnackbar();
 
   const FundSchema = Yup.object().shape({
     cashBalance: Yup.string().required('Cash Balance is required'),
+    cashBalanceDate:Yup.date().required('Date is required'),
     bankBalance: Yup.string().required('Bank Balance is required'),
+    bankBalanceDate: Yup.date().required('Date is required'),
     hasCredit: Yup.string().required('Please select credit rating option'),
     selectedAgency: Yup.string().when('hasCredit', {
       is: 'yes',
@@ -50,7 +53,9 @@ export default function FundPositionForm({ currentFund, setActiveStep }) {
   const defaultValues = useMemo(
     () => ({
       cashBalance: currentFund?.cashBalance || '',
+      cashBalanceDate: currentFund?.cashBalanceDate || '',
       bankBalance: currentFund?.bankBalance || '',
+      bankBalanceDate: currentFund?.bankBalanceDate || '',
       hasCredit: currentFund?.hasCredit || 'yes',
       selectedAgency: currentFund?.selectedAgency || '',
       selectedRating: currentFund?.selectedRating || '',
@@ -58,9 +63,9 @@ export default function FundPositionForm({ currentFund, setActiveStep }) {
       additionalRating: currentFund?.additionalRating || '',
       creditRatingLetter: currentFund?.creditRatingLetter
         ? {
-            fileUrl: currentFund.creditRatingLetter.fileUrl,
-            preview: currentFund.creditRatingLetter.fileUrl,
-          }
+          fileUrl: currentFund.creditRatingLetter.fileUrl,
+          preview: currentFund.creditRatingLetter.fileUrl,
+        }
         : { fileUrl: '', preview: '' },
     }),
     [currentFund]
@@ -77,6 +82,7 @@ export default function FundPositionForm({ currentFund, setActiveStep }) {
     handleSubmit,
     watch,
     setValue,
+    control,
     reset,
     formState: { isSubmitting, errors },
   } = methods;
@@ -145,6 +151,7 @@ export default function FundPositionForm({ currentFund, setActiveStep }) {
   // });
   const onSubmit = (data) => {
     console.log('Form Data:', data);
+    onSave(data);
     setActiveStep(1);
   };
 
@@ -197,20 +204,64 @@ export default function FundPositionForm({ currentFund, setActiveStep }) {
           </Typography>
 
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={3}>
               <RHFTextField
                 name="cashBalance"
                 label="Cash Balance as on Date"
                 fullWidth
-                size="small"
+               
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={3}>
+              <Controller
+                name="cashBalanceDate"
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <DatePicker
+                    label="Date"
+                    value={new Date(field.value)}
+                    onChange={(newValue) => {
+                      field.onChange(newValue);
+                    }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!error,
+                        helperText: error?.message,
+                      },
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12} md={3}>
               <RHFTextField
                 name="bankBalance"
                 label="Bank Balance as on Date"
                 fullWidth
-                size="small"
+           
+              />
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Controller
+                name="bankBalanceDate"
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <DatePicker
+                    label="Date"
+                    value={new Date(field.value)}
+                    onChange={(newValue) => {
+                      field.onChange(newValue);
+                    }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!error,
+                        helperText: error?.message,
+                      },
+                    }}
+                  />
+                )}
               />
             </Grid>
           </Grid>
@@ -393,4 +444,6 @@ CreditRatingCard.propTypes = {
   label: PropTypes.string,
   onClick: PropTypes.func,
   setActiveStep: PropTypes.func,
+  currentFund: PropTypes.object,
+  onSave: PropTypes.func,
 };

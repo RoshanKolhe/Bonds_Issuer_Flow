@@ -140,7 +140,7 @@ export default function ScenarioComparison() {
                         borderRadius: 2,
                         overflow: "hidden",
                         boxShadow: "0px 3px 8px rgba(0,0,0,0.1)",
-                         border: "1px solid #BDBDBD",
+                        border: "1px solid #BDBDBD",
                     }}
                 >
                     <Table
@@ -181,6 +181,7 @@ export default function ScenarioComparison() {
                                         fontSize: "0.95rem",
                                         width: "30%",
                                         borderBottom: "1px solid #BDBDBD",
+
                                     }}
                                 >
                                     System Rec
@@ -192,11 +193,6 @@ export default function ScenarioComparison() {
                             {comparisonData.map((row, index) => (
                                 <TableRow
                                     key={index}
-                                    sx={{
-                                        "&:last-child td, &:last-child th": {
-                                            borderBottom: "1px solid #BDBDBD", // keep last border line visible
-                                        },
-                                    }}
                                 >
                                     <TableCell
                                         sx={{
@@ -208,6 +204,7 @@ export default function ScenarioComparison() {
                                     >
                                         {row.parameter}
                                     </TableCell>
+
                                     <TableCell
                                         sx={{
                                             color: "#d32f2f",
@@ -218,6 +215,7 @@ export default function ScenarioComparison() {
                                     >
                                         {row.userInput}
                                     </TableCell>
+
                                     <TableCell
                                         sx={{
                                             color: "#2E7D32",
@@ -225,8 +223,8 @@ export default function ScenarioComparison() {
                                             display: "flex",
                                             alignItems: "center",
                                             gap: 1,
-                                            borderRight: "1px solid #E0E0E0",
                                             borderBottom: "1px solid #E0E0E0",
+
                                         }}
                                     >
                                         {row.systemRec}
@@ -249,6 +247,7 @@ export default function ScenarioComparison() {
                                 </TableRow>
                             ))}
                         </TableBody>
+
                     </Table>
                 </TableContainer>
 

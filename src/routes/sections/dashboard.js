@@ -6,6 +6,7 @@ import { AuthGuard } from 'src/auth/guard';
 import DashboardLayout from 'src/layouts/dashboard';
 // components
 import { LoadingScreen } from 'src/components/loading-screen';
+import { element } from 'prop-types';
 
 // ----------------------------------------------------------------------
 
@@ -40,6 +41,7 @@ const UserEditPage = lazy(() => import('src/pages/dashboard/user/edit'));
 // COMPANY
 const ROIGuidancePage = lazy(() => import('src/pages/dashboard/issure-services/roi'));
 const ROIFundFormPage = lazy(() => import('src/pages/dashboard/issure-services/roi-fund-form'));
+const AfterCompleteRoiStagePage = lazy(()=> import('src/pages/dashboard/issure-services/view'))
 // WORKFLOW
 const ReactFlowPage = lazy(() => import('src/pages/dashboard/react-flow/board'));
 // SCHEDULER
@@ -118,6 +120,7 @@ export const dashboardRoutes = [
           { element: <ROIGuidancePage />, index: true },
           { path: 'roi', element: <ROIGuidancePage /> },
           { path: 'fund-position-form', element: <ROIFundFormPage /> },
+          {path:'view', element:<AfterCompleteRoiStagePage/>},
         ],
       },
       {

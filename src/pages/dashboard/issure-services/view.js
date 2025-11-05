@@ -3,17 +3,18 @@ import { Helmet } from 'react-helmet-async';
 // sections
 // import FundPositionForm from 'src/sections/issure-services/fund-positions';
 import RoiStepper from 'src/sections/issure-services/stepper';
+import BondIssuePage from 'src/sections/issure-services/view/bond-isue-page';
 // ----------------------------------------------------------------------
 
-export default function ROIFundFormPage() {
+export default function AfterCompleteRoiStagePage() {
   return (
     <>
       <Helmet>
-        <title> Dashboard: ROI Fund Form</title>
+        <title> Dashboard: Complete</title>
       </Helmet>
 
       {/* <PreliminaryBondRequirements /> */}
-      <RoiStepper/>
+      <BondIssuePage/>
     </>
   );
 }

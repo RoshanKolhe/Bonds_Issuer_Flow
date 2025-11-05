@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 
 
 
-export default function StepFour({ currentFinancial, setActiveStep}) {
+export default function StepFour({ currentFinancial, setActiveStep, onSave}) {
 
 const MainSchema = Yup.object().shape({
  debtEquityRatio: Yup.string().required('Equity ratio is required'),
@@ -52,6 +52,7 @@ const MainSchema = Yup.object().shape({
 
   const onSubmit = (data) => {
     console.log('Full Form Data:', data);
+    onSave(data);
     setActiveStep(3);
   };
 
@@ -104,5 +105,6 @@ const MainSchema = Yup.object().shape({
 
 StepFour.propTypes={
     setActiveStep: PropTypes.func,
-    currentFinancial: PropTypes.array,
+    currentFinancial: PropTypes.object,
+    onSave: PropTypes.func,
 }

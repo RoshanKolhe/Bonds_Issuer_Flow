@@ -87,6 +87,7 @@ export default function BorrowingDetails() {
                                 name={`borrowings[${index}].lenderAmount`}
                                 label="Lender Amount"
                                 fullWidth
+                                type="number"
                             />
                         </Grid>
 
@@ -123,6 +124,7 @@ export default function BorrowingDetails() {
                                 name={`borrowings[${index}].interestPayment`}
                                 label="Interest Payment (%)"
                                 fullWidth
+                                 type="number"
                             />
                         </Grid>
 
@@ -131,6 +133,7 @@ export default function BorrowingDetails() {
                                 name={`borrowings[${index}].monthlyPrincipal`}
                                 label="Monthly Principal Payment"
                                 fullWidth
+                                 type="number"
                             />
                         </Grid>
 
@@ -139,6 +142,7 @@ export default function BorrowingDetails() {
                                 name={`borrowings[${index}].monthlyInterest`}
                                 label="Monthly Interest Payment"
                                 fullWidth
+                                 type="number"
                             />
                         </Grid>
                     </Grid>

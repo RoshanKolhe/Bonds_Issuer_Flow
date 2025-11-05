@@ -18,16 +18,22 @@ import {
 import { Icon } from '@iconify/react';
 import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
 import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import PropTypes from 'prop-types';
+import { useRouter } from 'src/routes/hook';
+import { paths } from 'src/routes/paths';
+import { DatePicker } from '@mui/x-date-pickers';
 
-export default function PreliminaryBondRequirements({ currentFund }) {
+export default function PreliminaryBondRequirements({ currentBondRequirements ,setActiveStep , onSave }) {
   const [security, setSecurity] = useState('secured');
   const [investorCategory, setInvestorCategory] = useState('retail');
   const [paymentCycle, setPaymentCycle] = useState('monthly');
   const [issueAmount, setIssueAmount] = useState('');
   const [tenure, setTenure] = useState('');
   const [roi, setRoi] = useState('');
+  
+  const router = useRouter();
 
   // Collateral Asset Verification State
   const [collateralType, setCollateralType] = useState('');
@@ -63,7 +69,7 @@ export default function PreliminaryBondRequirements({ currentFund }) {
     assetDescription: Yup.string().required('Asset Description is required'),
     estimatedValue: Yup.string().required('Estimated Value is required'),
     securityDocRef: Yup.string().required('Security Document Ref is required'),
-    valuationDate: Yup.string().required('Valuation Date is required'),
+    valuationDate: Yup.date().required('Valuation Date is required'),
     ownershipType: Yup.string().required('Ownership Type is required'),
     securityDocRef: Yup.string().required('Security Document Ref is required'),
     trustName: Yup.string().required('Trust Name is required'),
@@ -72,10 +78,10 @@ export default function PreliminaryBondRequirements({ currentFund }) {
 
   const defaultValues = useMemo(
     () => ({
-      creditRatingLetter: currentFund?.creditRatingLetter
+      creditRatingLetter: currentBondRequirements?.creditRatingLetter
         ? {
-            fileUrl: currentFund.creditRatingLetter.fileUrl,
-            preview: currentFund.creditRatingLetter.fileUrl,
+            fileUrl: currentBondRequirements.creditRatingLetter.fileUrl,
+            preview: currentBondRequirements.creditRatingLetter.fileUrl,
           }
         : { fileUrl: '', preview: '' },
       valuationReport: { fileUrl: '', preview: '' },
@@ -92,7 +98,7 @@ export default function PreliminaryBondRequirements({ currentFund }) {
       trustName: '',
       remarks: '',
     }),
-    [currentFund]
+    [currentBondRequirements]
   );
 
   const methods = useForm({
@@ -103,6 +109,7 @@ export default function PreliminaryBondRequirements({ currentFund }) {
 
   const {
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = methods;
 
@@ -113,6 +120,8 @@ export default function PreliminaryBondRequirements({ currentFund }) {
       investorCategory,
       paymentCycle,
     });
+    onSave(data);
+     router.push(paths.dashboard.issureservices.view);
   };
 
   return (
@@ -450,7 +459,26 @@ export default function PreliminaryBondRequirements({ currentFund }) {
                   </Typography>
                 </Grid>
                 <Grid item xs={8} md={9}>
-                  <RHFTextField name="valuationDate" fullWidth placeholder="DD/MM/YYYY" />
+                   <Controller
+                name="valuationDate"
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <DatePicker
+                    label="Date"
+                    value={new Date(field.value)}
+                    onChange={(newValue) => {
+                      field.onChange(newValue);
+                    }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!error,
+                        helperText: error?.message,
+                      },
+                    }}
+                  />
+                )}
+              />
                 </Grid>
               </Grid>
             </Grid>
@@ -519,7 +547,7 @@ export default function PreliminaryBondRequirements({ currentFund }) {
         sx={{ maxWidth: 400, ml: 'auto', mt: 5 }}
       >
         <Grid item xs={6}>
-          <Button fullWidth variant="outlined" color="inherit">
+          <Button fullWidth variant="outlined" color="inherit" onClick={()=> setActiveStep(2)}>
             Cancel
           </Button>
         </Grid>
@@ -536,4 +564,10 @@ export default function PreliminaryBondRequirements({ currentFund }) {
       </Grid>
     </FormProvider>
   );
+}
+
+PreliminaryBondRequirements.propTypes ={
+  setActiveStep: PropTypes.func,
+  currentBondRequirements: PropTypes.object,
+  onSave: PropTypes.func,
 }

@@ -6,57 +6,46 @@ import StepFour from "./stepFour";
 import FundPositionForm from "./fund-positions";
 import PreliminaryBondRequirements from "./preliminary-bond-requirements";
 
-const steps = ['1', '2', '3', '4', '5'];
+const steps = ['1', '2', '3', '4'];
 
 export default function RoiStepper() {
     const [activeSteps, setActiveSteps] = useState(0)
+    const [formData, setFormData] = useState(null)
 
     const renderForm = () => {
         switch (activeSteps) {
             case 0:
                 return (
                     <FundPositionForm
+                        currentFund={formData}
                         setActiveStep={setActiveSteps}
+                        onSave={(data) => setFormData(data)}
                     />
                 );
             case 1:
                 return (
-                   <MainFile
+                    <MainFile
+                    currentDetails={formData}
                         setActiveStep={setActiveSteps}
+                        onSave={(data)=> setFormData(data)}
                     />
                 );
-              case 2:
+            case 2:
                 return (
-                 <StepFour
-                        activeStep={activeSteps}
+                    <StepFour
+                       currentFinancial={formData}
                         setActiveStep={setActiveSteps}
+                        onSave={(data)=> setFormData(data)}
                     />
                 );
             case 3:
                 return (
-                 <PreliminaryBondRequirements
-                        activeStep={activeSteps}
+                    <PreliminaryBondRequirements
+                    currentBondRequirements={formData}
                         setActiveStep={setActiveSteps}
+                        onSave={(data)=> setFormData(data)}
                     />
                 );
-            //   case 3:
-            //     return (
-            //       <Tools
-            //         courseId={courseId}
-            //         activeStep={activeStep}
-            //         setActiveStep={setActiveStep}
-            //         currentTools={currentPlan?.courses?.tools}
-            //       />
-            //     );
-            //   case 4:
-            // return (
-            //   <Faq
-            //     courseId={courseId}
-            //     activeStep={activeStep}
-            //     setActiveStep={setActiveStep}
-            //     currentplansFaqs={currentPlan?.courses?.plansFaqs}
-            //   />
-            // );
             default:
                 return (
                     <Box sx={{ p: 3 }}>

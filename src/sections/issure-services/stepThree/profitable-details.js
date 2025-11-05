@@ -34,6 +34,7 @@ export default function ProfitabilityDetails() {
                 name="netProfit"
                 label="Net Profit"
                 fullWidth
+                type="number"
               />
             </Grid>
 
@@ -42,6 +43,7 @@ export default function ProfitabilityDetails() {
                 name="ebidta"
                 label="Enter EBIDTA Amount"
                 fullWidth
+                type="number"
               />
             </Grid>
           </Grid>
