@@ -65,3 +65,5 @@ const Chart = styled(ApexChart)(({ theme }) => ({
 }));
 
 export default memo(Chart);
+
+

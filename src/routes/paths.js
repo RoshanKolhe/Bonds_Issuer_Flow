@@ -112,9 +112,11 @@ export const paths = {
       //   edit: `${ROOTS.DASHBOARD}/user/${MOCK_ID}/edit`,
       // },
     },
-    company: {
-      root: `${ROOTS.DASHBOARD}/company`,
-      list: `${ROOTS.DASHBOARD}/company/list`,
+    issureservices: {
+      root: `${ROOTS.DASHBOARD}/issureservices`,
+      roi: `${ROOTS.DASHBOARD}/issureservices/roi`,
+      roifundform: `${ROOTS.DASHBOARD}/issureservices/fund-position-form`,
+      view: `${ROOTS.DASHBOARD}/issureservices/view`,
     },
     //   product: {
     //     root: `${ROOTS.DASHBOARD}/product`,

@@ -1,17 +1,16 @@
 import { Helmet } from 'react-helmet-async';
 // sections
-import CompanyListView from 'src/sections/company/view/company-list-view';
-
+import ROIGuidance from 'src/sections/issure-services/roi-guidance';
 // ----------------------------------------------------------------------
 
-export default function CompanyListPage() {
+export default function ROIGuidancePage() {
   return (
     <>
       <Helmet>
         <title> Dashboard: Company List</title>
       </Helmet>
 
-      <CompanyListView />
+      <ROIGuidance />
     </>
   );
 }
