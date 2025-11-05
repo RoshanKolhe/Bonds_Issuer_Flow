@@ -28,6 +28,10 @@ const ProductCheckoutPage = lazy(() => import('src/pages/product/checkout'));
 const PostListPage = lazy(() => import('src/pages/post/list'));
 const PostDetailsPage = lazy(() => import('src/pages/post/details'));
 
+const KYCViewPage = lazy(() => import('src/pages/kyc'));
+const KYCBasicInfoPage = lazy(() => import('src/pages/kyc-basic-info'));
+const KYCCompanyDetailsPage = lazy(() => import('src/pages/kyc-company-details'));
+
 // ----------------------------------------------------------------------
 
 export const mainRoutes = [
@@ -60,6 +64,9 @@ export const mainRoutes = [
           { path: ':title', element: <PostDetailsPage /> },
         ],
       },
+      { path: 'kyc', element: <KYCViewPage /> },
+      { path: 'kyc/basic-info', element: <KYCBasicInfoPage /> },
+      { path: 'kyc/company-details', element: <KYCCompanyDetailsPage /> },
     ],
   },
   {
