@@ -24,6 +24,7 @@ export const paths = {
   KYCBankDetails: '/kyc/bank-details',
   KYCReviewAndSubmit: '/kyc/review-and-submit',
   KYCSucessfull: '/kyc/sucessfull',
+  KYCSignatories: '/kyc/signatories',
   KYCPending: '/kyc/pending',
 
   comingSoon: '/coming-soon',
