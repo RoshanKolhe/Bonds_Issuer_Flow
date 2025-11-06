@@ -193,7 +193,7 @@ export default function BondLibraryCardGrid({ item }) {
         </Stack>
 
         {/* Know More Button */}
-        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+        {/* <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
           <Button
             size="small"
             variant="contained"
@@ -213,7 +213,7 @@ export default function BondLibraryCardGrid({ item }) {
           >
             Know More
           </Button>
-        </Box>
+        </Box> */}
       </Box>
     </Box>
   );

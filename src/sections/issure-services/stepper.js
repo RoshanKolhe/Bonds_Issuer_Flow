@@ -1,70 +1,90 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MainFile from "./stepThree/main";
-
-import { Box, Stepper, Step, StepLabel, Card, Stack, Button } from '@mui/material';
+import { Box, Stepper, Step, StepLabel, Card, Stack } from "@mui/material";
 import StepFour from "./stepFour";
 import FundPositionForm from "./fund-positions";
 import PreliminaryBondRequirements from "./preliminary-bond-requirements";
 
-const steps = ['1', '2', '3', '4'];
+const steps = ["1", "2", "3", "4"];
 
 export default function RoiStepper() {
-    const [activeSteps, setActiveSteps] = useState(0)
-    const [formData, setFormData] = useState(null)
+  // --- Load saved data from localStorage ---
+  const [activeSteps, setActiveSteps] = useState(() => {
+    const savedStep = localStorage.getItem("roi_active_step");
+    return savedStep ? Number(savedStep) : 0;
+  });
 
-    const renderForm = () => {
-        switch (activeSteps) {
-            case 0:
-                return (
-                    <FundPositionForm
-                        currentFund={formData}
-                        setActiveStep={setActiveSteps}
-                        onSave={(data) => setFormData(data)}
-                    />
-                );
-            case 1:
-                return (
-                    <MainFile
-                    currentDetails={formData}
-                        setActiveStep={setActiveSteps}
-                        onSave={(data)=> setFormData(data)}
-                    />
-                );
-            case 2:
-                return (
-                    <StepFour
-                       currentFinancial={formData}
-                        setActiveStep={setActiveSteps}
-                        onSave={(data)=> setFormData(data)}
-                    />
-                );
-            case 3:
-                return (
-                    <PreliminaryBondRequirements
-                    currentBondRequirements={formData}
-                        setActiveStep={setActiveSteps}
-                        onSave={(data)=> setFormData(data)}
-                    />
-                );
-            default:
-                return (
-                    <Box sx={{ p: 3 }}>
-                        <h3>All steps completed successfully!</h3>
-                    </Box>
-                );
-        }
+  const [formData, setFormData] = useState(() => {
+    const savedData = localStorage.getItem("roi_form_data");
+    return savedData ? JSON.parse(savedData) : null;
+  });
+
+  // --- Save step and form data on every change ---
+  useEffect(() => {
+    localStorage.setItem("roi_active_step", activeSteps);
+  }, [activeSteps]);
+
+  useEffect(() => {
+    localStorage.setItem("roi_form_data", JSON.stringify(formData));
+  }, [formData]);
+
+  const handleSave = (data) => {
+    setFormData(data);
+  };
+
+  const renderForm = () => {
+    switch (activeSteps) {
+      case 0:
+        return (
+          <FundPositionForm
+            currentFund={formData}
+            setActiveStep={setActiveSteps}
+            onSave={handleSave}
+          />
+        );
+      case 1:
+        return (
+          <MainFile
+            currentDetails={formData}
+            setActiveStep={setActiveSteps}
+            onSave={handleSave}
+          />
+        );
+      case 2:
+        return (
+          <StepFour
+            currentFinancial={formData}
+            setActiveStep={setActiveSteps}
+            onSave={handleSave}
+          />
+        );
+      case 3:
+        return (
+          <PreliminaryBondRequirements
+            currentBondRequirements={formData}
+            setActiveStep={setActiveSteps}
+            onSave={handleSave}
+          />
+        );
+      default:
+        return (
+          <Box sx={{ p: 3 }}>
+            <h3>All steps completed successfully!</h3>
+          </Box>
+        );
     }
-    return (
-        <Card sx={{ p: 3, boxShadow: 'none' }}>
+  };
 
-            <Stepper activeStep={activeSteps} sx={{ mb: 3 }}>
-                {steps.map((_, index) => (
-                    <Step key={index}>
-                        <StepLabel />
-                    </Step>
-                ))}
-            </Stepper>
-            <Stack spacing={3}>{renderForm()}</Stack>
-        </Card>
-    );
+  return (
+    <Card sx={{ p: 3, boxShadow: "none" }}>
+      <Stepper activeStep={activeSteps} sx={{ mb: 3 }}>
+        {steps.map((_, index) => (
+          <Step key={index}>
+            <StepLabel />
+          </Step>
+        ))}
+      </Stepper>
+      <Stack spacing={3}>{renderForm()}</Stack>
+    </Card>
+  );
 }
