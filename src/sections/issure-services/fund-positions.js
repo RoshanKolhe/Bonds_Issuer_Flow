@@ -32,7 +32,7 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave })
 
   const FundSchema = Yup.object().shape({
     cashBalance: Yup.string().required('Cash Balance is required'),
-    cashBalanceDate:Yup.date().required('Date is required'),
+    cashBalanceDate: Yup.date().required('Date is required'),
     bankBalance: Yup.string().required('Bank Balance is required'),
     bankBalanceDate: Yup.date().required('Date is required'),
     hasCredit: Yup.string().required('Please select credit rating option'),
@@ -46,7 +46,24 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave })
     }),
     vault: Yup.string().required('Vault Till data is required'),
     additionalRating: Yup.string().required('Additional rating is required'),
-    creditRatingLetter: Yup.mixed().required("File is required")
+    // creditRatingLetter: Yup.mixed().required('Credit rating letter is required'),
+    creditRatingLetter: Yup.mixed()
+      .required('Credit rating letter is required')
+      .test(
+        'fileSize',
+        'File size is too large (max 5MB)',
+        (value) => !value || value.size <= 5 * 1024 * 1024 // 5 MB
+      )
+      .test(
+        'fileType',
+        'Only PDF files are allowed',
+        (value) => !value || value.type === 'application/pdf'
+      )
+      .test(
+        'fileUploaded',
+        'Upload failed or file missing. Please re-upload.',
+        (value) => !!value && value instanceof File && !!value.name
+      ),
   });
   console.log('✅ FundSchema Initialized:', FundSchema);
 
@@ -63,9 +80,9 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave })
       additionalRating: currentFund?.additionalRating || '',
       creditRatingLetter: currentFund?.creditRatingLetter
         ? {
-          fileUrl: currentFund.creditRatingLetter.fileUrl,
-          preview: currentFund.creditRatingLetter.fileUrl,
-        }
+            fileUrl: currentFund.creditRatingLetter.fileUrl,
+            preview: currentFund.creditRatingLetter.fileUrl,
+          }
         : { fileUrl: '', preview: '' },
     }),
     [currentFund]
@@ -150,6 +167,17 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave })
   //   }
   // });
   const onSubmit = (data) => {
+    const uploadFields = Object.entries(data).filter(
+      ([key, value]) => value && typeof value === 'object' && 'progress' in value
+    );
+
+    const incompleteUploads = uploadFields.filter(([_, value]) => value.progress < 100);
+
+    if (incompleteUploads.length > 0) {
+      alert('Please wait — file uploads are not yet complete!');
+      return;
+    }
+
     console.log('Form Data:', data);
     onSave(data);
     setActiveStep(1);
@@ -205,12 +233,7 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave })
 
           <Grid container spacing={3}>
             <Grid item xs={12} md={3}>
-              <RHFTextField
-                name="cashBalance"
-                label="Cash Balance as on Date"
-                fullWidth
-               
-              />
+              <RHFTextField name="cashBalance" label="Cash Balance as on Date" fullWidth />
             </Grid>
             <Grid item xs={12} md={3}>
               <Controller
@@ -235,12 +258,7 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave })
               />
             </Grid>
             <Grid item xs={12} md={3}>
-              <RHFTextField
-                name="bankBalance"
-                label="Bank Balance as on Date"
-                fullWidth
-           
-              />
+              <RHFTextField name="bankBalance" label="Bank Balance as on Date" fullWidth />
             </Grid>
             <Grid item xs={12} md={3}>
               <Controller
@@ -382,7 +400,9 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave })
           name="creditRatingLetter"
           label="Upload Credit Rating Letter"
           icon="mdi:file-document-outline"
+          maxSizeMB={2}
         />
+        <YupErrorMessage name="creditRatingLetter" />
 
         {/* 6. Action Buttons */}
         <Grid
