@@ -158,7 +158,7 @@ export default function KYCReviewAndSubmit() {
               isFullWidth={true}
               title="Added Signatories"
               editPath={paths.kyc.companyDetails} // Make sure this path is defined in your routes
-              icon="mdi:bank-outline"
+              icon="mdi:account-multiple-plus"
               data={[
                 {
                   title: 'Director',

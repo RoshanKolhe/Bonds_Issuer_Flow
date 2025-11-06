@@ -33,6 +33,8 @@ const KYCBasicInfoPage = lazy(() => import('src/pages/kyc-basic-info'));
 const KYCCompanyDetailsPage = lazy(() => import('src/pages/kyc-company-details'));
 const KYCBankDetailsPage = lazy(() => import('src/pages/kyc-bank-details'))
 const KYCReviewAndSubmitPage = lazy(() => import('src/pages/kyc-review-and-submit'));
+const KYCSucessfullPage = lazy(() => import('src/pages/kyc-sucessfull'));
+const KYCPendingPage = lazy(() => import('src/pages/kyc-pending'));
 // ----------------------------------------------------------------------
 
 export const mainRoutes = [
@@ -70,6 +72,8 @@ export const mainRoutes = [
       { path: 'kyc/company-details', element: <KYCCompanyDetailsPage /> },
       { path: 'kyc/bank-details', element: <KYCBankDetailsPage /> },
       { path: 'kyc/review-and-submit', element: <KYCReviewAndSubmitPage /> },
+      { path: 'kyc/sucessfull', element: <KYCSucessfullPage /> },
+      { path: 'kyc/pending', element: <KYCPendingPage /> },
     ],
   },
   {
