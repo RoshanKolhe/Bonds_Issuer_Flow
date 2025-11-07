@@ -36,6 +36,10 @@ const KYCReviewAndSubmitPage = lazy(() => import('src/pages/kyc-review-and-submi
 const KYCSucessfullPage = lazy(() => import('src/pages/kyc-sucessfull'));
 const KYCPendingPage = lazy(() => import('src/pages/kyc-pending'));
 const KYCSignatoriesPage = lazy(() => import('src/pages/kyc-signatories'));
+// KYC
+const KycPage = lazy(() => import('src/pages/kyc'));
+const KycAddressInfoPage = lazy(() => import('src/pages/kyc-address-info'));
+const KycCompanyDetailsPage = lazy(() => import('src/pages/kyc-company-details'));
 // ----------------------------------------------------------------------
 
 export const mainRoutes = [
@@ -51,6 +55,8 @@ export const mainRoutes = [
       { path: 'about-us', element: <AboutPage /> },
       { path: 'contact-us', element: <ContactPage /> },
       { path: 'faqs', element: <FaqsPage /> },
+      // { path: 'kyc', element: <KycPage /> },
+      
       {
         path: 'product',
         children: [
@@ -76,6 +82,7 @@ export const mainRoutes = [
       { path: 'kyc/sucessfull', element: <KYCSucessfullPage /> },
       { path: 'kyc/pending', element: <KYCPendingPage /> },
       { path: 'kyc/signatories', element: <KYCSignatoriesPage /> },
+      { path: 'kyc/address-info', element: <KycAddressInfoPage /> },
     ],
   },
   {

@@ -11,6 +11,7 @@ import Badge, { badgeClasses } from '@mui/material/Badge';
 // hooks
 import { useOffSetTop } from 'src/hooks/use-off-set-top';
 import { useResponsive } from 'src/hooks/use-responsive';
+import { useRouter } from 'src/routes/hook';
 // theme
 import { bgBlur } from 'src/theme/css';
 // routes
@@ -30,6 +31,7 @@ import { lineHeight } from '@mui/system';
 // ----------------------------------------------------------------------
 
 export default function Header() {
+  const router = useRouter();
   const theme = useTheme();
 
   const mdUp = useResponsive('up', 'md');
@@ -80,9 +82,7 @@ export default function Header() {
           <Stack alignItems="center" direction={{ xs: 'row', md: 'row-reverse' }}>
             <Button
               variant="contained"
-              target="_blank"
-              rel="noopener"
-              href={paths.minimalUI}
+              onClick={() => router.push('/kyc')}
               sx={{
                 paddingX: '24px',
                 paddingY: '4px',
