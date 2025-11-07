@@ -94,7 +94,7 @@ export default function CostsBreakdown() {
             </Grid>
 
             {/* Body */}
-            <Grid container spacing={3} alignItems="center">
+            <Grid container spacing={3} alignItems="center" padding="6px">
                 {/* Left side - cost values */}
                 <Grid item xs={12} md={5}>
                     <Grid container spacing={3}>
@@ -200,7 +200,7 @@ export default function CostsBreakdown() {
                                         sx={{
                                             width: 14,
                                             height: 14,
-                                            borderRadius: "50%",
+                                            borderRadius: "1%",
                                             backgroundColor: item.color,
                                         }}
                                     />

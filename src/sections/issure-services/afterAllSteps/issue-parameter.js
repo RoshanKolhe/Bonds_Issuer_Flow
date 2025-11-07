@@ -15,11 +15,11 @@ export default function BondIssueParameters() {
     const [couponRate, setCouponRate] = useState(9);
     const [tenure, setTenure] = useState(11);
 
-    const totalInvestment = issueSize * (tenure / 10);
-    const interestPayment = totalInvestment * (couponRate / 100);
-    const totalAmount = totalInvestment + interestPayment;
+  const totalReturn = issueSize * Math.pow(1 + couponRate / 100, tenure);
+  const interestPayment = totalReturn - issueSize;
+  const totalInvestment = issueSize;
 
-    const totalAmountSeries = [totalInvestment, interestPayment];
+  const totalAmountSeries = [totalInvestment, interestPayment];
     const totalAmountOptions = {
         chart: {
             type: "donut",
@@ -82,7 +82,7 @@ export default function BondIssueParameters() {
                 step={step}
                 value={value}
                 onChange={(e, val) => setValue(val)}
-                sx={{ flexGrow: 1 }}
+                sx={{ flexGrow: 1, color:"#1976d2"}}
             />
 
             {/* Bottom min-max labels */}
@@ -161,7 +161,7 @@ export default function BondIssueParameters() {
                             border: "1px solid #e0e0e0",
                         }}
                     >
-                        <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 500 }}>
+                        <Typography variant="h6" sx={{ mb: 1, fontWeight: 500 }}>
                             Your Total Amount
                         </Typography>
 
@@ -169,9 +169,9 @@ export default function BondIssueParameters() {
                             variant="h5"
                             align="center"
                             color="primary"
-                            sx={{ fontWeight: 600, mb: 2 }}
+                            sx={{ fontWeight: 600, mb: 2 , color:"#1976d2"}}
                         >
-                            ₹ {totalAmount.toLocaleString()}
+                                ₹ {totalReturn.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                         </Typography>
 
                         {/* Donut Chart */}
@@ -249,3 +249,8 @@ export default function BondIssueParameters() {
         </Box>
     );
 }
+
+
+
+
+

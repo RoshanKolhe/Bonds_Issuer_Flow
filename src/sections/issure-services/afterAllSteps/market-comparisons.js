@@ -37,7 +37,7 @@ export default function MarketComparisons({ bonds }) {
         <Typography variant="h3" fontWeight={700} color='#154A8F'>
           Market Comparisons
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" color="#000">
           Compare bonds based on various metrics.
         </Typography>
       </Stack>
