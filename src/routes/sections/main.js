@@ -28,18 +28,18 @@ const ProductCheckoutPage = lazy(() => import('src/pages/product/checkout'));
 const PostListPage = lazy(() => import('src/pages/post/list'));
 const PostDetailsPage = lazy(() => import('src/pages/post/details'));
 
-const KYCViewPage = lazy(() => import('src/pages/kyc'));
-const KYCBasicInfoPage = lazy(() => import('src/pages/kyc-basic-info'));
-const KYCCompanyDetailsPage = lazy(() => import('src/pages/kyc-company-details'));
-const KYCBankDetailsPage = lazy(() => import('src/pages/kyc-bank-details'))
-const KYCReviewAndSubmitPage = lazy(() => import('src/pages/kyc-review-and-submit'));
-const KYCSucessfullPage = lazy(() => import('src/pages/kyc-sucessfull'));
-const KYCPendingPage = lazy(() => import('src/pages/kyc-pending'));
-const KYCSignatoriesPage = lazy(() => import('src/pages/kyc-signatories'));
+const KYCViewPage = lazy(() => import('src/pages/kyc/kyc'));
+const KYCBasicInfoPage = lazy(() => import('src/pages/kyc/kyc-basic-info'));
+const KYCCompanyDetailsPage = lazy(() => import('src/pages/kyc/kyc-company-details'));
+const KYCBankDetailsPage = lazy(() => import('src/pages/kyc/kyc-bank-details'))
+const KYCReviewAndSubmitPage = lazy(() => import('src/pages/kyc/kyc-review-and-submit'));
+const KYCSucessfullPage = lazy(() => import('src/pages/kyc/kyc-sucessfull'));
+const KYCPendingPage = lazy(() => import('src/pages/kyc/kyc-pending'));
+const KYCSignatoriesPage = lazy(() => import('src/pages/kyc/kyc-signatories'));
 // KYC
-const KycPage = lazy(() => import('src/pages/kyc'));
-const KycAddressInfoPage = lazy(() => import('src/pages/kyc-address-info'));
-const KycCompanyDetailsPage = lazy(() => import('src/pages/kyc-company-details'));
+const KycPage = lazy(() => import('src/pages/kyc/kyc'));
+const KycAddressInfoPage = lazy(() => import('src/pages/kyc/kyc-address-info'));
+const KycCompanyDetailsPage = lazy(() => import('src/pages/kyc/kyc-company-details'));
 // ----------------------------------------------------------------------
 
 export const mainRoutes = [
