@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 // @mui
 import Fade from '@mui/material/Fade';
 import Stack from '@mui/material/Stack';
@@ -24,7 +24,9 @@ export default function NavList({ item, offsetTop }) {
 
   const active = useActiveLink(path, false);
 
-  const externalLink = path.includes('http');
+  // const externalLink = path.includes('http');
+
+  const [anchorRect, setAnchorRect] = useState(null);
 
   useEffect(() => {
     if (nav.value) {
@@ -33,8 +35,12 @@ export default function NavList({ item, offsetTop }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
-  const handleOpenMenu = () => {
+  const handleOpenMenu = (event) => {
     if (children) {
+      const rect = event?.currentTarget?.getBoundingClientRect?.();
+      if (rect) {
+        setAnchorRect({ left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width });
+      }
       nav.onTrue();
     }
   };
@@ -46,7 +52,7 @@ export default function NavList({ item, offsetTop }) {
         offsetTop={offsetTop}
         active={active}
         open={nav.value}
-        externalLink={externalLink}
+        // externalLink={externalLink}
         onMouseEnter={handleOpenMenu}
         onMouseLeave={nav.onFalse}
       />
@@ -55,9 +61,18 @@ export default function NavList({ item, offsetTop }) {
         <Portal>
           <Fade in={nav.value}>
             <StyledMenu
-              onMouseEnter={handleOpenMenu}
+              onMouseEnter={nav.onTrue}
               onMouseLeave={nav.onFalse}
-              sx={{ display: 'flex' }}
+              sx={{
+                display: 'flex',
+                // Position directly under hovered item
+                left: anchorRect ? anchorRect.left : 0,
+                right: 'auto',
+                margin: 0,
+                // Slightly overlap the parent item to avoid hover gap
+                top: anchorRect ? anchorRect.bottom - 8 : undefined,
+                maxWidth: 'unset',
+              }}
             >
               {children.map((list) => (
                 <NavSubList
@@ -83,7 +98,7 @@ NavList.propTypes = {
 
 // ----------------------------------------------------------------------
 
-function NavSubList({ items, isDashboard, subheader, onClose }) {
+function NavSubList({ items, isDashboard, onClose }) {
   const pathname = usePathname();
 
   return (
@@ -97,7 +112,7 @@ function NavSubList({ items, isDashboard, subheader, onClose }) {
         }),
       }}
     >
-      <StyledSubheader disableSticky>{subheader}</StyledSubheader>
+      {/* <StyledSubheader disableSticky>{subheader}</StyledSubheader> */}
 
       {items.map((item) =>
         isDashboard ? (

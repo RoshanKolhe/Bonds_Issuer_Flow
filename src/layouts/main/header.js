@@ -11,6 +11,7 @@ import Badge, { badgeClasses } from '@mui/material/Badge';
 // hooks
 import { useOffSetTop } from 'src/hooks/use-off-set-top';
 import { useResponsive } from 'src/hooks/use-responsive';
+import { useRouter } from 'src/routes/hook';
 // theme
 import { bgBlur } from 'src/theme/css';
 // routes
@@ -25,10 +26,12 @@ import NavMobile from './nav/mobile';
 import NavDesktop from './nav/desktop';
 //
 import { SettingsButton, HeaderShadow, LoginButton } from '../_common';
+import { lineHeight } from '@mui/system';
 
 // ----------------------------------------------------------------------
 
 export default function Header() {
+  const router = useRouter();
   const theme = useTheme();
 
   const mdUp = useResponsive('up', 'md');
@@ -36,7 +39,7 @@ export default function Header() {
   const offsetTop = useOffSetTop(HEADER.H_DESKTOP);
 
   return (
-    <AppBar>
+    <AppBar sx={{ boxShadow: '0px 0px 4px 0px #00000040', backgroundColor: '#FFFFFF' }}>
       <Toolbar
         disableGutters
         sx={{
@@ -58,7 +61,9 @@ export default function Header() {
           }),
         }}
       >
-        <Container sx={{ height: 1, display: 'flex', alignItems: 'center' }}>
+        <Container
+          sx={{ height: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+        >
           <Badge
             sx={{
               [`& .${badgeClasses.badge}`]: {
@@ -66,40 +71,53 @@ export default function Header() {
                 right: -16,
               },
             }}
-            badgeContent={
-              <Link
-                href={paths.changelog}
-                target="_blank"
-                rel="noopener"
-                underline="none"
-                sx={{ ml: 1 }}
-              >
-                <Label color="info" sx={{ textTransform: 'unset', height: 22, px: 0.5 }}>
-                  v5.1.0
-                </Label>
-              </Link>
-            }
           >
             <Logo />
           </Badge>
 
-          <Box sx={{ flexGrow: 1 }} />
+          {/* <Box sx={{ flexGrow: 1 }} /> */}
 
           {mdUp && <NavDesktop offsetTop={offsetTop} data={navConfig} />}
 
           <Stack alignItems="center" direction={{ xs: 'row', md: 'row-reverse' }}>
-            <Button variant="contained" target="_blank" rel="noopener" href={paths.minimalUI}>
-              Purchase Now
+            <Button
+              variant="contained"
+              onClick={() => router.push('/kyc')}
+              sx={{
+                paddingX: '24px',
+                paddingY: '4px',
+                lineHeight: '24px',
+                bgcolor: 'primary.main',
+                borderColor: 'primary.main',
+                fontWeight: 700,
+                border: '1px solid',
+                borderRadius: '4px',
+              }}
+            >
+              Sign up
             </Button>
 
-            {mdUp && <LoginButton />}
+            {mdUp && (
+              <LoginButton
+                sx={{
+                  paddingX: '24px',
+                  paddingY: '3px',
+                  lineHeight: '24px',
+                  color: 'text.primary',
+                  borderColor: 'text.primary',
+                  fontWeight: 700,
+                  border: '1px solid',
+                  borderRadius: '4px',
+                }}
+              />
+            )}
 
-            <SettingsButton
+            {/* <SettingsButton
               sx={{
                 ml: { xs: 1, md: 0 },
                 mr: { md: 2 },
               }}
-            />
+            /> */}
 
             {!mdUp && <NavMobile offsetTop={offsetTop} data={navConfig} />}
           </Stack>

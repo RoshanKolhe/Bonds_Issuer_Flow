@@ -8,7 +8,7 @@ import NavList from './nav-list';
 
 export default function NavDesktop({ offsetTop, data }) {
   return (
-    <Stack component="nav" direction="row" spacing={5} sx={{ mr: 2.5, height: 1 }}>
+    <Stack component="nav" direction="row" spacing={5} sx={{ height: 1 }}>
       {data.map((link) => (
         <NavList key={link.title} item={link} offsetTop={offsetTop} />
       ))}

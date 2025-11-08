@@ -14,69 +14,54 @@ export const navConfig = [
     path: '/',
   },
   {
-    title: 'Components',
+    title: 'Bonds Library',
     icon: <Iconify icon="solar:atom-bold-duotone" />,
-    path: paths.components,
+    path: paths.bondLibrary,
   },
   {
-    title: 'Pages',
+    title: 'Products',
     path: '/pages',
     icon: <Iconify icon="solar:file-bold-duotone" />,
-    children: [
-      {
-        subheader: 'Other',
-        items: [
-          { title: 'About us', path: paths.about },
-          { title: 'Contact us', path: paths.contact },
-          { title: 'FAQs', path: paths.faqs },
-          { title: 'Pricing', path: paths.pricing },
-          { title: 'Payment', path: paths.payment },
-          { title: 'Maintenance', path: paths.maintenance },
-          { title: 'Coming Soon', path: paths.comingSoon },
-        ],
-      },
-      {
-        subheader: 'Concepts',
-        items: [
-          { title: 'Shop', path: paths.product.root },
-          { title: 'Product', path: paths.product.demo.details },
-          { title: 'Checkout', path: paths.product.checkout },
-          { title: 'Posts', path: paths.post.root },
-          { title: 'Post', path: paths.post.demo.details },
-        ],
-      },
-      {
-        subheader: 'Auth Demo',
-        items: [
-          { title: 'Login', path: paths.authDemo.classic.login },
-          { title: 'Register', path: paths.authDemo.classic.register },
-          { title: 'Forgot password', path: paths.authDemo.classic.forgotPassword },
-          { title: 'New password', path: paths.authDemo.classic.newPassword },
-          { title: 'Verify', path: paths.authDemo.classic.verify },
-          { title: 'Login (modern)', path: paths.authDemo.modern.login },
-          { title: 'Register (modern)', path: paths.authDemo.modern.register },
-          { title: 'Forgot password (modern)', path: paths.authDemo.modern.forgotPassword },
-          { title: 'New password (modern)', path: paths.authDemo.modern.newPassword },
-          { title: 'Verify (modern)', path: paths.authDemo.modern.verify },
-        ],
-      },
-      {
-        subheader: 'Error',
-        items: [
-          { title: 'Page 403', path: paths.page403 },
-          { title: 'Page 404', path: paths.page404 },
-          { title: 'Page 500', path: paths.page500 },
-        ],
-      },
-      {
-        subheader: 'Dashboard',
-        items: [{ title: 'Dashboard', path: PATH_AFTER_LOGIN }],
-      },
-    ],
+    // children: [
+    //   {
+    //     items: [
+    //       { title: 'Corporate Bond', path: paths.products.corporate_bonds},
+    //       { title: 'Government Bond', path: paths.products.government_bonds },
+    //       { title: 'Listed Bond', path: paths.products.listed_bonds },
+    //       { title: 'Unlisted Bond', path: paths.products.unlisted_bonds },
+    //     ],
+    //   },
+    // ],    
   },
   {
-    title: 'Docs',
-    icon: <Iconify icon="solar:notebook-bold-duotone" />,
-    path: paths.docs,
+    title: 'Resources',
+    path: '/pages',
+    icon: <Iconify icon="solar:file-bold-duotone" />,
+    // children: [
+    //   {
+    //     items: [
+    //       { title: 'Blogs', path: paths.post.root },
+    //       { title: 'FAQs', path: paths.faqs },
+    //       { title: 'News/Insight', path: paths.newsInsight },
+    //       { title: 'Calculator', path: paths.calculator },
+    //       { title: 'Refer and Earn', path: paths.maintenance },
+    //       { title: 'Issuers', path: paths.comingSoon },
+    //     ],
+    //   },
+    // ],
+  },
+  {
+    title: 'About',
+    path: '/pages',
+    icon: <Iconify icon="solar:file-bold-duotone" />,
+    // children: [
+    //   {
+    //     // subheader: 'Other',
+    //     items: [
+    //       { title: 'About Company', path: paths.about },
+    //       { title: 'Contact us', path: paths.contact },
+    //     ],
+    //   },
+    // ],
   },
 ];
