@@ -24,9 +24,12 @@ function UploadBox({
   value,
   error,
   helperText,
+  onProgressChange,
 }) {
   const [isDragging, setIsDragging] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [uploadStatus, setUploadStatus] = useState('idle');
+  const [errorMessage, setErrorMessage] = useState('');
   const fileInputRef = useRef(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -35,35 +38,50 @@ function UploadBox({
   const processFile = (file) => {
     if (!file) return;
 
+    setErrorMessage('');
+    setUploadStatus('uploading');
+    setProgress(0);
+
     const fileType = file?.type ? file.type.split('/')[1] : 'unknown';
     const allowedTypes = acceptedTypes ? acceptedTypes.split(',') : [];
-
-    // Validate file type
-    if (allowedTypes.length > 0 && !allowedTypes.includes(fileType)) {
-      alert(`Invalid file type. Allowed types: ${acceptedTypes}`);
-      return;
-    }
-
-    // Validate size
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
-    if (file.size > maxSizeBytes) {
-      alert(`File size exceeds ${maxSizeMB}MB limit.`);
-      return;
+
+    let hasError = false;
+    let tempErrorMsg = '';
+
+    // ✅ Validate file type
+    if (allowedTypes.length > 0 && !allowedTypes.includes(fileType)) {
+      hasError = true;
+      tempErrorMsg = `Invalid file type. Allowed: ${acceptedTypes}`;
     }
 
-    // Simulate upload progress
-    setProgress(0);
-    const interval = setInterval(() => {
-      setProgress((old) => {
-        if (old >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        return old + 10;
-      });
-    }, 150);
+    // ✅ Validate size
+    if (file.size > maxSizeBytes) {
+      hasError = true;
+      tempErrorMsg = `File size exceeds ${maxSizeMB}MB limit.`;
+    }
 
-    onChange(file);
+    // ✅ Simulate upload or error progress bar animation
+    let progressValue = 0;
+    const interval = setInterval(() => {
+      progressValue += 10;
+      setProgress(progressValue);
+      onProgressChange?.(progressValue);
+
+      if (progressValue >= 100) {
+        clearInterval(interval);
+
+        if (hasError) {
+          setUploadStatus('error');
+          setErrorMessage(tempErrorMsg);
+          onChange(null);
+        } else {
+          setUploadStatus('success');
+          setErrorMessage('');
+          onChange(file);
+        }
+      }
+    }, 120);
   };
 
   const handleFileSelect = (event) => {
@@ -80,19 +98,20 @@ function UploadBox({
 
   const handleClick = () => fileInputRef.current?.click();
 
+  const getBackgroundColor = () => {
+    if (uploadStatus === 'error') return '#FFEBEE'; // light red
+    if (uploadStatus === 'success') return '#E1FFEC'; // green
+    if (isDragging) return '#CFE4FF';
+    return '#F5F7FA';
+  };
+
   const uploadContent = (
     <Box
       sx={{
         textAlign: 'center',
         height: '100%',
         borderRadius: 0,
-        backgroundColor:
-          progress === 100
-            ? '#E1FFEC' // ✅ after upload complete
-            : isDragging
-            ? '#E1FFEC' // optional: keep same greenish color when dragging
-            : '#CFE4FF',
-        cursor: 'pointer',
+        backgroundColor: getBackgroundColor(),
       }}
     >
       <input
@@ -149,9 +168,24 @@ function UploadBox({
             >
               <Stack direction={{ xs: 'column', md: 'row' }}>
                 <Grid xs={12} md={4}>
-                  <Stack direction={'row'}>
-                    <Icon icon="mdi:cloud-check-outline" color="#2e7d32" width="24" height="24" />
-                    <Typography sx={{ pl: '10px' }}>Uploaded</Typography>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Icon
+                      icon={
+                        uploadStatus === 'error'
+                          ? 'mdi:alert-circle-outline'
+                          : 'mdi:cloud-check-outline'
+                      }
+                      color={uploadStatus === 'error' ? '#d32f2f' : '#2e7d32'}
+                      width="24"
+                      height="24"
+                    />
+                    <Typography color={uploadStatus === 'error' ? 'error.main' : 'text.primary'}>
+                      {uploadStatus === 'error'
+                        ? 'Upload Failed'
+                        : uploadStatus === 'success'
+                        ? 'Uploaded'
+                        : 'Upload'}
+                    </Typography>
                   </Stack>
                 </Grid>
                 <Grid xs={12} md={8}>
@@ -163,18 +197,30 @@ function UploadBox({
             </Stack>
           </Grid>
           <Grid item md={12}>
-            <LinearProgress variant="determinate" value={progress} fullWidth />
+            <LinearProgress
+              variant="determinate"
+              value={progress}
+              fullWidth
+              sx={{
+                mt: 1,
+                height: 6,
+                borderRadius: 5,
+                '& .MuiLinearProgress-bar': {
+                  backgroundColor: uploadStatus === 'error' ? '#d32f2f' : '#2e7d32',
+                },
+              }}
+            />
             <Typography
               variant="caption"
-              sx={{
-                color: 'primary.main',
-                display: 'flex',
-                mt: 0.5,
-                fontStyle: 'italic',
-                justifyContent: 'start',
-              }}
+              color={uploadStatus === 'error' ? 'error.main' : 'primary.main'}
+              display="block"
+              mt={0.5}
             >
-              {progress < 100 ? `${progress}% Uploading...` : 'Upload Complete (100%)'}
+              {uploadStatus === 'error'
+                ? errorMessage
+                : progress < 100
+                ? `${progress}% Uploading...`
+                : 'Upload Complete (100%)'}
             </Typography>
             <Typography
               variant="caption"
@@ -274,8 +320,12 @@ function UploadBox({
         sx={{
           height: 110,
           border: 2,
-          borderColor: progress === 100 ? '#E1FFEC' : isDragging ? '#CFE4FF' : '#CFE4FF',
-          borderRadius: 0,
+          borderColor:
+            uploadStatus === 'error'
+              ? '#d32f2f'
+              : uploadStatus === 'success'
+              ? '#2e7d32'
+              : '#b5b5b5ff',
           cursor: 'pointer',
         }}
       >
@@ -299,7 +349,7 @@ UploadBox.propTypes = {
 
 // --- Hook Form Integrated Wrapper ---
 export default function RHFFileUploadBox({ name, ...props }) {
-  const { control } = useFormContext();
+  const { control, setValue } = useFormContext();
 
   return (
     <Controller
@@ -309,8 +359,17 @@ export default function RHFFileUploadBox({ name, ...props }) {
         <UploadBox
           {...props}
           value={field.value}
-          onChange={(file) => field.onChange(file)}
+          onChange={(file) => {
+            field.onChange(file);
+            // store upload completion status as separate field
+            if (file && file.progress === 100) {
+              setValue(`${name}_status`, 'success');
+            } else {
+              setValue(`${name}_status`, 'incomplete');
+            }
+          }}
           error={!!error}
+          helperText={error?.message}
         />
       )}
     />
