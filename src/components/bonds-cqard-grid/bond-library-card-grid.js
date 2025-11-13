@@ -70,57 +70,101 @@ export default function BondLibraryCardGrid({ item }) {
         minHeight: 360,
         display: 'flex',
         flexDirection: 'column',
+
       }}
     >
       {/* Top Section */}
       <Box sx={{ p: 2 }}>
-        {/* Trending Label */}
-        <Box
-          component="img"
-          src="/assets/icons/bond-library/trending.svg"
-          alt="Trending"
-          sx={{
-            width: 70,
-            height: 20,
-            top: -20,
-            position: 'relative',
-          }}
-        />
-
-        {/* ASAPL */}
-        <Typography variant="subtitle2" sx={{ mt: 0, fontWeight: 700 }}>
-          {item?.asapl || 'N.A.'} ACAPL
-        </Typography>
-
-        {/* Company Logo (optional) */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Typography variant="subtitle2" sx={{ mt: 2, fontWeight: 700 }}>
-            {item?.issue_date || 'N.A.'}
-          </Typography>
+        {/* Top Images Row */}
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ mb: 0.5 }}
+        >
           <Box
             component="img"
-            src={item?.brandLogo ? item.brandLogo : '/assets/icons/bond-library/company.png'}
-            alt="Company Logo"
+            src={item?.brandLogo || '/assets/icons/bond-library/company.png'}
+            alt="logo"
             sx={{
-              height: 32,
-              width: 80,
-              objectFit: 'contain',
-              mt: 1,
+              width: 70,
+              height: 20,
+              position: 'relative',
+              top: -20,
+              mr: 1,
             }}
           />
 
+          <Box
+            sx={{
+              position: 'relative',
+              width: 70,
+              left: 20,
+              height: 20,
+              top: -22,
+              ml: 1,
+            }}
+          >
+            {/* Trending Image */}
+            <Box
+              component="img"
+              src="/assets/icons/bond-library/trending.svg"
+              alt="Trending"
+              sx={{
+                width: '100%',
+                height: '100%',
+              }}
+            />
+
+            {/* Centered Text */}
+            <Typography
+              variant="caption"
+              sx={{
+                position: 'absolute',
+                top: '70%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                color: '#fff',
+
+                fontSize: '10px',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {item?.status || 'Trending'}
+            </Typography>
+          </Box>
+
         </Stack>
 
-        {/* ISN */}
-        <Typography variant="body2" sx={{ fontWeight: 700, pt: 4, }}>
-          ISN-{item?.isin_code || 'N.A.'}
+        {/* ASAPL */}
+        <Typography variant="subtitle2" sx={{ fontWeight: 700, mt: -1 }}>
+          {item?.comapny_name || 'N.A.'}
         </Typography>
+
+        {/* ISIN Number — compact spacing */}
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ mt: 0.5 }}
+        >
+          <Typography variant="body2" sx={{ fontWeight: 700 }}>
+            <Box component="span" sx={{ color: 'primary.main' }}>
+              ISIN
+            </Box>{' '}
+            {item?.isin_code || 'N.A.'}
+          </Typography>
+
+
+        </Stack>
       </Box>
+
+      {/* ISN */}
 
       {/* Bottom Section */}
       <Box
         sx={{
-          bgcolor: '#154A8F',
+          bgcolor: theme.palette.primary.main,
           color: '#fff',
           mt: 'auto',
           p: 2.5,
@@ -154,10 +198,22 @@ export default function BondLibraryCardGrid({ item }) {
               <Typography variant="caption" sx={{ opacity: 0.72 }}>
                 Type of Bond
               </Typography>
-              <Typography variant="caption">{item?.issuer_type || 'N.A.'}</Typography>
+              <Typography
+                variant="caption"
+                noWrap
+                sx={{
+                  display: 'inline-block',
+                  maxWidth: '90px',
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden'
+                }}
+              >
+                {item?.issuer_type || 'N.A.'}
+              </Typography>
             </Stack>
           </Stack>
 
+          {/* Second Column */}
           {/* Second Column */}
           <Stack spacing={2} sx={{ flex: 1 }}>
             <Box
@@ -165,35 +221,57 @@ export default function BondLibraryCardGrid({ item }) {
                 width: 60,
                 height: 60,
                 borderRadius: '50%',
-                bgcolor: alpha('#fff', 0.6),
+                border: '2px solid #00A76F',
+                bgcolor: '#ffffff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                mb: 1,
+                 mt:-1.2,
+                overflow: 'hidden',
               }}
             >
-              <Typography variant="h6" fontWeight={700}>
-                {item?.ratings?.length > 0 ? item?.ratings[0]?.rating : 'N.A.'}
+              <Typography
+                variant='h5'
+                sx={{
+                  color: '#00A76F',
+                  textAlign: 'center',
+                  maxWidth: '100%',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  fontSize: 'clamp(12px, 4vw, 18px)',
+                  padding:'4px'
+                }}
+              >
+                {item?.ratings?.[0]?.rating || 'N.A.'}
               </Typography>
             </Box>
-            <Stack spacing={0.5} sx={{ width: '100%' }}>
+
+            {/* Yield aligned with Coupon */}
+            <Stack spacing={0.5} sx={{ width: '100%', mt: -1 }}>  
               <Typography variant="caption" sx={{ opacity: 0.72 }}>
                 Yield
               </Typography>
-              <Typography variant="caption">{item?.ytm_percent || 'N.A.'}%</Typography>
+              <Typography variant="caption">
+                {item?.ytm_percent || 'N.A.'}%
+              </Typography>
             </Stack>
 
-            <Stack spacing={0.5} sx={{ width: '100%' }}>
+            {/* Maturity Date aligned with IP Frequency */}
+            <Stack spacing={0.5} sx={{ width: '100%', mt: -1 }}>   
               <Typography variant="caption" sx={{ opacity: 0.72 }}>
                 Maturity Date
               </Typography>
-              <Typography variant="caption">{item?.maturity_date || 'N.A.'}</Typography>
+              <Typography variant="caption">
+                {item?.maturity_date || 'N.A.'}
+              </Typography>
             </Stack>
           </Stack>
+
         </Stack>
 
         {/* Know More Button */}
-        {/* <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
           <Button
             size="small"
             variant="contained"
@@ -213,7 +291,7 @@ export default function BondLibraryCardGrid({ item }) {
           >
             Know More
           </Button>
-        </Box> */}
+        </Box>
       </Box>
     </Box>
   );

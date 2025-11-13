@@ -1,3 +1,7 @@
+
+
+
+
 //
 import axios from 'axios';
 // config
@@ -55,6 +59,12 @@ export const endpoints = {
     list: '/schedulers',
     filterList: (filter) => `/schedulers?filter=${filter}`,
     details: (id) => `/schedulers/${id}`,
+  },
+
+   companyInfo: {
+    list: '/api/kyc/issuer_kyc/company-info/',
+    filterList: (filter) => `/api/kyc/issuer_kyc/company-info/?filter=${filter}`,
+    details: (id) => `/api/kyc/issuer_kyc/company-info//${id}`,
   },
   designation: {
     list: '/designations',
