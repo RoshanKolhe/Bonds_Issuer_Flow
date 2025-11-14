@@ -10,8 +10,14 @@ const steps = ["1", "2", "3", "4"];
 export default function RoiStepper() {
   // --- Load saved data from localStorage ---
   const [activeSteps, setActiveSteps] = useState(() => {
-    const savedStep = localStorage.getItem("roi_active_step");
-    return savedStep ? Number(savedStep) : 0;
+    const savedStep = Number(localStorage.getItem("roi_active_step"));
+
+    // Prevent loading an invalid or completed step (like 4)
+    if (!isNaN(savedStep) && savedStep >= 0 && savedStep < steps.length) {
+      return savedStep;
+    }
+
+    return 0; // reset to first step
   });
 
   const [formData, setFormData] = useState(() => {

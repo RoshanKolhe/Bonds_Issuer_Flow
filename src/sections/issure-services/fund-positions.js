@@ -35,16 +35,7 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave })
     cashBalanceDate: Yup.date().required('Date is required'),
     bankBalance: Yup.string().required('Bank Balance is required'),
     bankBalanceDate: Yup.date().required('Date is required'),
-    hasCredit: Yup.string().required('Please select credit rating option'),
-    selectedAgency: Yup.string().when('hasCredit', {
-      is: 'yes',
-      then: (schema) => schema.required('Agency selection is required'),
-    }),
-    selectedRating: Yup.string().when('hasCredit', {
-      is: 'yes',
-      then: (schema) => schema.required('Rating selection is required'),
-    }),
-    vault: Yup.string().required('Vault Till data is required'),
+   
     additionalRating: Yup.string().required('Additional rating is required'),
     // creditRatingLetter: Yup.mixed().required('Credit rating letter is required'),
     creditRatingLetter: Yup.mixed()
@@ -73,16 +64,14 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave })
       cashBalanceDate: currentFund?.cashBalanceDate || '',
       bankBalance: currentFund?.bankBalance || '',
       bankBalanceDate: currentFund?.bankBalanceDate || '',
-      hasCredit: currentFund?.hasCredit || 'yes',
-      selectedAgency: currentFund?.selectedAgency || '',
       selectedRating: currentFund?.selectedRating || '',
       vault: currentFund?.vault || '',
       additionalRating: currentFund?.additionalRating || '',
       creditRatingLetter: currentFund?.creditRatingLetter
         ? {
-            fileUrl: currentFund.creditRatingLetter.fileUrl,
-            preview: currentFund.creditRatingLetter.fileUrl,
-          }
+          fileUrl: currentFund.creditRatingLetter.fileUrl,
+          preview: currentFund.creditRatingLetter.fileUrl,
+        }
         : { fileUrl: '', preview: '' },
     }),
     [currentFund]
@@ -285,124 +274,82 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave })
           </Grid>
         </Card>
 
-        {/* 2. Credit Rating Question */}
-        <Box sx={{ mb: '20px' }}>
-          <FormControl>
-            <FormLabel
-              sx={{ fontWeight: 500, color: 'black', '&.Mui-focused': { color: 'black' } }}
-            >
-              Do You Already Have a Credit Rating? <span style={{ color: 'red' }}>*</span>
-            </FormLabel>
-            <RadioGroup
-              row
-              value={values.hasCredit}
-              onChange={(e) => setValue('hasCredit', e.target.value)}
-            >
-              <FormControlLabel value="yes" control={<Radio color="primary" />} label="Yes" />
-              <FormControlLabel value="no" control={<Radio color="primary" />} label="No" />
-            </RadioGroup>
-          </FormControl>
-        </Box>
 
         {/* 3. Conditional Rendering */}
-        {values.hasCredit === 'yes' ? (
-          <Card sx={{ p: 4, borderRadius: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', mb: 4 }}>
-            <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-              Credit Ratings Available
-            </Typography>
+        <Card sx={{ p: 4, borderRadius: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', mb: 4 }}>
+          <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
+            Credit Ratings Available
+          </Typography>
 
-            <Grid container spacing={4}>
-              <Grid item xs={12} md={4}>
-                <RHFSelect
-                  name="selectedAgency"
-                  label="Select Rating Agency"
-                  size="small"
-                  sx={{ mb: 2 }}
-                >
-                  <MenuItem value="">Select the appropriate rating agency</MenuItem>
-                  {agencies.map((agency, idx) => (
-                    <MenuItem key={idx} value={agency}>
-                      {agency}
-                    </MenuItem>
-                  ))}
-                </RHFSelect>
-              </Grid>
-
-              <Grid item xs={12} md={8}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
-                  Rating
-                </Typography>
-                <Grid container spacing={2}>
-                  {ratings
-                    .filter((rating) => {
-                      // Example logic: only show ratings based on selected category
-                      if (values.category === 'Credit') return rating.value <= 3;
-                      if (values.category === 'Risk') return rating.value > 3;
-                      return true;
-                    })
-                    .map((rating) => (
-                      <Grid item xs={4} key={rating.value}>
-                        <FormControlLabel
-                          value={rating.value}
-                          control={
-                            <Radio
-                              checked={values.selectedRating === rating.value}
-                              onChange={(e) => setValue('selectedRating', e.target.value)}
-                              color="primary"
-                            />
-                          }
-                          label={rating.label}
-                        />
-                      </Grid>
-                    ))}
-                </Grid>
-                <YupErrorMessage name="selectedRating" />
-              </Grid>
+          <Grid container spacing={4}>
+            <Grid item xs={12} md={4}>
+              <RHFSelect
+                name="selectedAgency"
+                label="Select Rating Agency"
+                size="small"
+                sx={{ mb: 2 }}
+              >
+                <MenuItem value="">Select the appropriate rating agency</MenuItem>
+                {agencies.map((agency, idx) => (
+                  <MenuItem key={idx} value={agency}>
+                    {agency}
+                  </MenuItem>
+                ))}
+              </RHFSelect>
             </Grid>
-          </Card>
-        ) : (
-          <Box
-            sx={{
-              overflowX: 'auto',
-              scrollBehavior: 'smooth',
-              mb: 4,
-              scrollbarWidth: { xs: 'none', md: 'thin' },
-              msOverflowStyle: { xs: 'none', md: 'auto' },
-              '&::-webkit-scrollbar': { height: 8, display: { xs: 'none', md: 'block' } },
-              '&::-webkit-scrollbar-thumb': { backgroundColor: '#ccc', borderRadius: 4 },
-            }}
-          >
-            <Box sx={{ display: 'flex', gap: 2, width: 'fit-content' }}>
-              {dummyCards.map((card, index) => (
-                <Box key={index} sx={{ minWidth: 250, flexShrink: 0 }}>
-                  <CreditRatingCard
-                    imageSrc={card.image}
-                    label={card.label}
-                    onClick={() => setValue('selectedAgency', card.label)}
-                  />
-                </Box>
-              ))}
-            </Box>
-          </Box>
-        )}
 
-        <RHFTextField name="vault" label="Vault Till" fullWidth size="small" sx={{ pb: '30px' }} />
-        <RHFTextField
-          name="additionalRating"
-          label="Additional Rating"
-          fullWidth
-          size="small"
-          sx={{ pb: '30px' }}
-        />
+            <Grid item xs={12} md={8}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
+                Rating
+              </Typography>
+              <Grid container spacing={2}>
+                {ratings
+                  .filter((rating) => {
+                    // Example logic: only show ratings based on selected category
+                    if (values.category === 'Credit') return rating.value <= 3;
+                    if (values.category === 'Risk') return rating.value > 3;
+                    return true;
+                  })
+                  .map((rating) => (
+                    <Grid item xs={4} key={rating.value}>
+                      <FormControlLabel
+                        value={rating.value}
+                        control={
+                          <Radio
+                            checked={values.selectedRating === rating.value}
+                            onChange={(e) => setValue('selectedRating', e.target.value)}
+                            color="primary"
+                          />
+                        }
+                        label={rating.label}
+                      />
+                    </Grid>
+                  ))}
+              </Grid>
+              <YupErrorMessage name="selectedRating" />
+            </Grid>
+          </Grid>
 
-        {/* 5. Credit Rating Letter Upload */}
-        <RHFFileUploadBox
-          name="creditRatingLetter"
-          label="Upload Credit Rating Letter"
-          icon="mdi:file-document-outline"
-          maxSizeMB={2}
-        />
-        <YupErrorMessage name="creditRatingLetter" />
+
+
+          <RHFTextField name="vault" label="Vault Till" fullWidth size="small" sx={{ pb: '30px' }} />
+          <RHFTextField
+            name="additionalRating"
+            label="Additional Rating"
+            fullWidth
+            size="small"
+            sx={{ pb: '30px' }}
+          />
+
+          {/* 5. Credit Rating Letter Upload */}
+          <RHFFileUploadBox
+            name="creditRatingLetter"
+            label="Upload Credit Rating Letter"
+            icon="mdi:file-document-outline"
+            maxSizeMB={2}
+          />
+          <YupErrorMessage name="creditRatingLetter" />
+        </Card>
 
         {/* 6. Action Buttons */}
         <Grid
@@ -429,6 +376,7 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave })
         </Grid>
       </FormProvider>
     </Box>
+
   );
 }
 

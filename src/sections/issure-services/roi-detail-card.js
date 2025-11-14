@@ -6,7 +6,7 @@ export default function RoiDetailCard({ onClose }) {
   const [open, setOpen] = useState(true);
 
   const cardData = {
-    title: "What's Inside the ROI Assessment?",
+    title: "What’s Inside the Bonds Estimation ?",
     sections: [
       {
         icon: <Icon icon="mdi:trending-up" width={24} height={24} color="#10b981" />,
