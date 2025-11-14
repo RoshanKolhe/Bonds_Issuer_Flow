@@ -7,6 +7,7 @@ import Divider from '@mui/material/Divider';
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
 import { useRouter } from 'src/routes/hook/use-router';
+import { Grid, Tooltip } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -88,9 +89,10 @@ export default function BondLibraryCardGrid({ item }) {
             alt="logo"
             sx={{
               width: 70,
-              height: 20,
+              height: 30,
               position: 'relative',
-              top: -20,
+              top: -15,
+              right:15,
               mr: 1,
             }}
           />
@@ -101,7 +103,7 @@ export default function BondLibraryCardGrid({ item }) {
               width: 70,
               left: 20,
               height: 20,
-              top: -22,
+              top: -24,
               ml: 1,
             }}
           >
@@ -137,9 +139,22 @@ export default function BondLibraryCardGrid({ item }) {
         </Stack>
 
         {/* ASAPL */}
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, mt: -1 }}>
-          {item?.comapny_name || 'N.A.'}
-        </Typography>
+        <Tooltip title={item?.issuer_name || 'N.A.'} arrow>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                mt: 0,
+                fontWeight: 700,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '100%', 
+                cursor: 'default',
+              }}
+            >
+              {item?.company_name || 'N.A.'}
+            </Typography>
+          </Tooltip>
 
         {/* ISIN Number — compact spacing */}
         <Stack
@@ -159,140 +174,156 @@ export default function BondLibraryCardGrid({ item }) {
         </Stack>
       </Box>
 
-      {/* ISN */}
-
       {/* Bottom Section */}
-      <Box
-        sx={{
-          bgcolor: theme.palette.primary.main,
-          color: '#fff',
-          mt: 'auto',
-          p: 2.5,
-          borderRadius: 1,
-        }}
-      >
-        <Stack direction="row" spacing={3} sx={{ mb: 2 }}>
-          {/* First Column */}
-          <Stack spacing={2} sx={{ flex: 1 }}>
-            <Stack spacing={0.5}>
-              <Typography variant="caption" sx={{ opacity: 0.72 }}>
-                Price
-              </Typography>
-              <Typography variant="caption">₹{item?.price || 'N.A.'} </Typography>
-            </Stack>
-            <Stack spacing={0.5}>
-              <Typography variant="caption" sx={{ opacity: 0.72 }}>
-                Coupon
-              </Typography>
-              <Typography variant="caption">{item?.coupon_rate_percent || 'N.A.'}%</Typography>
-            </Stack>
-            <Stack spacing={0.5}>
-              <Typography variant="caption" sx={{ opacity: 0.72 }}>
-                IP Frequency
-              </Typography>
-              <Typography variant="caption">
-                {item?.interest_payment_frequency || 'N.A.'}
-              </Typography>
-            </Stack>
-            <Stack spacing={0.5}>
-              <Typography variant="caption" sx={{ opacity: 0.72 }}>
-                Type of Bond
-              </Typography>
-              <Typography
-                variant="caption"
-                noWrap
-                sx={{
-                  display: 'inline-block',
-                  maxWidth: '90px',
-                  textOverflow: 'ellipsis',
-                  overflow: 'hidden'
-                }}
-              >
-                {item?.issuer_type || 'N.A.'}
-              </Typography>
-            </Stack>
-          </Stack>
+  <Box
+  sx={{
+    bgcolor: theme.palette.primary.main,
+    color: '#fff',
+    mt: 'auto',
+    p: 2.5,
+    borderRadius: 1,
+  }}
+>
+  <Grid container spacing={2}>
 
-          {/* Second Column */}
-          {/* Second Column */}
-          <Stack spacing={2} sx={{ flex: 1 }}>
-            <Box
-              sx={{
-                width: 60,
-                height: 60,
-                borderRadius: '50%',
-                border: '2px solid #00A76F',
-                bgcolor: '#ffffff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                 mt:-1.2,
-                overflow: 'hidden',
-              }}
-            >
-              <Typography
-                variant='h5'
-                sx={{
-                  color: '#00A76F',
-                  textAlign: 'center',
-                  maxWidth: '100%',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  fontSize: 'clamp(12px, 4vw, 18px)',
-                  padding:'4px'
-                }}
-              >
-                {item?.ratings?.[0]?.rating || 'N.A.'}
-              </Typography>
-            </Box>
+    {/* ROW 1 : PRICE - RATING */}
+    <Grid item xs={6}>
+      <Stack spacing={0.5}>
+        <Typography variant="caption" sx={{ opacity: 0.72 }}>
+          Price
+        </Typography>
+        <Typography variant="caption">
+          ₹{item?.price || 'N.A.'}
+        </Typography>
+      </Stack>
+    </Grid>
 
-            {/* Yield aligned with Coupon */}
-            <Stack spacing={0.5} sx={{ width: '100%', mt: -1 }}>  
-              <Typography variant="caption" sx={{ opacity: 0.72 }}>
-                Yield
-              </Typography>
-              <Typography variant="caption">
-                {item?.ytm_percent || 'N.A.'}%
-              </Typography>
-            </Stack>
-
-            {/* Maturity Date aligned with IP Frequency */}
-            <Stack spacing={0.5} sx={{ width: '100%', mt: -1 }}>   
-              <Typography variant="caption" sx={{ opacity: 0.72 }}>
-                Maturity Date
-              </Typography>
-              <Typography variant="caption">
-                {item?.maturity_date || 'N.A.'}
-              </Typography>
-            </Stack>
-          </Stack>
-
-        </Stack>
-
-        {/* Know More Button */}
-        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-          <Button
-            size="small"
-            variant="contained"
-            onClick={handleKnowMore}
+    <Grid item xs={6} sx={{ display: "flex", justifyContent: "center" }}>
+      <Stack spacing={0.5} alignItems="center">
+        <Box
+          sx={{
+            width: 45,
+            height: 45,
+            borderRadius: "50%",
+            border: "2px solid #00A76F",
+            bgcolor: "#ffffff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
+          }}
+        >
+          <Typography
             sx={{
-              bgcolor: '#fff',
-              color: theme.palette.primary.main,
-              borderRadius: 20,
-              py: 1,
-              px: 3,
-              fontWeight: 600,
-              '&:hover': {
-                bgcolor: alpha('#fff', 0.9),
-                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-              },
+              fontSize: "14px",
+              color: "#00A76F",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              padding: "4px",
             }}
           >
-            Know More
-          </Button>
+            {item?.ratings?.[0]?.rating || "N.A."}
+          </Typography>
         </Box>
-      </Box>
+      </Stack>
+    </Grid>
+
+    {/* ROW 2 : COUPON - YIELD */}
+    <Grid item xs={6}>
+      <Stack spacing={0.5}>
+        <Typography variant="caption" sx={{ opacity: 0.72 }}>
+          Coupon
+        </Typography>
+        <Typography variant="caption">
+          {item?.coupon_rate_percent || "N.A."}%
+        </Typography>
+      </Stack>
+    </Grid>
+
+    <Grid item xs={6}>
+      <Stack spacing={0.5}>
+        <Typography variant="caption" sx={{ opacity: 0.72 }}>
+          Yield
+        </Typography>
+        <Typography variant="caption">
+          {item?.ytm_percent || "N.A."}%
+        </Typography>
+      </Stack>
+    </Grid>
+
+    {/* ROW 3 : IP FREQUENCY - MATURITY DATE */}
+    <Grid item xs={6}>
+      <Stack spacing={0.5}>
+        <Typography variant="caption" sx={{ opacity: 0.72 }}>
+          IP Frequency
+        </Typography>
+        <Typography variant="caption">
+          {item?.interest_payment_frequency || "N.A."}
+        </Typography>
+      </Stack>
+    </Grid>
+
+    <Grid item xs={6}>
+      <Stack spacing={0.5}>
+        <Typography variant="caption" sx={{ opacity: 0.72 }}>
+          Maturity Date
+        </Typography>
+        <Typography variant="caption">
+          {item?.maturity_date || "N.A."}
+        </Typography>
+      </Stack>
+    </Grid>
+
+    {/* ROW 4 : TYPE OF BOND */}
+    <Grid item xs={6}>
+      <Stack spacing={0.5}>
+        <Typography variant="caption" sx={{ opacity: 0.72 }}>
+          Type of Bond
+        </Typography>
+
+        <Typography
+          variant="caption"
+          noWrap
+          sx={{
+            maxWidth: "90px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {item?.issuer_type || "N.A."}
+        </Typography>
+      </Stack>
+    </Grid>
+
+    <Grid item xs={6}></Grid>
+
+  </Grid>
+
+  {/* BUTTON */}
+  <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
+    <Button
+      size="small"
+      variant="contained"
+      onClick={handleKnowMore}
+      sx={{
+        bgcolor: "#fff",
+        color: theme.palette.primary.main,
+        borderRadius: 20,
+        py: 1,
+        px: 3,
+        fontWeight: 600,
+        "&:hover": {
+          bgcolor: alpha("#fff", 0.9),
+          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+        },
+      }}
+    >
+      Know More
+    </Button>
+  </Box>
+</Box>
+
+
     </Box>
   );
 }

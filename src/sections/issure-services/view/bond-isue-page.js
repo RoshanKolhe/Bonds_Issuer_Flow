@@ -24,7 +24,7 @@ const mockBonds = [
   {
     asin_code: "INE08X507Q82",
     asapl: "12.00%",
-    comapny_name: "Satya microcapital ltd.",
+    company_name: "Satya microcapital ltd.",
     issue_date: "14-Jun-2024",
     isin_code: "INE08X507Q82",
     price: "10,00,000",
@@ -38,7 +38,7 @@ const mockBonds = [
   {
     asin_code: "INE12X307P62",
     asapl: "10.75%",
-    comapny_name: "Satya microcapital ltd",
+    company_name: "Satya microcapital ltd",
     issue_date: "10-Apr-2023",
     isin_code: "INE12X307P62",
     price: "10,00,000",
@@ -52,7 +52,7 @@ const mockBonds = [
   {
     asin_code: "INE98X102K81",
     asapl: "9.50%",
-    comapny_name: "Satya microcapital ltd",
+    company_name: "Satya microcapital ltd",
     issue_date: "20-Jan-2022",
     isin_code: "INE98X102K81",
     price: "5,00,000",
@@ -66,7 +66,7 @@ const mockBonds = [
   {
     asin_code: "INE01X107L91",
     asapl: "11.20%",
-    comapny_name: "Satya microcapital ltd",
+    company_name: "Satya microcapital ltd",
     issue_date: "05-Mar-2025",
     isin_code: "INE01X107L91",
     price: "8,00,000",
