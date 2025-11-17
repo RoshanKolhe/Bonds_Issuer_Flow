@@ -34,16 +34,23 @@ export default function RoiStepper() {
     localStorage.setItem("roi_form_data", JSON.stringify(formData));
   }, [formData]);
 
-  const handleSave = (data) => {
-    setFormData(data);
-  };
+  const handleSave = (key, data) => {
+  setFormData((prev) => ({
+    ...prev,
+    [key]: {
+      ...(prev?.[key] || {}),
+      ...data,
+    },
+  }));
+};
+
 
   const renderForm = () => {
     switch (activeSteps) {
       case 0:
         return (
           <FundPositionForm
-            currentFund={formData}
+            currentFund={formData?.fundPosition}
             setActiveStep={setActiveSteps}
             onSave={handleSave}
           />
