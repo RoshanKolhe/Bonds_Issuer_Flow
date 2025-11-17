@@ -19,7 +19,6 @@ const MainSchema = Yup.object().shape({
     netWorth: Yup.string().required('Net worth is required'),
     quickRatio: Yup.string().required('Quick ratio is required'),
     returnOnEquity: Yup.string().required('Retrun equity is required'),
-    debtEquityRatio: Yup.string().required('Equity ratio is required'),
     returnOnAssets: Yup.string().required('Return on Assets (ROA) is required'),
     debtServiceCoverageRatio: Yup.string().required('Debt Service Coverage Ratio (DSCR) is required')
 });
@@ -30,7 +29,7 @@ const MainSchema = Yup.object().shape({
         netWorth: currentFinancial?.netWorth || '',
         quickRatio: currentFinancial?.quickRatio || '',
         returnOnEquity: currentFinancial?.returnOnEquity || '',
-        debtEquityRatio: currentFinancial?.debtEquityRatio || '',
+  
         returnOnAssets: currentFinancial?.returnOnAssets || '',
         debtServiceCoverageRatio: currentFinancial?.debtServiceCoverageRatio || '',
 
