@@ -1,6 +1,7 @@
 // utils
 import { paramCase } from 'src/utils/change-case';
 import { _id, _postTitles } from 'src/_mock/assets';
+import KYCBankDetails from 'src/sections/kyc/kyc-bank-details';
 
 // ----------------------------------------------------------------------
 
@@ -17,7 +18,17 @@ const ROOTS = {
 // ----------------------------------------------------------------------
 
 export const paths = {
-  
+  kyc: '/kyc',
+  kycBasicInfo: '/kyc/basic-info',
+  kycCompanyDetails: '/kyc/company-details',
+  KYCBankDetails: '/kyc/bank-details',
+  KYCReviewAndSubmit: '/kyc/review-and-submit',
+  KYCSucessfull: '/kyc/sucessfull',
+  KYCSignatories: '/kyc/signatories',
+  KYCPending: '/kyc/pending',
+
+  // kycCompanyDetails: '/kyc/kyc-company-details',
+  kycAddressInfo: '/kyc/kyc-address-info',
   comingSoon: '/coming-soon',
   maintenance: '/maintenance',
   pricing: '/pricing',
@@ -93,14 +104,11 @@ export const paths = {
   // DASHBOARD
   dashboard: {
     root: ROOTS.DASHBOARD,
- 
-      general: {
-     
-      
+
+    general: {
       analytics: `${ROOTS.DASHBOARD}/analytics`,
- 
     },
-     
+
     user: {
       root: `${ROOTS.DASHBOARD}/user`,
       new: `${ROOTS.DASHBOARD}/user/new`,
@@ -119,43 +127,43 @@ export const paths = {
       roifundform: `${ROOTS.DASHBOARD}/issureservices/fund-position-form`,
       view: `${ROOTS.DASHBOARD}/issureservices/view`,
     },
-  //   product: {
-  //     root: `${ROOTS.DASHBOARD}/product`,
-  //     new: `${ROOTS.DASHBOARD}/product/new`,
-  //     details: (id) => `${ROOTS.DASHBOARD}/product/${id}`,
-  //     edit: (id) => `${ROOTS.DASHBOARD}/product/${id}/edit`,
-  //     demo: {
-  //       details: `${ROOTS.DASHBOARD}/product/${MOCK_ID}`,
-  //       edit: `${ROOTS.DASHBOARD}/product/${MOCK_ID}/edit`,
-  //     },
-  //   },
-  //   invoice: {
-  //     root: `${ROOTS.DASHBOARD}/invoice`,
-  //     new: `${ROOTS.DASHBOARD}/invoice/new`,
-  //     details: (id) => `${ROOTS.DASHBOARD}/invoice/${id}`,
-  //     edit: (id) => `${ROOTS.DASHBOARD}/invoice/${id}/edit`,
-  //     demo: {
-  //       details: `${ROOTS.DASHBOARD}/invoice/${MOCK_ID}`,
-  //       edit: `${ROOTS.DASHBOARD}/invoice/${MOCK_ID}/edit`,
-  //     },
-  //   },
-  //   post: {
-  //     root: `${ROOTS.DASHBOARD}/post`,
-  //     new: `${ROOTS.DASHBOARD}/post/new`,
-  //     details: (title) => `${ROOTS.DASHBOARD}/post/${paramCase(title)}`,
-  //     edit: (title) => `${ROOTS.DASHBOARD}/post/${paramCase(title)}/edit`,
-  //     demo: {
-  //       details: `${ROOTS.DASHBOARD}/post/${paramCase(MOCK_TITLE)}`,
-  //       edit: `${ROOTS.DASHBOARD}/post/${paramCase(MOCK_TITLE)}/edit`,
-  //     },
-  //   },
-  //   order: {
-  //     root: `${ROOTS.DASHBOARD}/order`,
-  //     details: (id) => `${ROOTS.DASHBOARD}/order/${id}`,
-  //     demo: {
-  //       details: `${ROOTS.DASHBOARD}/order/${MOCK_ID}`,
-  //     },
-  //   },
+    //   product: {
+    //     root: `${ROOTS.DASHBOARD}/product`,
+    //     new: `${ROOTS.DASHBOARD}/product/new`,
+    //     details: (id) => `${ROOTS.DASHBOARD}/product/${id}`,
+    //     edit: (id) => `${ROOTS.DASHBOARD}/product/${id}/edit`,
+    //     demo: {
+    //       details: `${ROOTS.DASHBOARD}/product/${MOCK_ID}`,
+    //       edit: `${ROOTS.DASHBOARD}/product/${MOCK_ID}/edit`,
+    //     },
+    //   },
+    //   invoice: {
+    //     root: `${ROOTS.DASHBOARD}/invoice`,
+    //     new: `${ROOTS.DASHBOARD}/invoice/new`,
+    //     details: (id) => `${ROOTS.DASHBOARD}/invoice/${id}`,
+    //     edit: (id) => `${ROOTS.DASHBOARD}/invoice/${id}/edit`,
+    //     demo: {
+    //       details: `${ROOTS.DASHBOARD}/invoice/${MOCK_ID}`,
+    //       edit: `${ROOTS.DASHBOARD}/invoice/${MOCK_ID}/edit`,
+    //     },
+    //   },
+    //   post: {
+    //     root: `${ROOTS.DASHBOARD}/post`,
+    //     new: `${ROOTS.DASHBOARD}/post/new`,
+    //     details: (title) => `${ROOTS.DASHBOARD}/post/${paramCase(title)}`,
+    //     edit: (title) => `${ROOTS.DASHBOARD}/post/${paramCase(title)}/edit`,
+    //     demo: {
+    //       details: `${ROOTS.DASHBOARD}/post/${paramCase(MOCK_TITLE)}`,
+    //       edit: `${ROOTS.DASHBOARD}/post/${paramCase(MOCK_TITLE)}/edit`,
+    //     },
+    //   },
+    //   order: {
+    //     root: `${ROOTS.DASHBOARD}/order`,
+    //     details: (id) => `${ROOTS.DASHBOARD}/order/${id}`,
+    //     demo: {
+    //       details: `${ROOTS.DASHBOARD}/order/${MOCK_ID}`,
+    //     },
+    //   },
     job: {
       root: `${ROOTS.DASHBOARD}/job`,
       new: `${ROOTS.DASHBOARD}/job/new`,
@@ -191,7 +199,7 @@ export const paths = {
       },
     },
 
-     designation: {
+    designation: {
       root: `${ROOTS.DASHBOARD}/designation`,
       new: `${ROOTS.DASHBOARD}/designation/new`,
       list: `${ROOTS.DASHBOARD}/designation/list`,
@@ -202,16 +210,16 @@ export const paths = {
         edit: `${ROOTS.DASHBOARD}/designation/${MOCK_ID}/edit`,
       },
     },
-  //   tour: {
-  //     root: `${ROOTS.DASHBOARD}/tour`,
-  //     new: `${ROOTS.DASHBOARD}/tour/new`,
-  //     details: (id) => `${ROOTS.DASHBOARD}/tour/${id}`,
-  //     edit: (id) => `${ROOTS.DASHBOARD}/tour/${id}/edit`,
-  //     demo: {
-  //       details: `${ROOTS.DASHBOARD}/tour/${MOCK_ID}`,
-  //       edit: `${ROOTS.DASHBOARD}/tour/${MOCK_ID}/edit`,
-  //     },
-  //   },
-  // },
+    //   tour: {
+    //     root: `${ROOTS.DASHBOARD}/tour`,
+    //     new: `${ROOTS.DASHBOARD}/tour/new`,
+    //     details: (id) => `${ROOTS.DASHBOARD}/tour/${id}`,
+    //     edit: (id) => `${ROOTS.DASHBOARD}/tour/${id}/edit`,
+    //     demo: {
+    //       details: `${ROOTS.DASHBOARD}/tour/${MOCK_ID}`,
+    //       edit: `${ROOTS.DASHBOARD}/tour/${MOCK_ID}/edit`,
+    //     },
+    //   },
+    // },
   },
 };
