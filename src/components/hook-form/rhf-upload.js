@@ -4,6 +4,7 @@ import { useFormContext, Controller } from 'react-hook-form';
 import FormHelperText from '@mui/material/FormHelperText';
 //
 import { UploadAvatar, Upload, UploadBox } from '../upload';
+import { Icon } from '@iconify/react';
 
 // ----------------------------------------------------------------------
 
@@ -102,4 +103,77 @@ RHFUpload.propTypes = {
   helperText: PropTypes.string,
   multiple: PropTypes.bool,
   name: PropTypes.string,
+};
+
+
+// ----------------------------------------------------------------------
+export function RHFUploadRectangle({ name, label = "Upload File", ...other }) {
+  const { control } = useFormContext();
+
+  return (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field: { onChange, value }, fieldState: { error } }) => {
+        // Extract file name (works for File object or preview string)
+        const fileName =
+          value instanceof File ? value.name : value?.name || value?.fileUrl?.split("/")?.pop();
+
+        return (
+          <>
+            {/* Hidden input */}
+            <input
+              type="file"
+              style={{ display: "none" }}
+              id={name}
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null;
+                onChange(file);
+              }}
+              {...other}
+            />
+
+            {/* Blue rectangle button */}
+            <label
+              htmlFor={name}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "6px",
+                width: "100%",
+                height: 50,
+                backgroundColor: "#2E6CF6",
+                color: "#fff",
+                borderRadius: "10px",
+                padding: "0 8px",
+                fontSize: "12px",
+                cursor: "pointer",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              <Icon icon={fileName ? "mdi:file" : "mdi:upload"} width={14} height={14} />
+              <span style={{ lineHeight: "15px" }}>
+                {fileName ? fileName : label}
+              </span>
+            </label>
+
+            {/* Error */}
+            {error && (
+              <FormHelperText error sx={{ mt: 0.5 }}>
+                {error.message}
+              </FormHelperText>
+            )}
+          </>
+        );
+      }}
+    />
+  );
+}
+
+RHFUploadRectangle.propTypes = {
+  name: PropTypes.string,
+  label: PropTypes.string,
 };
