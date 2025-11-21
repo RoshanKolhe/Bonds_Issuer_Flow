@@ -38,6 +38,10 @@ const UserListPage = lazy(() => import('src/pages/dashboard/user/list'));
 const UserAccountPage = lazy(() => import('src/pages/dashboard/user/account'));
 const UserCreatePage = lazy(() => import('src/pages/dashboard/user/new'));
 const UserEditPage = lazy(() => import('src/pages/dashboard/user/edit'));
+
+// COMPANY PROFILE
+const CompanyProfilePage = lazy(() => import('src/pages/dashboard/company/profile'));
+
 // COMPANY
 const ROIGuidancePage = lazy(() => import('src/pages/dashboard/issure-services/roi'));
 const ROIFundFormPage = lazy(() => import('src/pages/dashboard/issure-services/roi-fund-form'));
@@ -112,6 +116,13 @@ export const dashboardRoutes = [
           { path: 'new', element: <UserCreatePage /> },
           { path: ':id/edit', element: <UserEditPage /> },
           { path: 'account', element: <UserAccountPage /> },
+        ],
+      },
+      {
+        path: 'company',
+        children: [
+          { element: <CompanyProfilePage />, index: true },
+          { path: 'profile', element: <CompanyProfilePage /> },
         ],
       },
       {
