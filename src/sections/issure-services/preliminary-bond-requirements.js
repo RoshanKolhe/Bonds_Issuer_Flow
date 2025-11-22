@@ -209,7 +209,12 @@ export default function PreliminaryBondRequirements({
 
   const handleRemoveCollateralFile = (fieldName, setValue) => {
     setValue(fieldName, null, { shouldValidate: true });
+
+
   };
+
+
+
 
   // const onSubmit = async (data) => {
   //   console.log('✅ Submitted Data:', {
@@ -697,16 +702,16 @@ export default function PreliminaryBondRequirements({
         justifyContent="flex-end"
         sx={{ maxWidth: 400, ml: 'auto', mt: 5 }}
       >
-        <Grid item xs={6}>
-          <Button variant="outlined" sx={{ color: '#000000' }} onClick={() => setActiveStep(2)}>
+        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+          <Button variant="outlined" sx={{ color: '#000' }} onClick={() => setActiveStep(1)}>
             Cancel
           </Button>
-        </Grid>
-        <Grid item xs={6}>
+
           <LoadingButton variant="contained" sx={{ color: '#fff' }} onClick={handleNextClick}>
             Calculate ROI
           </LoadingButton>
-        </Grid>
+        </Box>
+
       </Grid>
     </>
   );

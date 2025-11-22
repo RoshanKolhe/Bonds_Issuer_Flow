@@ -1,5 +1,5 @@
 /* eslint-disable no-useless-escape */
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
@@ -35,11 +35,29 @@ import { LoadingButton } from '@mui/lab';
 
 // ----------------------------------------------------------------------
 
-export default function FundPositionForm({ currentFund, setActiveStep, onSave }) {
+export default function FundPositionForm({ currentFund, setActiveStep, onSave, percent }) {
   const { enqueueSnackbar } = useSnackbar();
-  const [ratingList, setRatingList] = React.useState([]);
-  const [editIndex, setEditIndex] = React.useState(null);
-  const [isEditing, setIsEditing] = React.useState(false);
+  const [ratingList, setRatingList] = useState([]);
+  const [editIndex, setEditIndex] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [fundCompleted, setFundCompleted] = useState(false);
+  const [ratingCompleted, setRatingCompleted] = useState(false);
+
+  const calculatePercent = () => {
+    let p = 0;
+    if (fundCompleted) p += 50;
+    if (ratingCompleted) p += 50;
+
+    if (typeof percent === "function") {
+      percent(p);   // send to parent stepper
+    }
+  };
+
+  useEffect(() => {
+    calculatePercent();
+  }, [fundCompleted, ratingCompleted]);
+
+
 
   // ---- FUND POSITION SCHEMA ----
   const FundPositionSchema = Yup.object().shape({
@@ -104,9 +122,9 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave })
     additionalRating: currentFund?.creditRating?.additionalRating || '',
     creditRatingLetter: currentFund?.creditRating?.creditRatingLetter
       ? {
-          fileUrl: currentFund.creditRating.creditRatingLetter.fileUrl,
-          preview: currentFund.creditRating.creditRatingLetter.fileUrl,
-        }
+        fileUrl: currentFund.creditRating.creditRatingLetter.fileUrl,
+        preview: currentFund.creditRating.creditRatingLetter.fileUrl,
+      }
       : null,
   };
 
@@ -145,7 +163,10 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave })
   const onSubmitFund = async (data) => {
     console.log('🟦 FUND POSITION SUBMIT DATA:', data);
 
+    onSave("fundPosition", data);
+
     enqueueSnackbar('Fund position saved! (console only)', { variant: 'success' });
+    setFundCompleted(true);
 
     return true;
   };
@@ -159,7 +180,10 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave })
         : null,
     });
 
+    onSave("creditRating", { creditRating: data });
+
     enqueueSnackbar('Credit rating saved! (console only)', { variant: 'success' });
+    setRatingCompleted(true);
 
     return true;
   };
@@ -570,4 +594,5 @@ CreditRatingCard.propTypes = {
   setActiveStep: PropTypes.func,
   currentFund: PropTypes.object,
   onSave: PropTypes.func,
+  percent: PropTypes.func
 };
