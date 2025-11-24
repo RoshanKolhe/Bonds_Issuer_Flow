@@ -703,7 +703,7 @@ export default function PreliminaryBondRequirements({
         sx={{ maxWidth: 400, ml: 'auto', mt: 5 }}
       >
         <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-          <Button variant="outlined" sx={{ color: '#000' }} onClick={() => setActiveStep(1)}>
+          <Button variant="outlined" sx={{ color: '#000' }} onClick={() => setActiveStep(3)}>
             Cancel
           </Button>
 
