@@ -139,6 +139,12 @@ export const paths = {
       roifundform: `${ROOTS.DASHBOARD}/issureservices/fund-position-form`,
       view: `${ROOTS.DASHBOARD}/issureservices/view`,
     },
+    mybond: {
+      root: `${ROOTS.DASHBOARD}/mybond`,
+      list: `${ROOTS.DASHBOARD}/mybond/list`,
+      create: `${ROOTS.DASHBOARD}/mybond/create`,
+      investor: `${ROOTS.DASHBOARD}/mybond/investor`,
+    },
     //   product: {
     //     root: `${ROOTS.DASHBOARD}/product`,
     //     new: `${ROOTS.DASHBOARD}/product/new`,

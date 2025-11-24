@@ -97,6 +97,14 @@ export function useNavData() {
             ],
 
           },
+          {
+            title: t('my bonds'),
+            path: paths.dashboard.mybond.root,
+            icon: <Iconify icon="mdi:file-certificate-outline" width={24} />,
+            children: [
+              { title: t('create'), path: paths.dashboard.mybond.create },
+            ],
+          },
 
             // JOB
           // {

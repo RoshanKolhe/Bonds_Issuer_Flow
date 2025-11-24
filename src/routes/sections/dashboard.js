@@ -46,6 +46,9 @@ const CompanyProfilePage = lazy(() => import('src/pages/dashboard/company/profil
 const ROIGuidancePage = lazy(() => import('src/pages/dashboard/issure-services/roi'));
 const ROIFundFormPage = lazy(() => import('src/pages/dashboard/issure-services/roi-fund-form'));
 const AfterCompleteRoiStagePage = lazy(()=> import('src/pages/dashboard/issure-services/view'))
+//
+const MyBondCreatePage = lazy(() => import('src/pages/dashboard/mybond/create'))
+
 // WORKFLOW
 const ReactFlowPage = lazy(() => import('src/pages/dashboard/react-flow/board'));
 // SCHEDULER
@@ -132,6 +135,15 @@ export const dashboardRoutes = [
           { path: 'roi', element: <ROIGuidancePage /> },
           { path: 'fund-position-form', element: <ROIFundFormPage /> },
           {path:'view', element:<AfterCompleteRoiStagePage/>},
+        ],
+      },
+      {
+        path: 'mybond',
+        children: [
+          { element: <MyBondCreatePage />, index: true },
+          { path: 'list', element: <ROIGuidancePage /> },
+          { path: 'create', element: <MyBondCreatePage /> },
+          {path:'investor', element:<AfterCompleteRoiStagePage/>},
         ],
       },
       {
