@@ -48,16 +48,14 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave, p
     if (fundCompleted) p += 50;
     if (ratingCompleted) p += 50;
 
-    if (typeof percent === "function") {
-      percent(p);   // send to parent stepper
+    if (typeof percent === 'function') {
+      percent(p); // send to parent stepper
     }
   };
 
   useEffect(() => {
     calculatePercent();
   }, [fundCompleted, ratingCompleted]);
-
-
 
   // ---- FUND POSITION SCHEMA ----
   const FundPositionSchema = Yup.object().shape({
@@ -90,20 +88,33 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave, p
     }),
 
     // Always required (independent of ratingList)
-    vault: Yup.string().required('Vault Till is required'),
+    vault: Yup.string().when([], {
+      is: () => ratingList.length === 0,
+      then: (schema) => schema.required('Vault Till is required'),
+      otherwise: (schema) => schema.notRequired(),
+    }),
 
-    additionalRating: Yup.string().required('Additional Rating is required'),
+    additionalRating: Yup.string().when([], {
+      is: () => ratingList.length === 0,
+      then: (schema) => schema.required('Additional Rating is required'),
+      otherwise: (schema) => schema.notRequired(),
+    }),
 
-    creditRatingLetter: Yup.mixed()
-      .required('Credit rating letter is required')
-      .test('fileSize', 'Max size is 5MB', (value) => {
-        if (!value || typeof value === 'string') return true;
-        return value.size <= 5 * 1024 * 1024;
-      })
-      .test('fileType', 'Only PDF allowed', (value) => {
-        if (!value || typeof value === 'string') return true;
-        return value.type === 'application/pdf';
-      }),
+    creditRatingLetter: Yup.mixed().when([], {
+      is: () => ratingList.length === 0, // If no ratings in table → apply validation
+      then: (schema) =>
+        schema
+          .required('Credit rating letter is required')
+          .test('fileSize', 'Max size is 5MB', (value) => {
+            if (!value || typeof value === 'string') return true;
+            return value.size <= 5 * 1024 * 1024;
+          })
+          .test('fileType', 'Only PDF allowed', (value) => {
+            if (!value || typeof value === 'string') return true;
+            return value.type === 'application/pdf';
+          }),
+      otherwise: (schema) => schema.notRequired(), // If table already has 1 row → no validation
+    }),
   });
 
   // ---- FUND POSITION DEFAULT VALUES ----
@@ -122,9 +133,9 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave, p
     additionalRating: currentFund?.creditRating?.additionalRating || '',
     creditRatingLetter: currentFund?.creditRating?.creditRatingLetter
       ? {
-        fileUrl: currentFund.creditRating.creditRatingLetter.fileUrl,
-        preview: currentFund.creditRating.creditRatingLetter.fileUrl,
-      }
+          fileUrl: currentFund.creditRating.creditRatingLetter.fileUrl,
+          preview: currentFund.creditRating.creditRatingLetter.fileUrl,
+        }
       : null,
   };
 
@@ -160,10 +171,12 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave, p
     formState: { errors: ratingErrors },
   } = ratingForm;
 
+  const values = watchRating();
+
   const onSubmitFund = async (data) => {
     console.log('🟦 FUND POSITION SUBMIT DATA:', data);
 
-    onSave("fundPosition", data);
+    onSave('fundPosition', data);
 
     enqueueSnackbar('Fund position saved! (console only)', { variant: 'success' });
     setFundCompleted(true);
@@ -180,7 +193,7 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave, p
         : null,
     });
 
-    onSave("creditRating", { creditRating: data });
+    onSave('creditRating', { creditRating: data });
 
     enqueueSnackbar('Credit rating saved! (console only)', { variant: 'success' });
     setRatingCompleted(true);
@@ -189,36 +202,62 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave, p
   };
 
   const handleAddRating = () => {
+    console.log('CREDIT LETTER VALUE:', ratingValues.creditRatingLetter);
     const agency = ratingValues.selectedAgency;
     const rating = ratingValues.selectedRating;
+    const vault = ratingValues.vault;
+    const additionalRating = ratingValues.additionalRating;
+    const creditLetter = ratingValues.creditRatingLetter;
 
-    if (!agency || !rating) {
-      enqueueSnackbar('Please select both Agency and Rating', { variant: 'error' });
+    if (!agency || !rating || !vault || !additionalRating || !creditLetter) {
+      enqueueSnackbar('Please fill all required fields', { variant: 'error' });
       return;
     }
 
-    // 🔹 If editing, update instead of adding
-    if (isEditing) {
-      const updatedList = [...ratingList];
-      updatedList[editIndex] = { agency, rating };
-      setRatingList(updatedList);
+    let creditLetterObj = null;
 
-      // reset editing state
-      setIsEditing(false);
-      setEditIndex(null);
-
-      enqueueSnackbar('Rating updated!', { variant: 'success' });
+    if (creditLetter instanceof File) {
+      creditLetterObj = {
+        fileUrl: null, // backend url not yet available
+        preview: URL.createObjectURL(creditLetter), // create blob URL
+      };
     } else {
-      // 🔹 Normal Add
-      const newEntry = { agency, rating };
-      setRatingList((prev) => [...prev, newEntry]);
+      creditLetterObj = {
+        fileUrl: creditLetter?.fileUrl || null,
+        preview: creditLetter?.preview || null,
+      };
     }
 
-    // clear form fields
+    if (isEditing) {
+      const updated = [...ratingList];
+      updated[editIndex] = {
+        agency,
+        rating,
+        vault,
+        additionalRating,
+        creditRatingLetter: creditLetterObj,
+      };
+      setRatingList(updated);
+    } else {
+      setRatingList((prev) => [
+        ...prev,
+        {
+          agency,
+          rating,
+          vault,
+          additionalRating,
+          creditRatingLetter: creditLetterObj,
+        },
+      ]);
+    }
+
+    // Clear fields
     setRatingValue('selectedAgency', '');
     setRatingValue('selectedRating', '');
+    setRatingValue('vault', '');
+    setRatingValue('additionalRating', '');
+    setRatingValue('creditRatingLetter', null);
   };
-
   const handleDeleteRating = (index) => {
     setRatingList((prev) => prev.filter((_, i) => i !== index));
   };
@@ -440,67 +479,6 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave, p
               <YupErrorMessage name="selectedRating" />
             </Grid>
           </Grid>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
-            <Button variant="outlined" color="primary" onClick={handleAddRating}>
-              {isEditing ? 'Update Rating' : 'Add Rating'}
-            </Button>
-          </Box>
-          {ratingList.length > 0 && (
-            <Box sx={{ mt: 4, mb: 2 }}>
-              {' '}
-              {/* mb: 20px */}
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                Added Ratings
-              </Typography>
-              <TableContainer component={Card} sx={{ borderRadius: 2, mb: 2 }}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ fontWeight: 700 }}>Rating Agency</TableCell>
-                      <TableCell sx={{ fontWeight: 700 }}>Rating</TableCell>
-                      <TableCell sx={{ fontWeight: 700 }} align="center">
-                        Actions
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-
-                  <TableBody>
-                    {ratingList.map((row, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{row.agency}</TableCell>
-                        <TableCell>{row.rating}</TableCell>
-                        <TableCell align="center">
-                          {/* Edit Icon */}
-                          <Icon
-                            icon="mdi:pencil-outline"
-                            width="22"
-                            height="22"
-                            style={{ cursor: 'pointer', marginRight: 12 }}
-                            onClick={() => {
-                              setRatingValue('selectedAgency', row.agency);
-                              setRatingValue('selectedRating', row.rating);
-
-                              setEditIndex(index);
-                              setIsEditing(true);
-                            }}
-                          />
-
-                          {/* Delete Icon */}
-                          <Icon
-                            icon="mdi:delete-outline"
-                            width="22"
-                            height="22"
-                            style={{ cursor: 'pointer', color: '#d32f2f' }}
-                            onClick={() => handleDeleteRating(index)}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
-          )}
 
           <RHFTextField
             name="vault"
@@ -525,6 +503,97 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave, p
             maxSizeMB={2}
           />
           <YupErrorMessage name="creditRatingLetter" />
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1, mt: 2 }}>
+            <Button variant="outlined" color="primary" onClick={handleAddRating}>
+              {isEditing ? 'Update Rating' : 'Add Rating'}
+            </Button>
+          </Box>
+          {ratingList.length > 0 && (
+            <Box sx={{ mt: 4, mb: 2 }}>
+              {' '}
+              {/* mb: 20px */}
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                Added Ratings
+              </Typography>
+              <TableContainer component={Card} sx={{ borderRadius: 2, mb: 2 }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 700 }}>Rating Agency</TableCell>
+                      <TableCell sx={{ fontWeight: 700 }}>Rating</TableCell>
+                      <TableCell sx={{ fontWeight: 700 }}>Vault Till</TableCell>
+                      <TableCell sx={{ fontWeight: 700 }}>Additional Rating</TableCell>
+                      <TableCell sx={{ fontWeight: 700 }}>Credit Rating Letter</TableCell>
+                      <TableCell sx={{ fontWeight: 700 }} align="center">
+                        Actions
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+
+                  <TableBody>
+                    {ratingList.map((row, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{row.agency}</TableCell>
+                        <TableCell>{row.rating}</TableCell>
+                        <TableCell>{row.vault}</TableCell>
+                        <TableCell>{row.additionalRating}</TableCell>
+                        <TableCell>
+                          {row?.creditRatingLetter?.fileUrl || row?.creditRatingLetter?.preview ? (
+                            <Button
+                              variant="text"
+                              color="primary"
+                              onClick={() => {
+                                const url =
+                                  row.creditRatingLetter.fileUrl || row.creditRatingLetter.preview;
+
+                                window.open(url, '_blank');
+                              }}
+                            >
+                              Preview
+                            </Button>
+                          ) : (
+                            'No File'
+                          )}
+                        </TableCell>
+
+                        <TableCell align="center">
+                          {/* Edit Icon */}
+                          <Icon
+                            icon="mdi:pencil-outline"
+                            width="22"
+                            height="22"
+                            style={{ cursor: 'pointer', marginRight: 12 }}
+                            onClick={() => {
+                              setRatingValue('selectedAgency', row.agency);
+                              setRatingValue('selectedRating', row.rating);
+                              setRatingValue('vault', row.vault);
+                              setRatingValue('additionalRating', row.additionalRating);
+                              setRatingValue('creditRatingLetter', {
+                                fileUrl: row.creditRatingLetter?.fileUrl || null,
+                                preview: row.creditRatingLetter?.preview || null,
+                              });
+
+                              setEditIndex(index);
+                              setIsEditing(true);
+                            }}
+                          />
+
+                          {/* Delete Icon */}
+                          <Icon
+                            icon="mdi:delete-outline"
+                            width="22"
+                            height="22"
+                            style={{ cursor: 'pointer', color: '#d32f2f' }}
+                            onClick={() => handleDeleteRating(index)}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          )}
           <Box
             sx={{
               mt: 3,
@@ -594,5 +663,5 @@ CreditRatingCard.propTypes = {
   setActiveStep: PropTypes.func,
   currentFund: PropTypes.object,
   onSave: PropTypes.func,
-  percent: PropTypes.func
+  percent: PropTypes.func,
 };
