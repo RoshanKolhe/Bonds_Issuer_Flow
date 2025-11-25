@@ -127,6 +127,13 @@ export const paths = {
       roifundform: `${ROOTS.DASHBOARD}/issureservices/fund-position-form`,
       view: `${ROOTS.DASHBOARD}/issureservices/view`,
     },
+    trustee: {
+      root: `${ROOTS.DASHBOARD}/trustee`,
+      list: `${ROOTS.DASHBOARD}/trustee/list`,
+      details:`${ROOTS.DASHBOARD}/trustee/details`,
+      update:`${ROOTS.DASHBOARD}/trustee/update`,
+      compare:`${ROOTS.DASHBOARD}/trustee/compare`
+    },
     //   product: {
     //     root: `${ROOTS.DASHBOARD}/product`,
     //     new: `${ROOTS.DASHBOARD}/product/new`,

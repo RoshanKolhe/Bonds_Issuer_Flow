@@ -95,6 +95,15 @@ export function useNavData() {
             children: [
               { title: t('ROI guidance'), path: paths.dashboard.issureservices.roi },
             ],
+          },
+
+            {
+            title: t('intermediates'),
+            path: paths.dashboard.trustee.root,
+            icon: ICONS.company,
+            children: [
+              { title: t('Debenture Trustees'), path: paths.dashboard.trustee.list },
+            ],
 
           },
 

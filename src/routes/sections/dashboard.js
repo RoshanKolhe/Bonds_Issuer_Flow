@@ -41,7 +41,7 @@ const UserEditPage = lazy(() => import('src/pages/dashboard/user/edit'));
 // COMPANY
 const ROIGuidancePage = lazy(() => import('src/pages/dashboard/issure-services/roi'));
 const ROIFundFormPage = lazy(() => import('src/pages/dashboard/issure-services/roi-fund-form'));
-const AfterCompleteRoiStagePage = lazy(()=> import('src/pages/dashboard/issure-services/view'))
+const AfterCompleteRoiStagePage = lazy(() => import('src/pages/dashboard/issure-services/view'))
 // WORKFLOW
 const ReactFlowPage = lazy(() => import('src/pages/dashboard/react-flow/board'));
 // SCHEDULER
@@ -58,7 +58,13 @@ const DesignationViewPage = lazy(() => import('src/pages/dashboard/designation/v
 const BlogPostsPage = lazy(() => import('src/pages/dashboard/post/list'));
 const BlogPostPage = lazy(() => import('src/pages/dashboard/post/details'));
 const BlogNewPostPage = lazy(() => import('src/pages/dashboard/post/new'));
-const BlogEditPostPage = lazy(() => import('src/pages/dashboard/post/edit'));
+const BlogEditPostPage = lazy(() => import('src/pages/dashboard/post/edit'))
+// Trusteeee
+const TrusteeListPage = lazy(() => import('src/pages/dashboard/trustee/list'));
+const TrusteeDetailsPage = lazy(() => import('src/pages/dashboard/trustee/details'));
+const TrusteeEditPage= lazy(()=> import('src/pages/dashboard/trustee/edit'));
+const TrusteeComparePage= lazy(()=> import('src/pages/dashboard/trustee/comapre'))
+
 // JOB
 const JobDetailsPage = lazy(() => import('src/pages/dashboard/job/details'));
 const JobListPage = lazy(() => import('src/pages/dashboard/job/list'));
@@ -88,11 +94,11 @@ export const dashboardRoutes = [
     path: 'dashboard',
     element: (
       // <AuthGuard>
-        <DashboardLayout>
-          <Suspense fallback={<LoadingScreen />}>
-            <Outlet />
-          </Suspense>
-        </DashboardLayout>
+      <DashboardLayout>
+        <Suspense fallback={<LoadingScreen />}>
+          <Outlet />
+        </Suspense>
+      </DashboardLayout>
       // </AuthGuard>
     ),
     children: [
@@ -120,7 +126,17 @@ export const dashboardRoutes = [
           { element: <ROIGuidancePage />, index: true },
           { path: 'roi', element: <ROIGuidancePage /> },
           { path: 'fund-position-form', element: <ROIFundFormPage /> },
-          {path:'view', element:<AfterCompleteRoiStagePage/>},
+          { path: 'view', element: <AfterCompleteRoiStagePage /> },
+        ],
+      },
+      {
+        path: 'trustee',
+        children: [
+          { element: <TrusteeListPage />, index: true },
+          { path: 'list', element: <TrusteeListPage /> },
+          { path: 'details', element: <TrusteeDetailsPage /> },
+          {path:'update', element:<TrusteeEditPage/>},
+          {path:'compare', element:<TrusteeComparePage/>}
         ],
       },
       {
