@@ -3,6 +3,7 @@ import MainFile from '../borrowing/main';
 import FinancialDetails from '../financial-details';
 import FundPositionForm from '../fund-positions';
 import IsinActivation from '../isin-activation';
+import LaunchIssue from '../launch-issue';
 import MyBondNewIssue from '../mybond-new-issue';
 import MyBondStar from '../mybond-start';
 import PreliminaryBondRequirements from '../preliminary-bond-requirements';
@@ -21,7 +22,8 @@ export default function MyBondCreate() {
       {/* <FinancialDetails /> */}
       {/* <PreliminaryBondRequirements /> */}
       {/* <RegulatoryFiling /> */}
-      <IsinActivation />
+      {/* <IsinActivation /> */}
+      <LaunchIssue />
     </>
   );
 }
