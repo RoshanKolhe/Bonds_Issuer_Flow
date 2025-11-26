@@ -275,7 +275,7 @@ export default function MyBondNewIssue({ currentIssue }) {
           </Grid>
         </CardContent>
       </Card>
-      <Card sx={{ p: 2 }}>
+      <Card sx={{ p: 2, py: 5 }}>
         <Typography variant="h6" fontWeight="bold" sx={{ pb: '20px' }}>
           Upload Documents
         </Typography>

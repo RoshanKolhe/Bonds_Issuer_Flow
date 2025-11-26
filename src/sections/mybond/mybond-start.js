@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
-  Grid,
-  Typography,
-  Button,
-  Stack,
-} from '@mui/material';
+import { Box, Card, CardContent, Grid, Typography, Button, Stack } from '@mui/material';
 
 import Iconify from 'src/components/iconify';
 
@@ -20,17 +12,13 @@ const features = [
 
 export default function MyBondStar() {
   return (
-    <Card sx={{ borderRadius: 3, overflow: 'hidden' }}>
+    <Card sx={{ borderRadius: 3, overflow: 'hidden', py: 5 }}>
       <CardContent sx={{ p: { xs: 3, md: 5 } }}>
         <Grid container spacing={4} alignItems="center">
-
           {/* Left Content */}
           <Grid item xs={12} md={6}>
             <Box>
-              <Typography
-                variant="h2"
-                sx={{ lineHeight: 1.3, fontWeight:700 }}
-              >
+              <Typography variant="h2" sx={{ lineHeight: 1.3, fontWeight: 700 }}>
                 Issue Bonds, Grow your Business
               </Typography>
 
@@ -40,12 +28,7 @@ export default function MyBondStar() {
 
               <Stack spacing={2} sx={{ mb: 4 }}>
                 {features.map((feature, index) => (
-                  <Stack
-                    key={index}
-                    direction="row"
-                    alignItems="center"
-                    spacing={1.5}
-                  >
+                  <Stack key={index} direction="row" alignItems="center" spacing={1.5}>
                     <Box
                       sx={{
                         color: 'primary.main',
@@ -56,7 +39,10 @@ export default function MyBondStar() {
                       <Iconify icon={feature.icon} width={22} />
                     </Box>
 
-                    <Typography color="text.secondary" sx={{fontSize:{md:'20px', xs:'14px'}}}>
+                    <Typography
+                      color="text.secondary"
+                      sx={{ fontSize: { md: '20px', xs: '14px' } }}
+                    >
                       {feature.text}
                     </Typography>
                   </Stack>
@@ -87,7 +73,7 @@ export default function MyBondStar() {
           </Grid>
 
           {/* Right Content - Image */}
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6} sx={{ display: { xs: 'none', md: 'block' } }}>
             <Box
               sx={{
                 display: 'flex',

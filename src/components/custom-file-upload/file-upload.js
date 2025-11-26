@@ -12,6 +12,7 @@ import {
   LinearProgress,
   Grid,
   Stack,
+  Tooltip,
 } from '@mui/material';
 import { Icon } from '@iconify/react';
 
@@ -340,9 +341,21 @@ function UploadBox({
         }}
       >
         <Icon icon={icon} color={color} width="32" height="32" />
-        <Typography variant="subtitle1" fontWeight={500}>
-          {label}
-        </Typography>
+        <Tooltip title={label} placement="top" arrow>
+          <Typography
+            variant="subtitle1"
+            fontWeight={500}
+            sx={{
+              maxWidth: '230px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              cursor: 'pointer',
+            }}
+          >
+            {label}
+          </Typography>
+        </Tooltip>
       </Card>
 
       {/* Right Upload Area */}
