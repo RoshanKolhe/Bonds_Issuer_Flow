@@ -65,7 +65,13 @@ const DesignationViewPage = lazy(() => import('src/pages/dashboard/designation/v
 const BlogPostsPage = lazy(() => import('src/pages/dashboard/post/list'));
 const BlogPostPage = lazy(() => import('src/pages/dashboard/post/details'));
 const BlogNewPostPage = lazy(() => import('src/pages/dashboard/post/new'));
-const BlogEditPostPage = lazy(() => import('src/pages/dashboard/post/edit'));
+const BlogEditPostPage = lazy(() => import('src/pages/dashboard/post/edit'))
+// Trusteeee
+const TrusteeListPage = lazy(() => import('src/pages/dashboard/trustee/list'));
+const TrusteeDetailsPage = lazy(() => import('src/pages/dashboard/trustee/details'));
+const TrusteeEditPage= lazy(()=> import('src/pages/dashboard/trustee/edit'));
+const TrusteeComparePage= lazy(()=> import('src/pages/dashboard/trustee/comapre'))
+
 // JOB
 const JobDetailsPage = lazy(() => import('src/pages/dashboard/job/details'));
 const JobListPage = lazy(() => import('src/pages/dashboard/job/list'));
@@ -95,11 +101,11 @@ export const dashboardRoutes = [
     path: 'dashboard',
     element: (
       // <AuthGuard>
-        <DashboardLayout>
-          <Suspense fallback={<LoadingScreen />}>
-            <Outlet />
-          </Suspense>
-        </DashboardLayout>
+      <DashboardLayout>
+        <Suspense fallback={<LoadingScreen />}>
+          <Outlet />
+        </Suspense>
+      </DashboardLayout>
       // </AuthGuard>
     ),
     children: [
