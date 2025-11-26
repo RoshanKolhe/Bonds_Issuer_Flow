@@ -144,7 +144,7 @@ export default function JwtLoginView() {
               textDecoration: 'underline',
             },
           }}
-          onClick={() => router.push(paths.auth.amplify.forgotPassword)}
+          onClick={() => router.push(paths.auth.jwt.forgotPassword)}
         >
           Forgot password?
         </Link>
