@@ -107,7 +107,7 @@ export function AuthProvider({ children }) {
 
     const { accessToken, user } = response.data;
 
-    if (user?.permissions?.includes('admin')) {
+    if (user?.roles?.includes('company')) {
       setSession(accessToken);
       dispatch({
         type: 'LOGIN',
