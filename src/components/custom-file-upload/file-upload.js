@@ -222,9 +222,22 @@ function UploadBox({
                       ))}
                     </Stack>
                   ) : (
-                    <Typography variant="body2" fontWeight={500}>
-                      {value.name}
-                    </Typography>
+                    <Tooltip title={value.name} placement="top" arrow>
+                      <Typography
+                        variant="body2"
+                        fontWeight={500}
+                        sx={{
+                          maxWidth: '230px',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          cursor: 'pointer',
+                          display: 'block',
+                        }}
+                      >
+                        {value.name}
+                      </Typography>
+                    </Tooltip>
                   )}
                 </Grid>
               </Stack>
