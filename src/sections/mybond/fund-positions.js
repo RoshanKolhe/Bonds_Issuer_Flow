@@ -35,7 +35,17 @@ import { LoadingButton } from '@mui/lab';
 
 // ----------------------------------------------------------------------
 
-export default function FundPositionForm({ currentFund, setActiveStep, onSave, percent }) {
+const dummyCards = [
+  { image: '/assets/images/roi/crisil.png', label: 'CRISIL' },
+  { image: '/assets/images/roi/ICRA.png', label: 'ICRA' },
+  { image: '/assets/images/roi/india-ratings.png', label: 'India Ratings' },
+  { image: '/assets/images/roi/ICRA.png', label: 'Rating Agency 4' },
+  { image: '/assets/images/roi/ICRA.png', label: 'Rating Agency 5' },
+];
+
+// ----------------------------------------------------------------------
+
+export default function FundPositionForm({ currentFund, setActiveStep, percent }) {
   const { enqueueSnackbar } = useSnackbar();
   const [ratingList, setRatingList] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
@@ -75,6 +85,7 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave, p
   // ---- CREDIT RATING SCHEMA ----
   const CreditRatingSchema = Yup.object().shape({
     // Conditional validation (only required if no ratings added)
+    hasCredit: Yup.string().required('Please select credit rating option'),
     selectedAgency: Yup.string().when([], {
       is: () => ratingList.length === 0,
       then: (schema) => schema.required('Rating agency is required'),
@@ -127,6 +138,7 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave, p
 
   // ---- CREDIT RATING DEFAULT VALUES ----
   const ratingDefaults = {
+    hasCredit: currentFund?.hasCredit || 'yes',
     selectedAgency: currentFund?.creditRating?.selectedAgency || '',
     selectedRating: currentFund?.creditRating?.selectedRating || '',
     vault: currentFund?.creditRating?.vault || '',
@@ -176,8 +188,6 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave, p
   const onSubmitFund = async (data) => {
     console.log('🟦 FUND POSITION SUBMIT DATA:', data);
 
-    onSave('fundPosition', data);
-
     enqueueSnackbar('Fund position saved! (console only)', { variant: 'success' });
     setFundCompleted(true);
 
@@ -192,8 +202,6 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave, p
         ? { fileUrl: data.creditRatingLetter.fileUrl }
         : null,
     });
-
-    onSave('creditRating', { creditRating: data });
 
     enqueueSnackbar('Credit rating saved! (console only)', { variant: 'success' });
     setRatingCompleted(true);
@@ -258,6 +266,7 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave, p
     setRatingValue('additionalRating', '');
     setRatingValue('creditRatingLetter', null);
   };
+
   const handleDeleteRating = (index) => {
     setRatingList((prev) => prev.filter((_, i) => i !== index));
   };
@@ -279,12 +288,6 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave, p
         ...ratingForm.getValues(),
         ratings: ratingList,
       };
-
-      // 3. Save everything in parent (so data persists)
-      onSave('fundPosition', {
-        fundPosition: fundPayload,
-        creditRating: ratingPayload,
-      });
 
       enqueueSnackbar('All data saved in state!', { variant: 'success' });
 
@@ -427,173 +430,221 @@ export default function FundPositionForm({ currentFund, setActiveStep, onSave, p
       <FormProvider methods={ratingForm} onSubmit={handleRatingSubmit(onSubmitRating)}>
         {/* 3. Conditional Rendering */}
         <Card sx={{ p: 4, borderRadius: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', mb: 4 }}>
-          <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-            Credit Ratings Available
-          </Typography>
-
-          <Grid container spacing={4}>
-            <Grid item xs={12} md={4}>
-              <RHFSelect
-                name="selectedAgency"
-                label="Select Rating Agency"
-                size="small"
-                sx={{ mb: 2 }}
+          <Box sx={{ mb: '20px' }}>
+            <FormControl>
+              <FormLabel
+                sx={{ fontWeight: 500, color: 'black', '&.Mui-focused': { color: 'black' } }}
               >
-                <MenuItem value="">Select the appropriate rating agency</MenuItem>
-                {agencies.map((agency, idx) => (
-                  <MenuItem key={idx} value={agency}>
-                    {agency}
-                  </MenuItem>
-                ))}
-              </RHFSelect>
-            </Grid>
-
-            <Grid item xs={12} md={8}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
-                Rating
-              </Typography>
-              <Grid container spacing={2}>
-                {ratings
-                  .filter((rating) => {
-                    // Example logic: only show ratings based on selected category
-                    if (ratingValues.category === 'Credit') return rating.value <= 3;
-                    if (ratingValues.category === 'Risk') return rating.value > 3;
-                    return true;
-                  })
-                  .map((rating) => (
-                    <Grid item xs={4} key={rating.value}>
-                      <FormControlLabel
-                        value={rating.value}
-                        control={
-                          <Radio
-                            checked={ratingValues.selectedRating === rating.value}
-                            onChange={(e) => setRatingValue('selectedRating', e.target.value)}
-                            color="primary"
-                          />
-                        }
-                        label={rating.label}
-                      />
-                    </Grid>
-                  ))}
-              </Grid>
-              <YupErrorMessage name="selectedRating" />
-            </Grid>
-          </Grid>
-
-          <RHFTextField
-            name="vault"
-            label="Vault Till"
-            fullWidth
-            size="small"
-            sx={{ pb: '30px' }}
-          />
-          <RHFTextField
-            name="additionalRating"
-            label="Additional Rating"
-            fullWidth
-            size="small"
-            sx={{ pb: '30px' }}
-          />
-
-          {/* 5. Credit Rating Letter Upload */}
-          <RHFFileUploadBox
-            name="creditRatingLetter"
-            label="Upload Credit Rating Letter"
-            icon="mdi:file-document-outline"
-            maxSizeMB={2}
-          />
-          <YupErrorMessage name="creditRatingLetter" />
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1, mt: 2 }}>
-            <Button variant="outlined" color="primary" onClick={handleAddRating}>
-              {isEditing ? 'Update Rating' : 'Add Rating'}
-            </Button>
+                Do You Already Have a Credit Rating? <span style={{ color: 'red' }}>*</span>
+              </FormLabel>
+              <RadioGroup
+                row
+                value={values.hasCredit}
+                onChange={(e) => setRatingValue('hasCredit', e.target.value)}
+              >
+                <FormControlLabel value="yes" control={<Radio color="primary" />} label="Yes" />
+                <FormControlLabel value="no" control={<Radio color="primary" />} label="No" />
+              </RadioGroup>
+            </FormControl>
           </Box>
-          {ratingList.length > 0 && (
-            <Box sx={{ mt: 4, mb: 2 }}>
-              {' '}
-              {/* mb: 20px */}
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                Added Ratings
+          {values.hasCredit === 'yes' ? (
+            <>
+              <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
+                Credit Ratings Available
               </Typography>
-              <TableContainer component={Card} sx={{ borderRadius: 2, mb: 2 }}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ fontWeight: 700 }}>Rating Agency</TableCell>
-                      <TableCell sx={{ fontWeight: 700 }}>Rating</TableCell>
-                      <TableCell sx={{ fontWeight: 700 }}>Vault Till</TableCell>
-                      <TableCell sx={{ fontWeight: 700 }}>Additional Rating</TableCell>
-                      <TableCell sx={{ fontWeight: 700 }}>Credit Rating Letter</TableCell>
-                      <TableCell sx={{ fontWeight: 700 }} align="center">
-                        Actions
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
 
-                  <TableBody>
-                    {ratingList.map((row, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{row.agency}</TableCell>
-                        <TableCell>{row.rating}</TableCell>
-                        <TableCell>{row.vault}</TableCell>
-                        <TableCell>{row.additionalRating}</TableCell>
-                        <TableCell>
-                          {row?.creditRatingLetter?.fileUrl || row?.creditRatingLetter?.preview ? (
-                            <Button
-                              variant="text"
-                              color="primary"
-                              onClick={() => {
-                                const url =
-                                  row.creditRatingLetter.fileUrl || row.creditRatingLetter.preview;
-
-                                window.open(url, '_blank');
-                              }}
-                            >
-                              Preview
-                            </Button>
-                          ) : (
-                            'No File'
-                          )}
-                        </TableCell>
-
-                        <TableCell align="center">
-                          {/* Edit Icon */}
-                          <Icon
-                            icon="mdi:pencil-outline"
-                            width="22"
-                            height="22"
-                            style={{ cursor: 'pointer', marginRight: 12 }}
-                            onClick={() => {
-                              setRatingValue('selectedAgency', row.agency);
-                              setRatingValue('selectedRating', row.rating);
-                              setRatingValue('vault', row.vault);
-                              setRatingValue('additionalRating', row.additionalRating);
-                              setRatingValue('creditRatingLetter', {
-                                fileUrl: row.creditRatingLetter?.fileUrl || null,
-                                preview: row.creditRatingLetter?.preview || null,
-                              });
-
-                              setEditIndex(index);
-                              setIsEditing(true);
-                            }}
-                          />
-
-                          {/* Delete Icon */}
-                          <Icon
-                            icon="mdi:delete-outline"
-                            width="22"
-                            height="22"
-                            style={{ cursor: 'pointer', color: '#d32f2f' }}
-                            onClick={() => handleDeleteRating(index)}
-                          />
-                        </TableCell>
-                      </TableRow>
+              <Grid container spacing={4}>
+                <Grid item xs={12} md={4}>
+                  <RHFSelect
+                    name="selectedAgency"
+                    label="Select Rating Agency"
+                    size="small"
+                    sx={{ mb: 2 }}
+                  >
+                    <MenuItem value="">Select the appropriate rating agency</MenuItem>
+                    {agencies.map((agency, idx) => (
+                      <MenuItem key={idx} value={agency}>
+                        {agency}
+                      </MenuItem>
                     ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                  </RHFSelect>
+                </Grid>
+
+                <Grid item xs={12} md={8}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
+                    Rating
+                  </Typography>
+                  <Grid container spacing={2}>
+                    {ratings
+                      .filter((rating) => {
+                        // Example logic: only show ratings based on selected category
+                        if (ratingValues.category === 'Credit') return rating.value <= 3;
+                        if (ratingValues.category === 'Risk') return rating.value > 3;
+                        return true;
+                      })
+                      .map((rating) => (
+                        <Grid item xs={4} key={rating.value}>
+                          <FormControlLabel
+                            value={rating.value}
+                            control={
+                              <Radio
+                                checked={ratingValues.selectedRating === rating.value}
+                                onChange={(e) => setRatingValue('selectedRating', e.target.value)}
+                                color="primary"
+                              />
+                            }
+                            label={rating.label}
+                          />
+                        </Grid>
+                      ))}
+                  </Grid>
+                  <YupErrorMessage name="selectedRating" />
+                </Grid>
+              </Grid>
+
+              <RHFTextField
+                name="vault"
+                label="Vault Till"
+                fullWidth
+                size="small"
+                sx={{ pb: '30px', mt: '30px' }}
+              />
+              <RHFTextField
+                name="additionalRating"
+                label="Additional Rating"
+                fullWidth
+                size="small"
+                sx={{ pb: '30px' }}
+              />
+
+              {/* 5. Credit Rating Letter Upload */}
+              <RHFFileUploadBox
+                name="creditRatingLetter"
+                label="Upload Credit Rating Letter"
+                icon="mdi:file-document-outline"
+                maxSizeMB={2}
+              />
+              <YupErrorMessage name="creditRatingLetter" />
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1, mt: 2 }}>
+                <Button variant="outlined" color="primary" onClick={handleAddRating}>
+                  {isEditing ? 'Update Rating' : 'Add Rating'}
+                </Button>
+              </Box>
+              {ratingList.length > 0 && (
+                <Box sx={{ mt: 4, mb: 2 }}>
+                  {' '}
+                  {/* mb: 20px */}
+                  <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                    Added Ratings
+                  </Typography>
+                  <TableContainer component={Card} sx={{ borderRadius: 2, mb: 2 }}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 700 }}>Rating Agency</TableCell>
+                          <TableCell sx={{ fontWeight: 700 }}>Rating</TableCell>
+                          <TableCell sx={{ fontWeight: 700 }}>Vault Till</TableCell>
+                          <TableCell sx={{ fontWeight: 700 }}>Additional Rating</TableCell>
+                          <TableCell sx={{ fontWeight: 700 }}>Credit Rating Letter</TableCell>
+                          <TableCell sx={{ fontWeight: 700 }} align="center">
+                            Actions
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+
+                      <TableBody>
+                        {ratingList.map((row, index) => (
+                          <TableRow key={index}>
+                            <TableCell>{row.agency}</TableCell>
+                            <TableCell>{row.rating}</TableCell>
+                            <TableCell>{row.vault}</TableCell>
+                            <TableCell>{row.additionalRating}</TableCell>
+                            <TableCell>
+                              {row?.creditRatingLetter?.fileUrl ||
+                              row?.creditRatingLetter?.preview ? (
+                                <Button
+                                  variant="text"
+                                  color="primary"
+                                  onClick={() => {
+                                    const url =
+                                      row.creditRatingLetter.fileUrl ||
+                                      row.creditRatingLetter.preview;
+
+                                    window.open(url, '_blank');
+                                  }}
+                                >
+                                  Preview
+                                </Button>
+                              ) : (
+                                'No File'
+                              )}
+                            </TableCell>
+
+                            <TableCell align="center">
+                              {/* Edit Icon */}
+                              <Icon
+                                icon="mdi:pencil-outline"
+                                width="22"
+                                height="22"
+                                style={{ cursor: 'pointer', marginRight: 12 }}
+                                onClick={() => {
+                                  setRatingValue('selectedAgency', row.agency);
+                                  setRatingValue('selectedRating', row.rating);
+                                  setRatingValue('vault', row.vault);
+                                  setRatingValue('additionalRating', row.additionalRating);
+                                  setRatingValue('creditRatingLetter', {
+                                    fileUrl: row.creditRatingLetter?.fileUrl || null,
+                                    preview: row.creditRatingLetter?.preview || null,
+                                  });
+
+                                  setEditIndex(index);
+                                  setIsEditing(true);
+                                }}
+                              />
+
+                              {/* Delete Icon */}
+                              <Icon
+                                icon="mdi:delete-outline"
+                                width="22"
+                                height="22"
+                                style={{ cursor: 'pointer', color: '#d32f2f' }}
+                                onClick={() => handleDeleteRating(index)}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Box>
+              )}
+            </>
+          ) : (
+            <Box
+              sx={{
+                overflowX: 'auto',
+                scrollBehavior: 'smooth',
+                mb: 4,
+                scrollbarWidth: { xs: 'none', md: 'thin' },
+                msOverflowStyle: { xs: 'none', md: 'auto' },
+                '&::-webkit-scrollbar': { height: 8, display: { xs: 'none', md: 'block' } },
+                '&::-webkit-scrollbar-thumb': { backgroundColor: '#ccc', borderRadius: 4 },
+              }}
+            >
+              <Box sx={{ display: 'flex', gap: 2, width: 'fit-content' }}>
+                {dummyCards.map((card, index) => (
+                  <Box key={index} sx={{ minWidth: 250, flexShrink: 0 }}>
+                    <CreditRatingCard
+                      imageSrc={card.image}
+                      label={card.label}
+                      onClick={() => setRatingValue('selectedAgency', card.label)}
+                    />
+                  </Box>
+                ))}
+              </Box>
             </Box>
           )}
+
           <Box
             sx={{
               mt: 3,
@@ -662,6 +713,5 @@ CreditRatingCard.propTypes = {
   onClick: PropTypes.func,
   setActiveStep: PropTypes.func,
   currentFund: PropTypes.object,
-  onSave: PropTypes.func,
   percent: PropTypes.func,
 };

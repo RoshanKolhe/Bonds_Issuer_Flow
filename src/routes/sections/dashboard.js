@@ -38,10 +38,17 @@ const UserListPage = lazy(() => import('src/pages/dashboard/user/list'));
 const UserAccountPage = lazy(() => import('src/pages/dashboard/user/account'));
 const UserCreatePage = lazy(() => import('src/pages/dashboard/user/new'));
 const UserEditPage = lazy(() => import('src/pages/dashboard/user/edit'));
+
+// COMPANY PROFILE
+const CompanyProfilePage = lazy(() => import('src/pages/dashboard/company/profile'));
+
 // COMPANY
 const ROIGuidancePage = lazy(() => import('src/pages/dashboard/issure-services/roi'));
 const ROIFundFormPage = lazy(() => import('src/pages/dashboard/issure-services/roi-fund-form'));
-const AfterCompleteRoiStagePage = lazy(() => import('src/pages/dashboard/issure-services/view'))
+const AfterCompleteRoiStagePage = lazy(()=> import('src/pages/dashboard/issure-services/view'))
+//
+const MyBondCreatePage = lazy(() => import('src/pages/dashboard/mybond/create'))
+
 // WORKFLOW
 const ReactFlowPage = lazy(() => import('src/pages/dashboard/react-flow/board'));
 // DOCUMENT DRAFTING
@@ -123,22 +130,28 @@ export const dashboardRoutes = [
         ],
       },
       {
+        path: 'company',
+        children: [
+          { element: <CompanyProfilePage />, index: true },
+          { path: 'profile', element: <CompanyProfilePage /> },
+        ],
+      },
+      {
         path: 'issureservices',
         children: [
           { element: <ROIGuidancePage />, index: true },
           { path: 'roi', element: <ROIGuidancePage /> },
           { path: 'fund-position-form', element: <ROIFundFormPage /> },
-          { path: 'view', element: <AfterCompleteRoiStagePage /> },
+          {path:'view', element:<AfterCompleteRoiStagePage/>},
         ],
       },
       {
-        path: 'trustee',
+        path: 'mybond',
         children: [
-          { element: <TrusteeListPage />, index: true },
-          { path: 'list', element: <TrusteeListPage /> },
-          { path: 'details', element: <TrusteeDetailsPage /> },
-          {path:'update', element:<TrusteeEditPage/>},
-          {path:'compare', element:<TrusteeComparePage/>}
+          { element: <MyBondCreatePage />, index: true },
+          { path: 'list', element: <ROIGuidancePage /> },
+          { path: 'create', element: <MyBondCreatePage /> },
+          {path:'investor', element:<AfterCompleteRoiStagePage/>},
         ],
       },
       {

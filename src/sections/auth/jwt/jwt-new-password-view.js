@@ -27,7 +27,7 @@ import { Card } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
-export default function AmplifyNewPasswordView() {
+export default function JwtNewPasswordView() {
   const { newPassword, forgotPassword } = useAuthContext();
 
   const router = useRouter();

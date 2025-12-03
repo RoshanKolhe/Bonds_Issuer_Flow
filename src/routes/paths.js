@@ -74,6 +74,8 @@ export const paths = {
     jwt: {
       login: `${ROOTS.AUTH}/jwt/login`,
       register: `${ROOTS.AUTH}/jwt/register`,
+      newPassword: `${ROOTS.AUTH}/jwt/new-password`,
+      forgotPassword: `${ROOTS.AUTH}/jwt/forgot-password`,
     },
     firebase: {
       login: `${ROOTS.AUTH}/firebase/login`,
@@ -121,6 +123,18 @@ export const paths = {
       //   edit: `${ROOTS.DASHBOARD}/user/${MOCK_ID}/edit`,
       // },
     },
+    company: {
+      root: `${ROOTS.DASHBOARD}/company`,
+      new: `${ROOTS.DASHBOARD}/company/new`,
+      list: `${ROOTS.DASHBOARD}/company/list`,
+      // cards: `${ROOTS.DASHBOARD}/company/cards`,
+      profile: `${ROOTS.DASHBOARD}/company/profile`,
+      // account: `${ROOTS.DASHBOARD}/company/account`,
+      // edit: (id) => `${ROOTS.DASHBOARD}/company/${id}/edit`,
+      // demo: {
+      //   edit: `${ROOTS.DASHBOARD}/company/${MOCK_ID}/edit`,
+      // },
+    },
     issureservices: {
       root: `${ROOTS.DASHBOARD}/issureservices`,
       roi: `${ROOTS.DASHBOARD}/issureservices/roi`,
@@ -138,6 +152,12 @@ export const paths = {
       root: `${ROOTS.DASHBOARD}/documentDrafting`,
       documentDrafting: `${ROOTS.DASHBOARD}/documentDrafting/document-drafting`,
 
+    },
+    mybond: {
+      root: `${ROOTS.DASHBOARD}/mybond`,
+      list: `${ROOTS.DASHBOARD}/mybond/list`,
+      create: `${ROOTS.DASHBOARD}/mybond/create`,
+      investor: `${ROOTS.DASHBOARD}/mybond/investor`,
     },
     //   product: {
     //     root: `${ROOTS.DASHBOARD}/product`,
