@@ -44,6 +44,8 @@ const ROIFundFormPage = lazy(() => import('src/pages/dashboard/issure-services/r
 const AfterCompleteRoiStagePage = lazy(() => import('src/pages/dashboard/issure-services/view'))
 // WORKFLOW
 const ReactFlowPage = lazy(() => import('src/pages/dashboard/react-flow/board'));
+// DOCUMENT DRAFTING
+const DocumentDraftingFormPage = lazy(()=> import('src/pages/dashboard/document-drafting/document-drafting-forms'))
 // SCHEDULER
 const SchedulerNewPage = lazy(() => import('src/pages/dashboard/scheduler/new'));
 const SchedulerListPage = lazy(() => import('src/pages/dashboard/scheduler/list'));
@@ -166,6 +168,13 @@ export const dashboardRoutes = [
           // { path: ':id', element: <InvoiceDetailsPage /> },
           // { path: ':id/edit', element: <InvoiceEditPage /> },
           // { path: 'new', element: <InvoiceCreatePage /> },
+        ],
+      },
+        {
+        path: 'documentDrafting',
+        children: [
+          { element: <DocumentDraftingFormPage />, index: true },
+          { path: 'document-drafting', element: <DocumentDraftingFormPage /> },
         ],
       },
 

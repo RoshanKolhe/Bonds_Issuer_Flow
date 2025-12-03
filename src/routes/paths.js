@@ -130,9 +130,14 @@ export const paths = {
     trustee: {
       root: `${ROOTS.DASHBOARD}/trustee`,
       list: `${ROOTS.DASHBOARD}/trustee/list`,
-      details:`${ROOTS.DASHBOARD}/trustee/details`,
-      update:`${ROOTS.DASHBOARD}/trustee/update`,
-      compare:`${ROOTS.DASHBOARD}/trustee/compare`
+      details: `${ROOTS.DASHBOARD}/trustee/details`,
+      update: `${ROOTS.DASHBOARD}/trustee/update`,
+      compare: `${ROOTS.DASHBOARD}/trustee/compare`
+    },
+    documentDrafting: {
+      root: `${ROOTS.DASHBOARD}/documentDrafting`,
+      documentDrafting: `${ROOTS.DASHBOARD}/documentDrafting/document-drafting`,
+
     },
     //   product: {
     //     root: `${ROOTS.DASHBOARD}/product`,

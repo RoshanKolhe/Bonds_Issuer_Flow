@@ -94,6 +94,7 @@ export function useNavData() {
             icon: ICONS.company,
             children: [
               { title: t('ROI guidance'), path: paths.dashboard.issureservices.roi },
+              { title: t('Document Drafting'), path: paths.dashboard.documentDrafting.documentDrafting },
             ],
           },
 
