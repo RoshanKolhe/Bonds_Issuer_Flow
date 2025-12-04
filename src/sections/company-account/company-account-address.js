@@ -11,6 +11,7 @@ import {
   MenuItem,
   Checkbox,
   FormControlLabel,
+  Card,
 } from '@mui/material';
 
 import FormProvider, { RHFTextField, RHFSelect } from 'src/components/hook-form';
@@ -295,7 +296,7 @@ export default function AddressNewForm({ onClose }) {
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-      <Paper sx={{ p: 3, borderRadius: 2 }}>
+    <Stack component={Card} spacing={3} sx={{ p: 3 }}>
         <Stack spacing={4}>
           {/* ---------------- File Upload ---------------- */}
           <Stack spacing={2}>
@@ -419,7 +420,7 @@ export default function AddressNewForm({ onClose }) {
             </button>
           </Box>
         </Stack>
-      </Paper>
+      </Stack>
     </FormProvider>
   );
 }

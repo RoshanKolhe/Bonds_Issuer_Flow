@@ -115,6 +115,15 @@ export function useNavData() {
               { title: t('create'), path: paths.dashboard.mybond.create },
             ],
           },
+            {
+            title: t('signatories'),
+            path: paths.dashboard.signatories.root,
+            icon: <Iconify icon="mdi:file-certificate-outline" width={24} />,
+            children: [
+              { title: t('create'), path: paths.dashboard.signatories.new },
+                { title: t('list'), path: paths.dashboard.signatories.list },
+            ],
+          },
 
             // JOB
           // {

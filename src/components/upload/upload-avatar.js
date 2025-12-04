@@ -27,7 +27,7 @@ export default function UploadAvatar({ error, file, disabled, helperText, sx, ..
 
   const hasError = isDragReject || !!error;
 
-  const imgUrl = typeof file === 'string' ? file : file?.preview;
+  const imgUrl = typeof file === 'string' ? file : file?.fileUrl;
 
   const renderPreview = hasFile && (
     <Image

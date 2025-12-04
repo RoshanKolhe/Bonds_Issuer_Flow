@@ -159,16 +159,12 @@ export const paths = {
       create: `${ROOTS.DASHBOARD}/mybond/create`,
       investor: `${ROOTS.DASHBOARD}/mybond/investor`,
     },
-    //   product: {
-    //     root: `${ROOTS.DASHBOARD}/product`,
-    //     new: `${ROOTS.DASHBOARD}/product/new`,
-    //     details: (id) => `${ROOTS.DASHBOARD}/product/${id}`,
-    //     edit: (id) => `${ROOTS.DASHBOARD}/product/${id}/edit`,
-    //     demo: {
-    //       details: `${ROOTS.DASHBOARD}/product/${MOCK_ID}`,
-    //       edit: `${ROOTS.DASHBOARD}/product/${MOCK_ID}/edit`,
-    //     },
-    //   },
+    signatories: {
+      root: `${ROOTS.DASHBOARD}/signatories`,
+      new: `${ROOTS.DASHBOARD}/signatories/new`,
+      list: `${ROOTS.DASHBOARD}/signatories/list`,
+      edit: (id) => `${ROOTS.DASHBOARD}/signatories/${id}/edit`,
+    },
     //   invoice: {
     //     root: `${ROOTS.DASHBOARD}/invoice`,
     //     new: `${ROOTS.DASHBOARD}/invoice/new`,
