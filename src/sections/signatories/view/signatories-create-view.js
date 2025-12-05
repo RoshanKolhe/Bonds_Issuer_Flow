@@ -18,7 +18,7 @@ export default function SignatoriesCreateView() {
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
       <CustomBreadcrumbs
-        heading="Create a new Scheduler"
+        heading="Create a new Signatoires"
         links={[
           {
             name: 'Dashboard',

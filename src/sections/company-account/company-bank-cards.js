@@ -4,7 +4,7 @@ import Iconify from 'src/components/iconify';
 import { useGetBankDetails } from 'src/api/bank-details';
 
 
-export default function BankDetailsView({ bank, onViewRow }) {
+export default function BankDetailsCard({ bank, onViewRow }) {
 
     if (!bank) return null;
 
@@ -34,24 +34,45 @@ export default function BankDetailsView({ bank, onViewRow }) {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 2,
+                cursor: 'pointer',
+                transition: '0.2s',
+                '&:hover': {
+                    transform: 'scale(1.01)',
+                    boxShadow: '0 6px 18px rgba(0,0,0,0.12)',
+                },
             }}
+            onClick={onViewRow}
         >
             {/* Header */}
             <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Stack direction="row" spacing={2} alignItems="center">
-                    <Iconify icon="mdi:bank" width={30}  />
+                    <Iconify icon="mdi:bank" width={30} />
                     <Box>
                         <Typography variant="subtitle2" color="text.secondary">Bank Name</Typography>
 
-                        <Stack direction="row"  alignItems="center">
-                            <Typography variant="h6">{bank?.bankName}</Typography>
+                        <Stack direction="row" alignItems="center">
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    cursor: 'pointer',
+                                    transition: '0.2s',
+                                    '&:hover': {
+                                        color: 'primary.main',
+                                        textDecoration: 'underline',
+                                    },
+                                }}
+                                onClick={onViewRow}
+                            >
+                                {bank?.bankName}
+                            </Typography>
+
 
                             {bank?.isPrimary && (
                                 <Box
                                     sx={{
                                         display: 'flex',
                                         alignItems: 'center',
-                                       color:'#1d5ec7ff',
+                                        color: '#1d5ec7ff',
                                         px: 1.2,
                                         py: 0.4,
                                         borderRadius: '12px',
@@ -99,7 +120,7 @@ export default function BankDetailsView({ bank, onViewRow }) {
                 {/* IFSC Code */}
                 <Grid item xs={12} md={6}>
                     <Stack direction="row" spacing={2} alignItems="center">
-                        <Iconify icon="mdi:web" width={22}  />
+                        <Iconify icon="mdi:web" width={22} />
                         <Box>
                             <Typography variant="caption" color="text.secondary">IFSC Code</Typography>
                             <Typography variant="subtitle1">{bank?.ifscCode || '-'}</Typography>
@@ -121,7 +142,7 @@ export default function BankDetailsView({ bank, onViewRow }) {
                 {/* Account Proof + Eye Icon */}
                 <Grid item xs={12} md={6}>
                     <Stack direction="row" spacing={2} alignItems="center">
-                        <Iconify icon="mdi:file-document-outline" width={22}  />
+                        <Iconify icon="mdi:file-document-outline" width={22} />
 
                         <Box flex={1}>
                             <Typography variant="caption" color="text.secondary">
@@ -136,11 +157,16 @@ export default function BankDetailsView({ bank, onViewRow }) {
 
                                 <IconButton
                                     size="small"
-                                    onClick={onViewRow}
-                                    sx={{ ml: 0.5 }} // small spacing after label
+                                    onClick={() => {
+                                        if (bank?.bankAccountProof?.fileUrl) {
+                                            window.open(bank.bankAccountProof.fileUrl, "_blank");
+                                        }
+                                    }}
+                                    sx={{ ml: 0.5 }}
                                 >
                                     <Iconify icon="mdi:eye" width={20} />
                                 </IconButton>
+
                             </Typography>
                         </Box>
 
@@ -153,6 +179,6 @@ export default function BankDetailsView({ bank, onViewRow }) {
     );
 }
 
-BankDetailsView.propTypes = {
+BankDetailsCard.propTypes = {
     onViewRow: PropTypes.func,
 };

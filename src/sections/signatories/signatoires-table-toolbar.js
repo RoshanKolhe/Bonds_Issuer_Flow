@@ -12,7 +12,7 @@ import CustomPopover, { usePopover } from 'src/components/custom-popover';
 
 // ----------------------------------------------------------------------
 
-export default function SchedulerTableToolbar({ filters, onFilters }) {
+export default function SignatoiresTableToolbar({ filters, onFilters }) {
   const popover = usePopover();
 
   const handleFilterName = useCallback(
@@ -41,7 +41,7 @@ export default function SchedulerTableToolbar({ filters, onFilters }) {
             fullWidth
             value={filters.name}
             onChange={handleFilterName}
-            placeholder="Search by Scheduler..."
+            placeholder="Search by Signatoires..."
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -82,7 +82,7 @@ export default function SchedulerTableToolbar({ filters, onFilters }) {
   );
 }
 
-SchedulerTableToolbar.propTypes = {
+SignatoiresTableToolbar.propTypes = {
   filters: PropTypes.object,
   onFilters: PropTypes.func,
 };

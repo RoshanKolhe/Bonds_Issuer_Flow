@@ -27,14 +27,14 @@ export function useGetBankDetails() {
 
 // ----------------------------------------------------------------------
 
-export function useGetBankDetail(id) {
-  const URL = id ? endpoints.bankDetails.details(id) : null;
+export function useGetBankDetail(accountId) {
+  const URL = accountId ? endpoints.bankDetails.details(accountId) : null;
 
   const { data, isLoading, error, isValidating } = useSWR(URL, fetcher);
 
   const memoizedValue = useMemo(
     () => ({
-      bankDetail: data,
+      bankDetail: data?.bankDetails || [],
       bankDetailLoading: isLoading,
       bankDetailError: error,
       bankDetailValidating: isValidating,

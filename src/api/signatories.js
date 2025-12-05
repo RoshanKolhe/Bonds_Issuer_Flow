@@ -27,14 +27,14 @@ export function useGetSignatories() {
 
 // ----------------------------------------------------------------------
 
-export function useGetSignatorie(id) {
-  const URL = id ? endpoints.signatories.details(id) : null;
+export function useGetSignatorie(signatoryId) {
+  const URL = signatoryId ? endpoints.signatories.details(signatoryId) : null;
 
   const { data, isLoading, error, isValidating } = useSWR(URL, fetcher);
 
   const memoizedValue = useMemo(
     () => ({
-      signatorie: data,
+      signatorie:  data?.signatory || [], 
       signatorieLoading: isLoading,
       signatorieError: error,
       signatorieValidating: isValidating,

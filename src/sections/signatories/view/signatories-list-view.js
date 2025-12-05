@@ -40,10 +40,11 @@ import {
   TablePaginationCustom,
 } from 'src/components/table';
 //
-import SchedulerTableFiltersResult from '../scheduler-table-filters-result';
-import SchedulerTableRow from '../scheduler-table-row';
-import SchedulerTableToolbar from '../scheduler-table-toolbar';
+
 import { useGetSignatories } from 'src/api/signatories';
+import SignatoiresTableRow from '../signatoires-table-row';
+import SignatoiresTableFiltersResult from '../signatoires-table-filters-result';
+import SignatoiresTableToolbar from '../signatoires-table-toolbar';
 
 
 
@@ -84,7 +85,7 @@ console.log(Signatories);
 
   const handleViewRow = useCallback(
     (id) => {
-      router.push(paths.dashboard.category.details(id));
+      router.push(paths.dashboard.signatories.details(id));
     },
     [router]
   );
@@ -185,10 +186,10 @@ console.log(Signatories);
             ))}
           </Tabs>
 
-          <SchedulerTableToolbar filters={filters} onFilters={handleFilters} />
+          <SignatoiresTableToolbar filters={filters} onFilters={handleFilters} />
 
           {canReset && (
-            <SchedulerTableFiltersResult
+            <SignatoiresTableFiltersResult
               filters={filters}
               onFilters={handleFilters}
               onResetFilters={handleResetFilters}
@@ -243,7 +244,7 @@ console.log(Signatories);
                       table.page * table.rowsPerPage + table.rowsPerPage
                     )
                     .map((row) => (
-                      <SchedulerTableRow
+                      <SignatoiresTableRow
                         key={row.id}
                         row={row}
                         selected={table.selected.includes(row.id)}

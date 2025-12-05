@@ -10,7 +10,7 @@ import Iconify from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
-export default function SchedulerTableFiltersResult({
+export default function SignatoiresTableFiltersResult({
   filters,
   onFilters,
   onResetFilters,
@@ -49,7 +49,7 @@ export default function SchedulerTableFiltersResult({
   );
 }
 
-SchedulerTableFiltersResult.propTypes = {
+SignatoiresTableFiltersResult.propTypes = {
   filters: PropTypes.object,
   onFilters: PropTypes.func,
   onResetFilters: PropTypes.func,
