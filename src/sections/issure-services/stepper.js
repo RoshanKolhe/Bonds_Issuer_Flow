@@ -119,8 +119,6 @@ export default function RoiStepper({ percent }) {
     return !isNaN(saved) && saved >= 0 && saved < steps.length ? saved : 0;
   });
 
-
-
   const [formData, setFormData] = useState(() => {
     const savedData = localStorage.getItem("roi_form_data");
     return savedData ? JSON.parse(savedData) : null;

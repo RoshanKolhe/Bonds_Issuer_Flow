@@ -11,10 +11,9 @@ import RegulatoryFiling from '../regulatory-filing';
 // ----------------------------------------------------------------------
 
 export default function MyBondCreate() {
-
   return (
     <>
-      {/* <MyBondStar/> */}
+      <MyBondStar />
       {/* <MyBondNewIssue  /> */}
       {/* <FundPositionForm /> */}
       {/* <AuditedFinancial /> */}
@@ -23,7 +22,7 @@ export default function MyBondCreate() {
       {/* <PreliminaryBondRequirements /> */}
       {/* <RegulatoryFiling /> */}
       {/* <IsinActivation /> */}
-      <LaunchIssue />
+      {/* <LaunchIssue /> */}
     </>
   );
 }

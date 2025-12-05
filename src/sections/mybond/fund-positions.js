@@ -45,21 +45,23 @@ const dummyCards = [
 
 // ----------------------------------------------------------------------
 
-export default function FundPositionForm({ currentFund, setActiveStep, percent }) {
+export default function FundPositionForm({ currentFund, saveStepData, setActiveStepId, percent }) {
   const { enqueueSnackbar } = useSnackbar();
   const [ratingList, setRatingList] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [fundCompleted, setFundCompleted] = useState(false);
   const [ratingCompleted, setRatingCompleted] = useState(false);
+  const [payloadData, setpayloadData] = useState(null);
 
   const calculatePercent = () => {
     let p = 0;
     if (fundCompleted) p += 50;
     if (ratingCompleted) p += 50;
-
+    
     if (typeof percent === 'function') {
       percent(p); // send to parent stepper
+      console.log('🟠 Fund Position Percent Calculation Triggered',p);
     }
   };
 
@@ -99,9 +101,9 @@ export default function FundPositionForm({ currentFund, setActiveStep, percent }
     }),
 
     // Always required (independent of ratingList)
-    vault: Yup.string().when([], {
+    valid: Yup.string().when([], {
       is: () => ratingList.length === 0,
-      then: (schema) => schema.required('Vault Till is required'),
+      then: (schema) => schema.required('Valid Till is required'),
       otherwise: (schema) => schema.notRequired(),
     }),
 
@@ -141,7 +143,7 @@ export default function FundPositionForm({ currentFund, setActiveStep, percent }
     hasCredit: currentFund?.hasCredit || 'yes',
     selectedAgency: currentFund?.creditRating?.selectedAgency || '',
     selectedRating: currentFund?.creditRating?.selectedRating || '',
-    vault: currentFund?.creditRating?.vault || '',
+    valid: currentFund?.creditRating?.valid || '',
     additionalRating: currentFund?.creditRating?.additionalRating || '',
     creditRatingLetter: currentFund?.creditRating?.creditRatingLetter
       ? {
@@ -190,7 +192,7 @@ export default function FundPositionForm({ currentFund, setActiveStep, percent }
 
     enqueueSnackbar('Fund position saved! (console only)', { variant: 'success' });
     setFundCompleted(true);
-
+    setpayloadData((prev) => ({ ...prev, fundPosition: data }));
     return true;
   };
 
@@ -202,10 +204,8 @@ export default function FundPositionForm({ currentFund, setActiveStep, percent }
         ? { fileUrl: data.creditRatingLetter.fileUrl }
         : null,
     });
-
-    enqueueSnackbar('Credit rating saved! (console only)', { variant: 'success' });
+    setpayloadData((prev) => ({ ...prev, creditratings: data }));
     setRatingCompleted(true);
-
     return true;
   };
 
@@ -213,11 +213,11 @@ export default function FundPositionForm({ currentFund, setActiveStep, percent }
     console.log('CREDIT LETTER VALUE:', ratingValues.creditRatingLetter);
     const agency = ratingValues.selectedAgency;
     const rating = ratingValues.selectedRating;
-    const vault = ratingValues.vault;
+    const valid = ratingValues.valid;
     const additionalRating = ratingValues.additionalRating;
     const creditLetter = ratingValues.creditRatingLetter;
 
-    if (!agency || !rating || !vault || !additionalRating || !creditLetter) {
+    if (!agency || !rating || !valid || !additionalRating || !creditLetter) {
       enqueueSnackbar('Please fill all required fields', { variant: 'error' });
       return;
     }
@@ -241,7 +241,7 @@ export default function FundPositionForm({ currentFund, setActiveStep, percent }
       updated[editIndex] = {
         agency,
         rating,
-        vault,
+        valid,
         additionalRating,
         creditRatingLetter: creditLetterObj,
       };
@@ -252,7 +252,7 @@ export default function FundPositionForm({ currentFund, setActiveStep, percent }
         {
           agency,
           rating,
-          vault,
+          valid,
           additionalRating,
           creditRatingLetter: creditLetterObj,
         },
@@ -262,7 +262,7 @@ export default function FundPositionForm({ currentFund, setActiveStep, percent }
     // Clear fields
     setRatingValue('selectedAgency', '');
     setRatingValue('selectedRating', '');
-    setRatingValue('vault', '');
+    setRatingValue('valid', '');
     setRatingValue('additionalRating', '');
     setRatingValue('creditRatingLetter', null);
   };
@@ -289,10 +289,10 @@ export default function FundPositionForm({ currentFund, setActiveStep, percent }
         ratings: ratingList,
       };
 
-      enqueueSnackbar('All data saved in state!', { variant: 'success' });
-
+      saveStepData(payloadData);
+      setActiveStepId('audited_financial');
+      enqueueSnackbar('Created Successfully!', { variant: 'success' });
       // 4. Go to next page
-      setActiveStep(1);
     } catch (error) {
       enqueueSnackbar('Something went wrong', { variant: 'error' });
       console.error(error);
@@ -503,8 +503,8 @@ export default function FundPositionForm({ currentFund, setActiveStep, percent }
               </Grid>
 
               <RHFTextField
-                name="vault"
-                label="Vault Till"
+                name="valid"
+                label="Valid Till"
                 fullWidth
                 size="small"
                 sx={{ pb: '30px', mt: '30px' }}
@@ -543,7 +543,7 @@ export default function FundPositionForm({ currentFund, setActiveStep, percent }
                         <TableRow>
                           <TableCell sx={{ fontWeight: 700 }}>Rating Agency</TableCell>
                           <TableCell sx={{ fontWeight: 700 }}>Rating</TableCell>
-                          <TableCell sx={{ fontWeight: 700 }}>Vault Till</TableCell>
+                          <TableCell sx={{ fontWeight: 700 }}>Valid Till</TableCell>
                           <TableCell sx={{ fontWeight: 700 }}>Additional Rating</TableCell>
                           <TableCell sx={{ fontWeight: 700 }}>Credit Rating Letter</TableCell>
                           <TableCell sx={{ fontWeight: 700 }} align="center">
@@ -557,7 +557,7 @@ export default function FundPositionForm({ currentFund, setActiveStep, percent }
                           <TableRow key={index}>
                             <TableCell>{row.agency}</TableCell>
                             <TableCell>{row.rating}</TableCell>
-                            <TableCell>{row.vault}</TableCell>
+                            <TableCell>{row.valid}</TableCell>
                             <TableCell>{row.additionalRating}</TableCell>
                             <TableCell>
                               {row?.creditRatingLetter?.fileUrl ||
@@ -590,7 +590,7 @@ export default function FundPositionForm({ currentFund, setActiveStep, percent }
                                 onClick={() => {
                                   setRatingValue('selectedAgency', row.agency);
                                   setRatingValue('selectedRating', row.rating);
-                                  setRatingValue('vault', row.vault);
+                                  setRatingValue('valid', row.valid);
                                   setRatingValue('additionalRating', row.additionalRating);
                                   setRatingValue('creditRatingLetter', {
                                     fileUrl: row.creditRatingLetter?.fileUrl || null,
@@ -668,9 +668,9 @@ export default function FundPositionForm({ currentFund, setActiveStep, percent }
             gap: 2,
           }}
         >
-          <Button variant="outlined" sx={{ color: '#000000' }} onClick={() => setActiveStep(0)}>
+          {/* <Button variant="outlined" sx={{ color: '#000000' }} onClick={() => setActiveStep(0)}>
             Cancel
-          </Button>
+          </Button> */}
           <LoadingButton variant="contained" sx={{ color: '#fff' }} onClick={handleNextClick}>
             Next
           </LoadingButton>

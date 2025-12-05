@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import {
+  Box,
   Card,
   Container,
   Grid,
@@ -17,8 +18,9 @@ import {
 import FormProvider, { RHFTextField, RHFUploadRectangle } from 'src/components/hook-form';
 import { LoadingButton } from '@mui/lab';
 import { DatePicker } from '@mui/x-date-pickers';
+import { enqueueSnackbar } from 'notistack';
 
-export default function IsinActivation({ onSave }) {
+export default function IsinActivation({ saveStepData, setActiveStepId, percent }) {
   const IsinSchema = Yup.object().shape({
     ISIN: Yup.string()
       .required('ISIN is required')
@@ -74,6 +76,37 @@ export default function IsinActivation({ onSave }) {
 
   const currentAction = watch('actionType');
 
+  const requiredFields = [
+    'ISIN',
+    'activationDate',
+    'isinLetter',
+    'creditConfirmationDate',
+    'creditProof',
+    'actionType',
+  ];
+
+  const calculatePercent = () => {
+    let completed = 0;
+
+    requiredFields.forEach((field) => {
+      const value = methods.getValues(field);
+
+      if (value && value !== '' && value !== null) {
+        completed += 1;
+      }
+    });
+
+    const p = Math.round((completed / requiredFields.length) * 100);
+
+    if (typeof percent === 'function') {
+      percent(p);
+    }
+  };
+
+  useEffect(() => {
+    calculatePercent();
+  }, [watch()]);
+
   const handleFileDrop = (fieldName, acceptedFiles) => {
     const file = acceptedFiles[0];
     if (!file) return;
@@ -92,9 +125,11 @@ export default function IsinActivation({ onSave }) {
   const onSubmit = (data) => {
     console.log('ISIN DATA:', data);
 
-    if (onSave) {
-      onSave('isinActivation', data);
-    }
+    saveStepData({ isinActivation: data });
+
+    setActiveStepId('launch_issue');
+
+    enqueueSnackbar('Created Successfully!', { variant: 'success' });
   };
 
   return (
@@ -249,6 +284,20 @@ export default function IsinActivation({ onSave }) {
             </Grid> */}
           </Grid>
         </Card>
+        <Grid item xs={12}>
+          <Box
+            sx={{
+              mt: 3,
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 2,
+            }}
+          >
+            <LoadingButton variant="contained" type="submit" sx={{ color: '#fff' }}>
+              Next
+            </LoadingButton>
+          </Box>
+        </Grid>
       </Container>
     </FormProvider>
   );

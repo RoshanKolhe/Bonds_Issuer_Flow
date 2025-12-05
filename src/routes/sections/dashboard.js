@@ -52,6 +52,7 @@ const AfterCompleteRoiStagePage = lazy(() => import('src/pages/dashboard/issure-
 const BankViewPage = lazy(()=> import('src/pages/dashboard/company/view'))
 //
 const MyBondCreatePage = lazy(() => import('src/pages/dashboard/mybond/create'))
+const MyBondNewIssuePage = lazy(() => import('src/pages/dashboard/mybond/bond-issue'))
 
 // WORKFLOW
 const ReactFlowPage = lazy(() => import('src/pages/dashboard/react-flow/board'));
@@ -161,6 +162,7 @@ export const dashboardRoutes = [
           { element: <MyBondCreatePage />, index: true },
           { path: 'list', element: <ROIGuidancePage /> },
           { path: 'create', element: <MyBondCreatePage /> },
+          { path: 'bond-issue', element: <MyBondNewIssuePage /> },
           { path: 'investor', element: <AfterCompleteRoiStagePage /> },
         ],
       },

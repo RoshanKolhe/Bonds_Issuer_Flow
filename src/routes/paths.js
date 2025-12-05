@@ -160,6 +160,7 @@ export const paths = {
       root: `${ROOTS.DASHBOARD}/mybond`,
       list: `${ROOTS.DASHBOARD}/mybond/list`,
       create: `${ROOTS.DASHBOARD}/mybond/create`,
+      bondIssue: `${ROOTS.DASHBOARD}/mybond/bond-issue`,
       investor: `${ROOTS.DASHBOARD}/mybond/investor`,
     },
     signatories: {

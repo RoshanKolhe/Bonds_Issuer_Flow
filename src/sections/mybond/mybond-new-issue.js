@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import {
   Card,
@@ -13,7 +13,7 @@ import {
   Box,
 } from '@mui/material';
 
-import { RHFTextField, RHFSelect } from '../../components/hook-form';
+import FormProvider, { RHFTextField, RHFSelect } from '../../components/hook-form';
 import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
 import { useRouter } from 'src/routes/hook';
@@ -23,7 +23,7 @@ import axiosInstance from 'src/utils/axios';
 import { LoadingButton } from '@mui/lab';
 // FIXED: Correct path
 
-export default function MyBondNewIssue({ currentIssue }) {
+export default function MyBondNewIssue({ currentIssue, saveStepData, setActiveStepId, percent }) {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -72,8 +72,58 @@ export default function MyBondNewIssue({ currentIssue }) {
     setValue,
     handleSubmit,
     reset,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = methods;
+  console.log('values', watch());
+  console.log('errors', errors);
+
+  const requiredFields = [
+    'issueType',
+    'securityType',
+    'issueSize',
+    'tenureYears',
+    'couponRate',
+    'minimumInvestmentPrice',
+    'redemptionType',
+    'minimumPurchaseUnit',
+    'totalUnit',
+    'boardResolution',
+    'shareholderResolution',
+    'moa',
+  ];
+
+  const calculatePercent = (values) => {
+    let filled = 0;
+
+    requiredFields.forEach((field) => {
+      const value = values[field];
+
+      if (
+        value !== null &&
+        value !== undefined &&
+        value !== ''
+        // !(typeof value === 'object' && Object.keys(value || {}).length === 0) // for files
+      ) {
+        filled++;
+      }
+    });
+
+    return Math.round((filled / requiredFields.length) * 100);
+  };
+
+  useEffect(() => {
+    const subscription = methods.watch((values) => {
+      const p = calculatePercent(values);
+      percent(p); // SEND percent to parent stepper
+    });
+
+    return () => subscription.unsubscribe();
+  }, [methods.watch]);
+
+  useEffect(() => {
+    const initialPercent = calculatePercent(methods.getValues());
+    percent(initialPercent);
+  }, []);
 
   const issueType = watch('issueType');
   const securityType = watch('securityType');
@@ -103,15 +153,17 @@ export default function MyBondNewIssue({ currentIssue }) {
         totalUnit: formData.totalUnit,
       };
 
-      if (!currentIssue) {
-        await axiosInstance.post('/bonds/new-issue', payload);
-      } else {
-        await axiosInstance.patch(`/bonds/new-issue/${currentIssue.id}`, payload);
-      }
+      console.log('payload', payload);
 
+      // if (!currentIssue) {
+      //   await axiosInstance.post('/bonds/new-issue', payload);
+      // } else {
+      //   await axiosInstance.patch(`/bonds/new-issue/${currentIssue.id}`, payload);
+      // }
+
+      saveStepData(payload);
+      setActiveStepId("fund_position");
       enqueueSnackbar(currentIssue ? 'Updated Successfully!' : 'Created Successfully!');
-      reset();
-      router.back();
     } catch (err) {
       console.error(err);
       enqueueSnackbar(err.message || 'Error saving issue', { variant: 'error' });
@@ -136,7 +188,7 @@ export default function MyBondNewIssue({ currentIssue }) {
   }, [issueSize, totalUnit, minimumPurchaseUnit, setValue]);
 
   return (
-    <FormProvider {...methods} onSubmit={onSubmit}>
+    <FormProvider methods={methods} onSubmit={onSubmit}>
       <Card sx={{ p: 2, mb: '50px' }}>
         <CardContent>
           <Typography variant="h6" fontWeight="bold" color="primary">

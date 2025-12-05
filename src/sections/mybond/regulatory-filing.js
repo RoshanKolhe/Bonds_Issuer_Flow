@@ -23,8 +23,9 @@ import FormProvider, { RHFTextField } from 'src/components/hook-form';
 import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
 import { DatePicker } from '@mui/x-date-pickers';
+import { enqueueSnackbar } from 'notistack';
 
-export default function RegulatoryFiling({ onSave }) {
+export default function RegulatoryFiling({ saveStepData, setActiveStepId, percent }) {
   const [authority, setAuthority] = useState();
 
   const RegulatoryFilingSchema = Yup.object().shape({
@@ -125,12 +126,45 @@ export default function RegulatoryFiling({ onSave }) {
   const onSubmit = (data) => {
     console.log('🟢 Regulatory Filing Submit Data:', data);
 
-    if (onSave) {
-      onSave('regulatoryFiling', data);
-    }
+    saveStepData({ regulatoryFiling: data });
 
-    alert('Regulatory Filing Saved!');
+    setActiveStepId('isin_activation');
+    enqueueSnackbar('Created Successfully!', { variant: 'success' });
   };
+
+  const requiredFields = [
+    'pas4',
+    'informationMemorandum',
+    'sebi',
+    'principle',
+    'roc',
+    'authorityType',
+  ];
+
+  const calculatePercentUsingYup = () => {
+    let completed = 0;
+
+    requiredFields.forEach((field) => {
+      if (!errors[field]) {
+        const value = methods.getValues(field);
+
+        // Only count if field has actual value or valid file
+        if (value && value !== '' && value !== null) {
+          completed += 1;
+        }
+      }
+    });
+
+    const p = Math.round((completed / requiredFields.length) * 100);
+
+    if (typeof percent === 'function') {
+      percent(p);
+    }
+  };
+
+  useEffect(() => {
+    calculatePercentUsingYup();
+  }, [methods.watch(), errors]);
 
   useEffect(() => {
     if (authority) {
@@ -475,10 +509,10 @@ export default function RegulatoryFiling({ onSave }) {
               gap: 2,
             }}
           >
-            <Button variant="outlined" sx={{ color: '#000000' }}>
+            {/* <Button variant="outlined" sx={{ color: '#000000' }}>
               Cancel
-            </Button>
-            <LoadingButton variant="contained" sx={{ color: '#fff' }}>
+            </Button> */}
+            <LoadingButton variant="contained" type='submit' sx={{ color: '#fff' }}>
               Next
             </LoadingButton>
           </Box>
