@@ -46,7 +46,10 @@ const NewBankPage = lazy(() => import('src/pages/dashboard/company/new'))
 // COMPANY
 const ROIGuidancePage = lazy(() => import('src/pages/dashboard/issure-services/roi'));
 const ROIFundFormPage = lazy(() => import('src/pages/dashboard/issure-services/roi-fund-form'));
-const AfterCompleteRoiStagePage = lazy(() => import('src/pages/dashboard/issure-services/view'))
+const AfterCompleteRoiStagePage = lazy(() => import('src/pages/dashboard/issure-services/view'));
+
+// Companyyyy
+const BankViewPage = lazy(()=> import('src/pages/dashboard/company/view'))
 //
 const MyBondCreatePage = lazy(() => import('src/pages/dashboard/mybond/create'))
 
@@ -139,7 +142,8 @@ export const dashboardRoutes = [
         children: [
           { element: <CompanyProfilePage />, index: true },
           { path: 'profile', element: <CompanyProfilePage /> },
-          { path: 'new', element: <NewBankPage /> }
+          { path: 'new', element: <NewBankPage /> },
+          {path: 'view', element:<BankViewPage/>}
         ],
       },
       {

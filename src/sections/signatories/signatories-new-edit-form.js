@@ -21,6 +21,7 @@ import axios from 'axios';
 import { useAuthContext } from 'src/auth/hooks';
 import { DatePicker } from '@mui/x-date-pickers';
 import axiosInstance from 'src/utils/axios';
+import { Card } from '@mui/material';
 
 const ROLES = [
   { value: 'DIRECTOR', label: 'Director' },
@@ -260,157 +261,158 @@ export default function SignatoriesNewEditForm({
   }, [currentUser, defaultValues, reset]);
 
   return (
+    <Card sx={{p:4}}>
+      <FormProvider methods={methods} onSubmit={onSubmit}>
 
-    <FormProvider methods={methods} onSubmit={onSubmit}>
 
-
-      <Box rowGap={3} display="grid" mt={2}>
-        <RHFTextField
-          name="name"
-          label="Name*"
-          InputLabelProps={{ shrink: true }}
-          disabled={isViewMode}
-        />
-
-        <RHFTextField
-          name="email"
-          label="Email*"
-          type="email"
-          InputLabelProps={{ shrink: true }}
-          disabled={isViewMode}
-        />
-
-        <RHFTextField
-          name="phoneNumber"
-          label="Phone Number*"
-          type="tel"
-          disabled={isViewMode}
-          InputLabelProps={{ shrink: true }}
-          inputProps={{ maxLength: 10 }}
-        />
-        <RHFSelect
-          name="role"
-          label="Designation*"
-          InputLabelProps={{ shrink: true }}
-          disabled={isViewMode}
-        >
-          {ROLES.map((role) => (
-            <MenuItem key={role.value} value={role.value}>
-              {role.label}
-            </MenuItem>
-          ))}
-        </RHFSelect>
-
-        {watchRole === 'OTHER' && !isViewMode && (
+        <Box rowGap={3} display="grid" mt={2}>
           <RHFTextField
-            name="customDesignation"
-            label="Enter Custom Designation*"
-            placeholder="Enter custom designation"
+            name="name"
+            label="Name*"
             InputLabelProps={{ shrink: true }}
+            disabled={isViewMode}
           />
-        )}
 
-        {isViewMode ? (
-          <>
-            <RHFTextField
-              name="panNumber"
-              label="PAN Number*"
-              InputLabelProps={{ shrink: true }}
-              disabled
-            />
-            <RHFTextField
-              name="boardResolution"
-              label="Board Resolution*"
-              InputLabelProps={{ shrink: true }}
-              disabled
-            />
-          </>
-        ) : (
-          <>
-            <RHFFileUploadBox
-              name="panCard"
-              label="Upload PAN*"
-              accept="application/pdf,image/*"
-              fileType="pan"
-              required={!isEditMode}
-              error={!!errors.panCard}
-              onDrop={async (files) => {
-                const file = files[0];
-                if (!file) return;
-                methods.setValue('panCard', file, { shouldValidate: true });
-                await handlePanUpload(file);
-              }}
-            />
-            {getErrorMessage('panCard')}
-            <RHFTextField
-              name="submittedPanFullName"
-              label="PAN Holder Full Name*"
-              InputLabelProps={{ shrink: true }}
-              disabled={!isPanUploaded || isViewMode}
-            />
+          <RHFTextField
+            name="email"
+            label="Email*"
+            type="email"
+            InputLabelProps={{ shrink: true }}
+            disabled={isViewMode}
+          />
 
-            <RHFTextField
-              name="submittedPanNumber"
-              label="PAN Number*"
-              InputLabelProps={{ shrink: true }}
-              disabled={!isPanUploaded || isViewMode}
-            />
-
-            <Controller
-              name="submittedDateOfBirth"
-              control={control}
-              render={({ field, fieldState: { error } }) => (
-                <DatePicker
-                  {...field}
-                  label="PAN Date of Birth*"
-                  disabled={!isPanUploaded || isViewMode}
-                  value={field.value ? new Date(field.value) : null}
-                  onChange={(newValue) => field.onChange(newValue)}
-                  format="dd/MM/yyyy"
-                  slotProps={{
-                    textField: {
-                      fullWidth: true,
-                      error: !!error,
-                      helperText: error?.message,
-                    },
-                  }}
-                />
-              )}
-            />
-
-            <RHFFileUploadBox
-              name="boardResolution"
-              label="Board Resolution*"
-              accept="application/pdf,image/*"
-              fileType="boardResolution"
-              required={!isEditMode}
-              error={!!errors.boardResolution}
-            />
-            {getErrorMessage('boardResolution')}
-          </>
-        )}
-      </Box>
-
-
-
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, p: 2 }}>
-        <Button variant="outlined" onClick={onClose}>
-          {isViewMode ? 'Close' : 'Cancel'}
-        </Button>
-
-        {!isViewMode && (
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={isSubmitting}
-            startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
+          <RHFTextField
+            name="phoneNumber"
+            label="Phone Number*"
+            type="tel"
+            disabled={isViewMode}
+            InputLabelProps={{ shrink: true }}
+            inputProps={{ maxLength: 10 }}
+          />
+          <RHFSelect
+            name="role"
+            label="Designation*"
+            InputLabelProps={{ shrink: true }}
+            disabled={isViewMode}
           >
-            {isEditMode ? 'Update' : 'Add'}
-          </Button>
-        )}
-      </Box>
+            {ROLES.map((role) => (
+              <MenuItem key={role.value} value={role.value}>
+                {role.label}
+              </MenuItem>
+            ))}
+          </RHFSelect>
 
-    </FormProvider>
+          {watchRole === 'OTHER' && !isViewMode && (
+            <RHFTextField
+              name="customDesignation"
+              label="Enter Custom Designation*"
+              placeholder="Enter custom designation"
+              InputLabelProps={{ shrink: true }}
+            />
+          )}
+
+          {isViewMode ? (
+            <>
+              <RHFTextField
+                name="panNumber"
+                label="PAN Number*"
+                InputLabelProps={{ shrink: true }}
+                disabled
+              />
+              <RHFTextField
+                name="boardResolution"
+                label="Board Resolution*"
+                InputLabelProps={{ shrink: true }}
+                disabled
+              />
+            </>
+          ) : (
+            <>
+              <RHFFileUploadBox
+                name="panCard"
+                label="Upload PAN*"
+                accept="application/pdf,image/*"
+                fileType="pan"
+                required={!isEditMode}
+                error={!!errors.panCard}
+                onDrop={async (files) => {
+                  const file = files[0];
+                  if (!file) return;
+                  methods.setValue('panCard', file, { shouldValidate: true });
+                  await handlePanUpload(file);
+                }}
+              />
+              {getErrorMessage('panCard')}
+              <RHFTextField
+                name="submittedPanFullName"
+                label="PAN Holder Full Name*"
+                InputLabelProps={{ shrink: true }}
+                disabled={!isPanUploaded || isViewMode}
+              />
+
+              <RHFTextField
+                name="submittedPanNumber"
+                label="PAN Number*"
+                InputLabelProps={{ shrink: true }}
+                disabled={!isPanUploaded || isViewMode}
+              />
+
+              <Controller
+                name="submittedDateOfBirth"
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <DatePicker
+                    {...field}
+                    label="PAN Date of Birth*"
+                    disabled={!isPanUploaded || isViewMode}
+                    value={field.value ? new Date(field.value) : null}
+                    onChange={(newValue) => field.onChange(newValue)}
+                    format="dd/MM/yyyy"
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!error,
+                        helperText: error?.message,
+                      },
+                    }}
+                  />
+                )}
+              />
+
+              <RHFFileUploadBox
+                name="boardResolution"
+                label="Board Resolution*"
+                accept="application/pdf,image/*"
+                fileType="boardResolution"
+                required={!isEditMode}
+                error={!!errors.boardResolution}
+              />
+              {getErrorMessage('boardResolution')}
+            </>
+          )}
+        </Box>
+
+
+
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, p: 2 }}>
+          {/* <Button variant="outlined" onClick={onClose}>
+            {isViewMode ? 'Close' : 'Cancel'}
+          </Button> */}
+
+          {!isViewMode && (
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={isSubmitting}
+              startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
+            >
+              {isEditMode ? 'Update' : 'Add'}
+            </Button>
+          )}
+        </Box>
+
+      </FormProvider>
+    </Card>
 
   );
 }

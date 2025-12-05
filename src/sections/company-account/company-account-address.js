@@ -12,6 +12,7 @@ import {
   Checkbox,
   FormControlLabel,
   Card,
+  Button,
 } from '@mui/material';
 
 import FormProvider, { RHFTextField, RHFSelect } from 'src/components/hook-form';
@@ -23,6 +24,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
 import { useRouter } from 'src/routes/hook';
 import { paths } from 'src/routes/paths';
+import { LoadingButton } from '@mui/lab';
 
 export default function AddressNewForm({ onClose }) {
   const [isUploading, setIsUploading] = useState(false);
@@ -296,7 +298,7 @@ export default function AddressNewForm({ onClose }) {
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-    <Stack component={Card} spacing={3} sx={{ p: 3 }}>
+      <Stack component={Card} spacing={3} sx={{ p: 3 }}>
         <Stack spacing={4}>
           {/* ---------------- File Upload ---------------- */}
           <Stack spacing={2}>
@@ -312,10 +314,9 @@ export default function AddressNewForm({ onClose }) {
             <RHFFileUploadBox
               name="addressProof"
               // label="Upload Address Proof"
-              label={`Upload ${
-              (documentType === 'electricityBill' && 'Electricity Bill') ||
-              (documentType === 'leaseAgreement' && 'Lease Agreement') 
-            }`}
+              label={`Upload ${(documentType === 'electricityBill' && 'Electricity Bill') ||
+                (documentType === 'leaseAgreement' && 'Lease Agreement')
+                }`}
               acceptedTypes="pdf,jpg,jpeg,png"
               maxSizeMB={10}
             />
@@ -405,19 +406,12 @@ export default function AddressNewForm({ onClose }) {
 
           {/* ---------------- Buttons ---------------- */}
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-            <button onClick={onClose}>Cancel</button>
-            <button
-              disabled={isUploading}
-              style={{
-                background: '#1976D2',
-                color: '#fff',
-                padding: '8px 20px',
-                borderRadius: 6,
-                cursor: 'pointer',
-              }}
-            >
-              Save
-            </button>
+         
+            <LoadingButton type="submit" variant="contained" loading={isUploading} sx={{ ml: 'auto' }}>
+              Save Changes
+            </LoadingButton>
+
+
           </Box>
         </Stack>
       </Stack>

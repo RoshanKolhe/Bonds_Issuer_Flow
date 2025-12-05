@@ -6,22 +6,29 @@ import TableCell from '@mui/material/TableCell';
 import ListItemText from '@mui/material/ListItemText';
 // utils
 import { format } from 'date-fns';
-import { IconButton, Tooltip } from '@mui/material';
+import { Chip, IconButton, Tooltip } from '@mui/material';
 import Iconify from 'src/components/iconify';
+import { color } from 'framer-motion';
 
 // ----------------------------------------------------------------------
 
+const statusMap = {
+  1: { label: 'Verified', color: 'success' },
+  0: { label: 'Pending', color: 'warning' },
+};
+
+
 export default function SchedulerTableRow({ row, selected, onSelectRow, onViewRow, onEditRow }) {
-  const { platformName, schedulerType, schedulerFor,interval,date,time } = row;
+  const { fullName, email, roleValue, phone, extractedDateOfBirth, panCardFile, boardResolutionFile, status } = row;
 
   return (
     <TableRow hover selected={selected}>
-      <TableCell>{platformName || 'NA'}</TableCell>
+      <TableCell>{fullName || 'NA'}</TableCell>
 
-      <TableCell>{schedulerType || 'NA'}</TableCell>
-      <TableCell>{schedulerFor || 'NA'}</TableCell>
-      <TableCell>{interval || 'NA'}</TableCell>
-      <TableCell>
+      <TableCell>{email || 'NA'}</TableCell>
+      <TableCell>{roleValue || 'NA'}</TableCell>
+      <TableCell>{phone || 'NA'}</TableCell>
+      {/* <TableCell>
         <ListItemText
           primary={format(new Date(date), 'dd/MMM/yyyy')}
           secondary={format(new Date(date), 'p')}
@@ -32,9 +39,39 @@ export default function SchedulerTableRow({ row, selected, onSelectRow, onViewRo
             typography: 'caption',
           }}
         />
+      </TableCell> */}
+      <TableCell>{extractedDateOfBirth || 'NA'} </TableCell>
+      <TableCell>
+        {panCardFile?.fileUrl ? (
+          <a
+            href={panCardFile.fileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: '#1976d2', textDecoration: 'underline' }}
+          >
+            View
+          </a>
+        ) : (
+          '-'
+        )}
       </TableCell>
-      <TableCell>{time || 'NA'} </TableCell>
-
+      <TableCell>
+        {boardResolutionFile?.fileUrl ? (
+          <a
+            href={boardResolutionFile.fileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: '#1976d2', textDecoration: 'underline' }}
+          >
+            View
+          </a>
+        ) : (
+          '-'
+        )}
+      </TableCell>
+      <TableCell>
+        <Chip label={statusMap[status].label} color={statusMap[status].color} variant="soft" />
+      </TableCell>
       <TableCell>
         {/* <Tooltip title="View Events">
             <IconButton onClick={onViewRow}>

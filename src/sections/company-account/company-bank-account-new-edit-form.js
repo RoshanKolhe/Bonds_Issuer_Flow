@@ -23,11 +23,18 @@ import { enqueueSnackbar } from 'notistack';
 import axiosInstance from 'src/utils/axios';
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router';
+import { LoadingButton } from '@mui/lab';
 
 // ----------------------------------------------------------------------
+const documentOptions = [
+  { label: 'Cheque', value: 0 },
+  { label: 'Bank Statement', value: 1 },
+]
 
-export default function BankNewForm({bankDetails}) {
+export default function BankNewForm({ bankDetails }) {
   const router = useRouter();
+  const navigate = useNavigate();
 
   // ---------------- VALIDATION ----------------
   const NewSchema = Yup.object().shape({
@@ -45,7 +52,7 @@ export default function BankNewForm({bankDetails}) {
     resolver: yupResolver(NewSchema),
     reValidateMode: 'onChange',
     defaultValues: {
-      documentType: 'cheque',
+      documentType: '0',
       bankName: '',
       branchName: '',
       accountNumber: '',
@@ -79,12 +86,12 @@ export default function BankNewForm({bankDetails}) {
 
   const existingProof = bankDetails?.bankAccountProof
     ? {
-        id: bankDetails.bankAccountProof.id,
-        name: bankDetails.bankAccountProof.fileOriginalName,
-        url: bankDetails.bankAccountProof.fileUrl,
-        status: bankDetails.status === 1 ? 'approved' : 'pending',
-        isServerFile: true, 
-      }
+      id: bankDetails.bankAccountProof.id,
+      name: bankDetails.bankAccountProof.fileOriginalName,
+      url: bankDetails.bankAccountProof.fileUrl,
+      status: bankDetails.status === 1 ? 'approved' : 'pending',
+      isServerFile: true,
+    }
     : null;
 
   const onSubmit = handleSubmit(async (data) => {
@@ -118,7 +125,7 @@ export default function BankNewForm({bankDetails}) {
           accountType: data.accountType === 'CURRENT' ? 1 : 0,
           accountHolderName: data.accountHolderName,
           accountNumber: String(data.accountNumber),
-          bankAccountProofType: data.documentType === 'cheque' ? 0 : 1,
+          bankAccountProofType: Number(data.documentType),
           bankAccountProofId: uploadedProofId,
         },
       };
@@ -129,7 +136,7 @@ export default function BankNewForm({bankDetails}) {
 
       if (res?.data?.success) {
         enqueueSnackbar('Bank details submitted successfully!', { variant: 'success' });
-        router.push(paths.KYCSignatories);
+        router.push(paths.dashboard.company.profile);
       } else {
         enqueueSnackbar(res?.data?.message || 'Something went wrong!', {
           variant: 'error',
@@ -159,7 +166,7 @@ export default function BankNewForm({bankDetails}) {
   useEffect(() => {
     if (bankDetails) {
       reset({
-        documentType: bankDetails.bankAccountProofType === 0 ? 'cheque' : 'bank_statement',
+        documentType: bankDetails.bankAccountProofType ?? 0,
         bankName: bankDetails.bankName || '',
         branchName: bankDetails.branchName || '',
         accountNumber: bankDetails.accountNumber || '',
@@ -190,17 +197,14 @@ export default function BankNewForm({bankDetails}) {
           </Typography>
 
           <Box sx={{ width: 200, mb: 3 }}>
-            <RHFSelect
-              name="documentType"
-              SelectProps={{
-                displayEmpty: true,
-                renderValue: (value) =>
-                  value ? value : <Box sx={{ color: 'text.disabled' }}>Select Type</Box>,
-              }}
-            >
-              <MenuItem value="cheque">Cheque</MenuItem>
-              <MenuItem value="bank_statement">Bank Statement</MenuItem>
+            <RHFSelect name="documentType" label="Document Type" sx={{ width: 200 }}>
+              {documentOptions.map((item) => (
+                <MenuItem key={item.value} value={item.value}>
+                  {item.label}
+                </MenuItem>
+              ))}
             </RHFSelect>
+
           </Box>
 
           {/* ---------------- ADDRESS PROOF UPLOAD ---------------- */}
@@ -227,8 +231,9 @@ export default function BankNewForm({bankDetails}) {
                       placeholder="Enter IFSC Code"
                       InputProps={{
                         endAdornment: (
-                          <Button
+                          <LoadingButton
                             variant="contained"
+                            loading={isSubmitting}
                             size="small"
                             sx={{
                               ml: 1,
@@ -285,7 +290,7 @@ export default function BankNewForm({bankDetails}) {
                             }}
                           >
                             Fetch
-                          </Button>
+                          </LoadingButton>
                         ),
                       }}
                     />
@@ -350,18 +355,29 @@ export default function BankNewForm({bankDetails}) {
               </Grid>
             </Grid>
           </Box>
+          {/* ---------------- FOOTER BUTTONS ---------------- */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4, mb: 2 }}>
+            {/* <Button
+              component={RouterLink}
+              href={paths.dashboard.company.profile}
+              sx={{ bgcolor: '#000', color: '#fff', '&:hover': { bgcolor: '#333' } }}
+            >
+              Back
+            </Button> */}
+            <Button
+              variant="outlined"
+           
+            >
+              Cancel
+            </Button>
+
+            <LoadingButton type="submit" variant="contained" loading={isSubmitting} sx={{ ml: 'auto' }}>
+              Create
+            </LoadingButton>
+          </Box>
         </Paper>
 
-        {/* ---------------- FOOTER BUTTONS ---------------- */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4, mb: 2 }}>
-          <Button component={RouterLink} href={paths.kycCompanyDetails} variant="outlined">
-            Back
-          </Button>
 
-          <Button variant="contained" type="submit">
-            Next
-          </Button>
-        </Box>
       </FormProvider>
 
     </Container>
@@ -369,6 +385,6 @@ export default function BankNewForm({bankDetails}) {
 }
 
 
-BankNewForm.propTypes ={
-    bankDetails : PropTypes.object,
+BankNewForm.propTypes = {
+  bankDetails: PropTypes.object,
 }

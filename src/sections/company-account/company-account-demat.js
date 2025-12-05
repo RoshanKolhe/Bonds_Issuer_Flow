@@ -177,13 +177,15 @@ export default function DematNewForm({ onClose }) {
           </Paper>
         {/* Submit / buttons */}
         <Box sx={{ display: 'flex', justifyContent: 'end' ,gap: 2 , mt: 4 }}>
-          <Button variant="outlined" onClick={onClose}>
+          {/* <Button variant="outlined" onClick={onClose}>
             Cancel
-          </Button>
+          </Button> */}
 
           <Button variant="contained" type="submit" disabled={isUploading || isSubmitting}>
-            {isUploading || isSubmitting ? 'Submitting...' : 'Save & Continue'}
+            {isUploading || isSubmitting ? 'Submitting...' : 'Save'}
           </Button>
+
+           {/* & Continue */}
         </Box>
       </Stack>
     </FormProvider>

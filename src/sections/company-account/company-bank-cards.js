@@ -39,7 +39,7 @@ export default function BankDetailsView({ bank, onViewRow }) {
             {/* Header */}
             <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Stack direction="row" spacing={2} alignItems="center">
-                    <Iconify icon="mdi:bank" width={30} color="#2e5aac" />
+                    <Iconify icon="mdi:bank" width={30}  />
                     <Box>
                         <Typography variant="subtitle2" color="text.secondary">Bank Name</Typography>
 
@@ -88,7 +88,7 @@ export default function BankDetailsView({ bank, onViewRow }) {
                 {/* Branch Name */}
                 <Grid item xs={12} md={6}>
                     <Stack direction="row" spacing={2} alignItems="center">
-                        <Iconify icon="mdi:home-city-outline" width={22} color="#5ac267" />
+                        <Iconify icon="mdi:home-city-outline" width={22} />
                         <Box>
                             <Typography variant="caption" color="text.secondary">Branch Name</Typography>
                             <Typography variant="subtitle1">{bank?.branchName || '-'}</Typography>
@@ -99,7 +99,7 @@ export default function BankDetailsView({ bank, onViewRow }) {
                 {/* IFSC Code */}
                 <Grid item xs={12} md={6}>
                     <Stack direction="row" spacing={2} alignItems="center">
-                        <Iconify icon="mdi:web" width={22} color="#1565C0" />
+                        <Iconify icon="mdi:web" width={22}  />
                         <Box>
                             <Typography variant="caption" color="text.secondary">IFSC Code</Typography>
                             <Typography variant="subtitle1">{bank?.ifscCode || '-'}</Typography>
@@ -110,7 +110,7 @@ export default function BankDetailsView({ bank, onViewRow }) {
                 {/* Account Number */}
                 <Grid item xs={12} md={6}>
                     <Stack direction="row" spacing={2} alignItems="center">
-                        <Iconify icon="mdi:card-account-details" width={22} color="#9c27b0" />
+                        <Iconify icon="mdi:card-account-details" width={22} />
                         <Box>
                             <Typography variant="caption" color="text.secondary">Account Number</Typography>
                             <Typography variant="subtitle1">{maskAccountNumber(bank?.accountNumber)}</Typography>
@@ -121,7 +121,7 @@ export default function BankDetailsView({ bank, onViewRow }) {
                 {/* Account Proof + Eye Icon */}
                 <Grid item xs={12} md={6}>
                     <Stack direction="row" spacing={2} alignItems="center">
-                        <Iconify icon="mdi:file-document-outline" width={22} color="#2e5aac" />
+                        <Iconify icon="mdi:file-document-outline" width={22}  />
 
                         <Box flex={1}>
                             <Typography variant="caption" color="text.secondary">

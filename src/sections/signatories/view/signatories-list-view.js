@@ -22,7 +22,6 @@ import { useBoolean } from 'src/hooks/use-boolean';
 import { RouterLink } from 'src/routes/components';
 
 
-import { useGetSchedulers } from 'src/api/scheduler';
 // components
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
@@ -53,13 +52,13 @@ import { useGetSignatories } from 'src/api/signatories';
 const STATUS_OPTIONS = [{ value: 'all', label: 'All' }];
 
 const TABLE_HEAD = [
-  { id: 'platformName', label: 'Name' },
-  { id: 'schedulerType', label: 'Role' },
-  { id: 'schedulerFor', label: 'Email' },
-  { id: 'interval', label: 'Phone' },
-  { id: 'date', label: 'DOB' },
-  { id: 'time', label: 'PAN' },
-  { id: 'time', label: 'Board Resolution' },
+  { id: 'fullName', label: 'Name' },
+  { id: 'roleValue', label: 'Role' },
+  { id: 'email', label: 'Email' },
+  { id: 'phone', label: 'Phone' },
+  { id: 'extractedDateOfBirth', label: 'DOB' },
+  { id: 'panCardFile', label: 'PAN' },
+  { id: 'boardResolutionFile', label: 'Board Resolution' },
   { id: 'time', label: 'Status' },
   { id: '', label: 'Actions' },
 ];
@@ -78,7 +77,7 @@ export default function SignatoriesListView() {
   const router = useRouter();
   const confirm = useBoolean();
 
-  const {Schedulers}= useGetSchedulers();
+
 
   const {Signatories}= useGetSignatories();
 console.log(Signatories);
@@ -100,7 +99,7 @@ console.log(Signatories);
   const [filters, setFilters] = useState(defaultFilters);
 
   const dataFiltered = applyFilter({
-    inputData: Schedulers,
+    inputData: Signatories,
     comparator: getComparator(table.order, table.orderBy),
     filters,
   });
@@ -131,11 +130,11 @@ console.log(Signatories);
 
   const handleDeleteRows = useCallback(() => {
     table.onUpdatePageDeleteRows({
-      totalRows: Schedulers.length,
+      totalRows: Signatories.length,
       totalRowsInPage: dataInPage.length,
       totalRowsFiltered: dataFiltered.length,
     });
-  }, [dataFiltered.length, dataInPage.length, Schedulers.length, table]);
+  }, [dataFiltered.length, dataInPage.length, Signatories.length, table]);
 
   const handleFilterStatus = useCallback(
     (event, newValue) => {
@@ -155,17 +154,17 @@ console.log(Signatories);
           heading="List"
           links={[
             { name: 'Dashboard', href: paths.dashboard.root },
-            { name: 'Scheduler', href: paths.dashboard.scheduler.list },
+            { name: 'Signatories', href: paths.dashboard.signatories.list },
             { name: 'List' },
           ]}
           action={
             <Button
               component={RouterLink}
-              href={paths.dashboard.scheduler.new}
+              href={paths.dashboard.signatories.new}
               variant="contained"
               startIcon={<Iconify icon="mingcute:add-line" />}
             >
-              New Scheduler
+              New Signatories
             </Button>
           }
           sx={{
@@ -202,11 +201,11 @@ console.log(Signatories);
             <TableSelectedAction
               dense={table.dense}
               numSelected={table.selected.length}
-              rowCount={Schedulers.length}
+              rowCount={Signatories.length}
               onSelectAllRows={(checked) =>
                 table.onSelectAllRows(
                   checked,
-                  Schedulers.map((row) => row.id)
+                  Signatories.map((row) => row.id)
                 )
               }
               action={
@@ -225,13 +224,13 @@ console.log(Signatories);
                   order={table.order}
                   orderBy={table.orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={Schedulers.length}
+                  rowCount={Signatories.length}
                   numSelected={table.selected.length}
                   onSort={table.onSort}
                   onSelectAllRows={(checked) =>
                     table.onSelectAllRows(
                       checked,
-                      Schedulers.map((row) => row.id)
+                      Signatories.map((row) => row.id)
                     )
                   }
                   showCheckbox={false}
@@ -257,7 +256,7 @@ console.log(Signatories);
 
                   <TableEmptyRows
                     height={denseHeight}
-                    emptyRows={emptyRows(table.page, table.rowsPerPage, Schedulers.length)}
+                    emptyRows={emptyRows(table.page, table.rowsPerPage, Signatories.length)}
                   />
 
                   <TableNoData notFound={notFound} />

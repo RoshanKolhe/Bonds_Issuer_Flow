@@ -434,18 +434,11 @@ export default function CompanyAccountGeneral() {
               />
             </Grid>
           </Grid>
-
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-            <LoadingButton
-              type="submit"
-              variant="contained"
-              size="large"
-              loading={isSubmitting}
-              sx={{ bgcolor: 'grey.800', color: '#fff', px: 4, py: 1.5 }}
-            >
-              Save & Continue
+          <Stack spacing={3} alignItems="flex-end" sx={{ mt: 3 }}>
+            <LoadingButton type="submit" variant="contained" loading={isSubmitting} sx={{ ml: 'auto' }}>
+              Save Changes
             </LoadingButton>
-          </Box>
+          </Stack>
         </Card>
       </FormProvider>
     </Container>

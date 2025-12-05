@@ -25,10 +25,10 @@ export default function SignatoriesCreateView() {
             href: paths.dashboard.root,
           },
           {
-            name: 'Scheduler',
-            href: paths.dashboard.scheduler.root,
+            name: 'Signatories',
+            href: paths.dashboard.signatories.root,
           },
-          { name: 'New Scheduler' },
+          { name: 'New Signatories' },
         ]}
         sx={{
           mb: { xs: 3, md: 5 },
