@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { alpha, styled } from '@mui/material/styles';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
@@ -42,7 +42,7 @@ const StyledDropZone = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function AuditedGSTR9() {
+export default function AuditedGSTR9({ setPercent, setProgress }) {
   const [auditorName, setAuditorName] = useState('');
   const [documents, setDocuments] = useState([
     {
@@ -109,6 +109,31 @@ export default function AuditedGSTR9() {
         return 'warning';
     }
   };
+
+  const calculateCompletion = () => {
+    let score = 0;
+
+    // Auditor Name (max: 6%)
+    if (auditorName?.trim()) score += 6;
+
+    // 3 Files (max: 7%)
+    const uploadedCount = documents.filter(doc => !!doc.file).length;
+    score += (uploadedCount * (7 / 3));
+
+    // 3 Dates (max: 7%)
+    const dateCount = documents.filter(doc => !!doc.reportDate).length;
+    score += (dateCount * (7 / 3));
+
+    const percentValue = Math.min(20, Math.round(score));
+
+    setPercent(percentValue);
+    setProgress(percentValue === 20);
+  };
+
+
+  useEffect(() => {
+    calculateCompletion();
+  }, [auditorName, documents]);
 
   return (
     <Container disableGutters>

@@ -1,120 +1,143 @@
-import PropTypes from 'prop-types';
-import * as Yup from 'yup';
-import { useMemo, useEffect } from 'react';
-import { useSnackbar } from 'src/components/snackbar';
 import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useDropzone } from 'react-dropzone';
-import { useState } from 'react';
-// @mui
-import Container from '@mui/material/Container';
-import Box from '@mui/material/Box';
 import Grid from '@mui/material/Unstable_Grid2';
-import Stack from '@mui/material/Stack';
 import MenuItem from '@mui/material/MenuItem';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { alpha } from '@mui/material/styles';
-import { format } from 'date-fns';
-import LoadingButton from '@mui/lab/LoadingButton';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControl from '@mui/material/FormControl';
-
-// assets
-import { countries } from 'src/assets/data';
-// components
-import Iconify from 'src/components/iconify';
-import FormProvider, { RHFTextField, RHFSelect, RHFAutocomplete } from 'src/components/hook-form';
-import { paths } from 'src/routes/paths';
-import { RouterLink } from 'src/routes/components';
-
-
-import axiosInstance from 'src/utils/axios';
-import dayjs from 'dayjs';
-import { fDate } from 'src/utils/format-time';
-
-
+import FormProvider, { RHFSelect } from 'src/components/hook-form';
 import AuditedFinancialStatement from './audited-fnancial-statement';
 import AuditedIncomeTaxReturn from './audited-income-tax-return';
 import AuditedGSTR9 from './audited-gstr9';
 import AuditedGST3B from './audited-gstr3b';
-// ----------------------------------------------------------------------
+import { Box, Button, Container } from '@mui/material';
+import KYCTitle from 'src/sections/kyc/kyc-title';
+import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
+import { useSnackbar } from 'notistack';
 
-export default function AuditedFinancialDocument() {
+export default function AuditedFinancialDocument({ setActiveStepId, percent }) {
+  const { enqueueSnackbar } = useSnackbar();
+
+  const [isBaseYearDone, setBaseYearDone] = useState(false);
+  const [baseYearPercent, setBaseYearPercent] = useState(20);
+
+  const [financialPercent, setFinancialPercent] = useState(0);
+  const [itrPercent, setItrPercent] = useState(0);
+  const [gstr9Percent, setGstr9Percent] = useState(0);
+  const [gstr3bPercent, setGstr3bPercent] = useState(0);
+
+  const [financialDone, setFinancialDone] = useState(false);
+  const [itrDone, setItrDone] = useState(false);
+  const [gstr9Done, setGstr9Done] = useState(false);
+  const [gstr3bDone, setGstr3bDone] = useState(false);
+
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 10 }, (_, i) => {
     const year = currentYear - i;
-    return {
-      value: year.toString(),
-      label: `${year - 1} - ${year}`, // Shows as "2023 - 2024" for FY 2023-24
-    };
+    return { value: year.toString(), label: `${year - 1} - ${year}` };
   });
 
   const methods = useForm({
     defaultValues: {
-      documentType: '',
-      baseYear: currentYear.toString(),
+      baseYear: '2025',
     },
   });
 
-  const {
-    handleSubmit,
-    control,
-    reset,
-    setValue,
-    formState: { isSubmitting },
-  } = methods;
+  const { watch, control } = methods;
+  const selectedYear = watch("baseYear");
 
-  const onSubmit = handleSubmit(async (formData) => {});
+  useEffect(() => {
+    setBaseYearDone(!!selectedYear); // TRUE when year is selected
+  }, [selectedYear]);
+
+  const handleNextClick = () => {
+    if (!isBaseYearDone) return enqueueSnackbar("Please select base year");
+    if (!financialDone) return enqueueSnackbar("Complete audited financial statement");
+    if (!itrDone) return enqueueSnackbar("Complete ITR section");
+    if (!gstr9Done) return enqueueSnackbar("Complete GSTR-9 section");
+    if (!gstr3bDone) return enqueueSnackbar("Complete GSTR-3B section");
+
+    setActiveStepId();
+  };
+
+  useEffect(() => {
+    const total =
+      (isBaseYearDone ? baseYearPercent : 0) +
+      financialPercent +
+      itrPercent +
+      gstr9Percent +
+      gstr3bPercent;
+
+    percent?.(total);
+  }, [
+    baseYearPercent,
+    financialPercent,
+    itrPercent,
+    gstr9Percent,
+    gstr3bPercent,
+    isBaseYearDone,
+    percent
+  ]);
 
   return (
-    <FormProvider methods={methods} onSubmit={onSubmit}>
-      <Grid
-        container
-        sx={{
-          p: { xs: 2, md: 4 },
-          borderRadius: 2,
-          border: (theme) => `1px solid ${theme.palette.divider}`,
-          boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.08)',
-        }}
-      >
-        <Grid xs={12}>
-          <Typography variant="h6" sx={{ mb: 3 }}>
-            Base Year (Latest Financial Year)
-          </Typography>
+    <Container>
+      <KYCTitle
+        title="Audited Financial"
+        subtitle="Upload audited financial documents for assessment"
+      />
 
-          <Controller
-            name="baseYear"
-            control={control}
-            render={({ field }) => (
-              <RHFSelect
-                {...field}
-                select
-                fullWidth
-                placeholder="Select Year"
-                sx={{ maxWidth: 200 }}
-              >
-                {years.map((yearData) => (
-                  <MenuItem key={yearData.value} value={yearData.value}>
-                    {yearData.label}
-                  </MenuItem>
-                ))}
-              </RHFSelect>
-            )}
-          />
+      <FormProvider methods={methods}>
+        <Grid container sx={{ p: 4, borderRadius: 2, border: '1px solid #ddd', boxShadow: 2 }}>
+          <Grid xs={12}>
+            <Typography variant="h6" sx={{ mb: 3 }}>
+              Base Year (Latest Financial Year)
+            </Typography>
 
-          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1.5 }}>
-            Select your latest financial year. Previous years will be auto populated
-          </Typography>
+            <RHFSelect name="baseYear" sx={{ maxWidth: 260 }}
+              placeholder="Select Base Financial Year">
+              <MenuItem value="">Select Base Year</MenuItem>
+              {years.map((yearData) => (
+                <MenuItem key={yearData.value} value={yearData.value}>
+                  {yearData.label}
+                </MenuItem>
+              ))}
+            </RHFSelect>
+
+            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1.5 }}>
+              Select your latest financial year. Previous years will auto-populate.
+            </Typography>
+          </Grid>
         </Grid>
-      </Grid>
 
-      <AuditedFinancialStatement />
-      <AuditedIncomeTaxReturn />
-      <AuditedGSTR9 />
-      <AuditedGST3B />
-    </FormProvider>
+        <AuditedFinancialStatement
+          setPercent={setFinancialPercent}
+          setProgress={setFinancialDone}
+        />
+
+        <AuditedIncomeTaxReturn
+          setPercent={setItrPercent}
+          setProgress={setItrDone}
+        />
+
+        <AuditedGSTR9
+          setPercent={setGstr9Percent}
+          setProgress={setGstr9Done}
+        />
+
+        <AuditedGST3B
+          setPercent={setGstr3bPercent}
+          setProgress={setGstr3bDone}
+        />
+      </FormProvider>
+
+      <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+        <Button variant="contained" onClick={handleNextClick}>
+          Next
+        </Button>
+      </Box>
+    </Container>
   );
 }
+
+AuditedFinancialDocument.propTypes = {
+  setActiveStepId: PropTypes.func,
+  percent: PropTypes.func
+};

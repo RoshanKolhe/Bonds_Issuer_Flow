@@ -4,6 +4,7 @@ import FundAndCreditForm from './fund-position-and-credit-rating/fundAndCreditFo
 import { useGetBondEstimation } from 'src/api/bondEstimations';
 import { useParams } from 'src/routes/hook';
 import NotFoundPage from 'src/pages/404';
+import AuditedFinancialDocument from './audited-financial/audited-financial-document';
 
 // -------------------- Dynamic Stepper ------------------------
 function DynamicStepper({ steps, activeStepId, stepsProgress, onStepClick }) {
@@ -143,6 +144,15 @@ export default function Stepper() {
             setActiveStepId={() => setActiveStepId('audited_financial')}
             currentFundPosition={estimationData ? estimationData?.fundPosition : null}
             currentCreditRatings={estimationData ? estimationData?.estimationCreditRatings : null}
+          />
+        );
+
+      case 'audited_financial':
+        return (
+          <AuditedFinancialDocument
+            percent={(p) => updateStepPercent('audited_financial', p)}
+            setActiveStepId={() => setActiveStepId('borrowing_details')}
+            currentAuditedFinancials={estimationData ? estimationData?.fundPosition : null}
           />
         );
 

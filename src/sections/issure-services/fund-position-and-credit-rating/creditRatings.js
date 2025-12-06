@@ -19,9 +19,10 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  TextField,
 } from '@mui/material';
 import { useSnackbar } from 'src/components/snackbar';
-import FormProvider, { RHFSelect } from 'src/components/hook-form';
+import FormProvider, { RHFAutocomplete, RHFSelect } from 'src/components/hook-form';
 import axiosInstance from 'src/utils/axios';
 import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
@@ -29,14 +30,18 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { Icon } from '@iconify/react';
 import { LoadingButton } from '@mui/lab';
 import { useGetCreditRatingAgencies, useGetCreditRatings } from 'src/api/creditRatingsAndAgencies';
+import { useParams } from 'src/routes/hook';
+import { format } from 'date-fns';
 
-export default function CreditRating({ currentCreditRatings, setPercent }) {
+export default function CreditRating({ currentCreditRatings, setPercent, setProgress }) {
+  const params = useParams();
+  const { applicationId } = params;
   const [agenciesData, setAgenciesData] = useState([]);
   const [ratingsData, setRatingsData] = useState([]);
   const { creditRatingAgencies, creditRatingAgenciesLoading } = useGetCreditRatingAgencies();
   const { creditRatings, creditRatingsLoading } = useGetCreditRatings();
   const { enqueueSnackbar } = useSnackbar();
-  const [ratingList, setRatingList] = useState(currentCreditRatings || []);
+  const [ratingList, setRatingList] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isApiSubmitting, setIsApiSubmitting] = useState(false);
@@ -117,18 +122,34 @@ export default function CreditRating({ currentCreditRatings, setPercent }) {
   };
 
   const onSubmit = async () => {
-    setIsApiSubmitting(true);
-    if (!ratingList.length) {
-      enqueueSnackbar('Please add at least one rating', { variant: 'error' });
-      return;
+    try {
+      setIsApiSubmitting(true);
+      if (!ratingList.length || ratingList.length === 0) {
+        enqueueSnackbar('Please add at least one rating', { variant: 'error' });
+        return;
+      }
+
+      const payload = {
+        creditRatings: ratingList.map((rating) => ({
+          validFrom: rating.validFrom,
+          creditRatingsId: rating.rating.id,
+          creditRatingAgenciesId: rating.agency.id,
+          ratingLetterId: rating.creditRatingLetter.id,
+          isActive: true
+        }))
+      };
+
+      const response = await axiosInstance.patch(`/bond-estimations/credit-ratings/${applicationId}`, payload);
+
+      if (response.data?.success) {
+        enqueueSnackbar('Credit ratings updated', { variant: 'success' });
+      }
+
+    } catch (error) {
+      console.error('error while submitting credit ratings :', error);
+    } finally {
+      setIsApiSubmitting(false);
     }
-
-    const payload = { creditRatings: ratingList };
-
-    console.log("Final Submit Payload:", payload);
-
-    enqueueSnackbar('Credit ratings saved successfully', { variant: 'success' });
-    setIsApiSubmitting(false);
   };
 
   const calculatePercent = () => {
@@ -166,6 +187,20 @@ export default function CreditRating({ currentCreditRatings, setPercent }) {
     }
   }, [creditRatings, creditRatingsLoading]);
 
+  useEffect(() => {
+    if (currentCreditRatings?.length && currentCreditRatings?.length > 0) {
+      const newRatingList = currentCreditRatings.map((rating) => ({
+        agency: rating.creditRatingAgencies,
+        rating: rating.creditRatings,
+        validFrom: rating.validFrom,
+        creditRatingLetter: rating.ratingLetter
+      }));
+
+      setRatingList(newRatingList);
+      setProgress(true);
+    }
+  }, [currentCreditRatings, setProgress])
+
   return (
     <FormProvider methods={methods} onSubmit={handleAddRating}>
       <Card sx={{ p: 4, borderRadius: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', mb: 4 }}>
@@ -175,14 +210,18 @@ export default function CreditRating({ currentCreditRatings, setPercent }) {
 
         <Grid container spacing={4}>
           <Grid item xs={12} md={4}>
-            <RHFSelect name="selectedAgency" label="Select Rating Agency" size="small" sx={{ mb: 2 }}>
-              <MenuItem value="">Select the appropriate rating agency</MenuItem>
-              {agenciesData.map((agency) => (
-                <MenuItem key={agency.id} value={agency}>
-                  {agency.name}
-                </MenuItem>
-              ))}
-            </RHFSelect>
+            <RHFAutocomplete
+              name="selectedAgency"
+              label="Credit Rating Agency"
+              options={agenciesData || []}
+              getOptionLabel={(option) => option.name}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              renderOption={(props, option) => (
+                <li {...props} key={option.id}>
+                  {option.name}
+                </li>
+              )}
+            />
           </Grid>
 
           <Grid item xs={12} md={8}>
@@ -213,7 +252,7 @@ export default function CreditRating({ currentCreditRatings, setPercent }) {
           control={control}
           render={({ field, fieldState: { error } }) => (
             <DatePicker
-              sx={{mb: 2}}
+              sx={{ mb: 2 }}
               {...field}
               label="Valid From"
               value={
@@ -265,7 +304,7 @@ export default function CreditRating({ currentCreditRatings, setPercent }) {
                   <TableRow>
                     <TableCell>Rating Agency</TableCell>
                     <TableCell>Rating</TableCell>
-                    <TableCell>Valid Till</TableCell>
+                    <TableCell>Valid From</TableCell>
                     <TableCell>Letter</TableCell>
                     <TableCell align="center">Actions</TableCell>
                   </TableRow>
@@ -276,7 +315,7 @@ export default function CreditRating({ currentCreditRatings, setPercent }) {
                     <TableRow key={index}>
                       <TableCell>{row.agency?.name}</TableCell>
                       <TableCell>{row.rating?.name}</TableCell>
-                      <TableCell>{row.validFrom}</TableCell>
+                      <TableCell>{row.validFrom ? format(new Date(row.validFrom), 'dd/MM/yyyy') : 'NA'}</TableCell>
                       <TableCell>
                         <Button
                           variant="text"
@@ -331,5 +370,6 @@ export default function CreditRating({ currentCreditRatings, setPercent }) {
 CreditRating.propTypes = {
   currentCreditRatings: PropTypes.array,
   setPercent: PropTypes.func,
+  setProgress: PropTypes.func
 }
 

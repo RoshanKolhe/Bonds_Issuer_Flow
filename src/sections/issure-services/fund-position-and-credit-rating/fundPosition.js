@@ -11,7 +11,7 @@ import { useParams } from 'src/routes/hook';
 import axiosInstance from 'src/utils/axios';
 import * as Yup from 'yup';
 
-export default function FundPosition({ currentFundPosition, setPercent }) {
+export default function FundPosition({ currentFundPosition, setPercent, setProgress }) {
     const params = useParams();
     const { applicationId } = params;
     const { enqueueSnackbar } = useSnackbar();
@@ -82,8 +82,9 @@ export default function FundPosition({ currentFundPosition, setPercent }) {
     useEffect(() => {
         if (currentFundPosition) {
             reset(defaultValues);
+            setProgress(true);
         }
-    }, [currentFundPosition, defaultValues, reset]);
+    }, [currentFundPosition, defaultValues, reset, setProgress]);
 
     return (
         <FormProvider methods={methods} onSubmit={onSubmit}>
@@ -178,5 +179,6 @@ export default function FundPosition({ currentFundPosition, setPercent }) {
 
 FundPosition.propTypes = {
     currentFundPosition: PropTypes.object,
-    setPercent: PropTypes.func
+    setPercent: PropTypes.func,
+    setProgress: PropTypes.func
 }
