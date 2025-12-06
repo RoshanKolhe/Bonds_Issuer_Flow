@@ -48,6 +48,30 @@ export default function MainFile({ currentDetails, saveStepData, setActiveStepId
     }
   };
 
+  useEffect(() => {
+    if (!currentDetails) return;
+
+    let count = 0;
+
+    if (currentDetails.borrowings && Object.keys(currentDetails.borrowings).length > 0) {
+      count += 1;
+    }
+    if (currentDetails.capitalDetails && Object.keys(currentDetails.capitalDetails).length > 0) {
+      count += 1;
+    }
+    if (currentDetails.profitDetails && Object.keys(currentDetails.profitDetails).length > 0) {
+      count += 1;
+    }
+
+    setCurrentFormCount(count);
+
+    setpayloadData({
+      borrowings: currentDetails.borrowings || null,
+      capitalDetails: currentDetails.capitalDetails || null,
+      profitDetails: currentDetails.profitDetails || null,
+    });
+  }, [currentDetails]);
+
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>

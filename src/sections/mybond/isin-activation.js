@@ -20,7 +20,7 @@ import { LoadingButton } from '@mui/lab';
 import { DatePicker } from '@mui/x-date-pickers';
 import { enqueueSnackbar } from 'notistack';
 
-export default function IsinActivation({ saveStepData, setActiveStepId, percent }) {
+export default function IsinActivation({ currentIsin, saveStepData, setActiveStepId, percent }) {
   const IsinSchema = Yup.object().shape({
     ISIN: Yup.string()
       .required('ISIN is required')
@@ -124,13 +124,56 @@ export default function IsinActivation({ saveStepData, setActiveStepId, percent 
 
   const onSubmit = (data) => {
     console.log('ISIN DATA:', data);
-
-    saveStepData({ isinActivation: data });
-
+    saveStepData('isin_activation', { ...data });
     setActiveStepId('launch_issue');
-
     enqueueSnackbar('Created Successfully!', { variant: 'success' });
   };
+
+  useEffect(() => {
+    if (!currentIsin || Object.keys(currentIsin).length === 0) return;
+
+    const normalized = {
+      ...defaultValues,
+      ...currentIsin,
+
+      activationDate: currentIsin.activationDate
+        ? currentIsin.activationDate instanceof Date
+          ? currentIsin.activationDate
+          : new Date(currentIsin.activationDate)
+        : '',
+
+      creditConfirmationDate: currentIsin.creditConfirmationDate
+        ? currentIsin.creditConfirmationDate instanceof Date
+          ? currentIsin.creditConfirmationDate
+          : new Date(currentIsin.creditConfirmationDate)
+        : '',
+
+      actionType: currentIsin.actionType || 'activate isin',
+    };
+
+    methods.reset(normalized);
+
+    // Restore files with preview
+    if (currentIsin.isinLetter && typeof currentIsin.isinLetter === 'object') {
+      setValue(
+        'isinLetter',
+        Object.assign(currentIsin.isinLetter, {
+          preview: currentIsin.isinLetter.preview || URL.createObjectURL(currentIsin.isinLetter),
+        })
+      );
+    }
+
+    if (currentIsin.creditProof && typeof currentIsin.creditProof === 'object') {
+      setValue(
+        'creditProof',
+        Object.assign(currentIsin.creditProof, {
+          preview: currentIsin.creditProof.preview || URL.createObjectURL(currentIsin.creditProof),
+        })
+      );
+    }
+
+    percent?.(100);
+  }, [currentIsin]);
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>

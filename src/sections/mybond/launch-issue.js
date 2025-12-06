@@ -24,7 +24,12 @@ import { Icon } from '@iconify/react';
 import { LoadingButton } from '@mui/lab';
 import { enqueueSnackbar } from 'notistack';
 
-export default function LaunchIssue({ saveStepData, setActiveStepId, percent }) {
+export default function LaunchIssue({
+  currentLaunchIssue,
+  saveStepData,
+  setActiveStepId,
+  percent,
+}) {
   const LaunchIssueSchema = Yup.object().shape({
     listingExchange: Yup.string().required('Listing exchange is required'),
     subscriptionStartDateTime: Yup.date().nullable().required('Start date & time is required'),
@@ -98,11 +103,21 @@ export default function LaunchIssue({ saveStepData, setActiveStepId, percent }) 
   }, [watch(), errors]);
 
   const onSubmit = (data) => {
-    saveStepData({ launchIssue: data });
-
+    saveStepData(data);
     // setActiveStepId('next_step_here');
     enqueueSnackbar('Created Successfully!', { variant: 'success' });
   };
+
+  useEffect(() => {
+    if (!currentLaunchIssue || Object.keys(currentLaunchIssue).length === 0) return;
+
+    methods.reset({
+      ...defaultValues,
+      ...currentLaunchIssue,
+    });
+
+    percent?.(100);
+  }, [currentLaunchIssue]);
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
@@ -390,7 +405,7 @@ export default function LaunchIssue({ saveStepData, setActiveStepId, percent }) 
             </Grid>
           </Grid>
 
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <Box
               sx={{
                 mt: 3,
@@ -406,7 +421,7 @@ export default function LaunchIssue({ saveStepData, setActiveStepId, percent }) 
                 Launch Issue
               </LoadingButton>
             </Box>
-          </Grid>
+          </Grid> */}
         </Card>
         <Grid item xs={12}>
           <Box

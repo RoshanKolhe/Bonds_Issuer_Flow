@@ -157,14 +157,24 @@ export default function PreliminaryBondRequirements({
   } = collateralMethods;
 
   const onSubmitBond = async (data) => {
-    console.log('Card 1 submitted:', data);
-    setpayloadData((prev) => ({ ...prev, bondRequirements: data }));
+    const finalBond = {
+      ...data,
+      security,
+      investorCategory,
+      paymentCycle,
+    };
+    setpayloadData((prev) => ({
+      ...prev,
+      bondRequirements: finalBond,
+    }));
     setBondCompleted(true);
   };
 
   const onSubmitCollateral = async (data) => {
-    console.log('Card 2 submitted:', data);
-    setpayloadData((prev) => ({ ...prev, collateralRequirement: data }));
+    setpayloadData((prev) => ({
+      ...prev,
+      collateralRequirement: data,
+    }));
     setCollateralCompleted(true);
   };
 
@@ -207,6 +217,46 @@ export default function PreliminaryBondRequirements({
     setValue(fieldName, null, { shouldValidate: true });
   };
 
+  useEffect(() => {
+    if (!currentBondRequirements) return;
+
+    bondMethods.reset({
+      issueAmount: currentBondRequirements.issueAmount || '',
+      tenure: currentBondRequirements.tenure || '',
+      roi: currentBondRequirements.roi || '',
+    });
+
+    setSecurity(currentBondRequirements.security || 'secured');
+    setInvestorCategory(currentBondRequirements.investorCategory || 'retail');
+    setPaymentCycle(currentBondRequirements.paymentCycle || 'monthly');
+
+    setBondCompleted(true);
+    percent?.(50);
+  }, [currentBondRequirements]);
+
+  useEffect(() => {
+    if (!currentBondRequirements?.collateralRequirement) return;
+
+    const cr = currentBondRequirements.collateralRequirement;
+
+    collateralMethods.reset({
+      collateralType: cr.collateralType || '',
+      chargeType: cr.chargeType || '',
+      assetDescription: cr.assetDescription || '',
+      estimatedValue: cr.estimatedValue || '',
+      valuationDate: cr.valuationDate ? new Date(cr.valuationDate) : null,
+      ownershipType: cr.ownershipType || '',
+      securityDocRef: cr.securityDocRef || '',
+      trustName: cr.trustName || '',
+      remarks: cr.remarks || '',
+      creditRatingLetter: cr.creditRatingLetter || null,
+      valuationReport: cr.valuationReport || null,
+    });
+
+    setCollateralCompleted(true);
+    percent?.(50);
+  }, [currentBondRequirements]);
+
   // const onSubmit = async (data) => {
   //   console.log('✅ Submitted Data:', {
   //     ...data,
@@ -224,7 +274,7 @@ export default function PreliminaryBondRequirements({
         <Box
           sx={{
             minHeight: '100vh',
-            p: 4,
+            // p: 4,
             display: 'flex',
             flexDirection: 'column',
             gap: 4,
@@ -431,7 +481,7 @@ export default function PreliminaryBondRequirements({
         <Box
           sx={{
             minHeight: '100vh',
-            p: 4,
+            pt: 4,
             display: 'flex',
             flexDirection: 'column',
             gap: 4,
@@ -671,27 +721,15 @@ export default function PreliminaryBondRequirements({
           </Card>
         </Box>
       </FormProvider>
-      <Grid
-        container
-        spacing={2}
-        justifyContent="flex-end"
-        sx={{ maxWidth: 400, ml: 'auto', mt: 5 }}
-      >
-        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-          {/* <Button variant="outlined" sx={{ color: '#000' }} onClick={() => setActiveStep(3)}>
-            Cancel
-          </Button> */}
+      <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+        {/* <Button variant="outlined" sx={{ color: '#000' }} onClick={() => setActiveStep(2)}>
+                Cancel
+              </Button> */}
 
-          <LoadingButton
-            variant="contained"
-            type="submit"
-            sx={{ color: '#fff' }}
-            onClick={handleNextClick}
-          >
-            Next
-          </LoadingButton>
-        </Box>
-      </Grid>
+        <LoadingButton variant="contained" sx={{ color: '#fff' }} onClick={handleNextClick}>
+          Next
+        </LoadingButton>
+      </Box>
     </>
   );
 }

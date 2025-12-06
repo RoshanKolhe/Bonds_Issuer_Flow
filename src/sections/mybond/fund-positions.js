@@ -58,10 +58,10 @@ export default function FundPositionForm({ currentFund, saveStepData, setActiveS
     let p = 0;
     if (fundCompleted) p += 50;
     if (ratingCompleted) p += 50;
-    
+
     if (typeof percent === 'function') {
       percent(p); // send to parent stepper
-      console.log('🟠 Fund Position Percent Calculation Triggered',p);
+      console.log('🟠 Fund Position Percent Calculation Triggered', p);
     }
   };
 
@@ -273,7 +273,6 @@ export default function FundPositionForm({ currentFund, saveStepData, setActiveS
 
   const handleNextClick = async () => {
     try {
-      // 1. Validate both forms
       const fundValid = await fundForm.trigger();
       const ratingValid = await ratingForm.trigger();
 
@@ -282,17 +281,23 @@ export default function FundPositionForm({ currentFund, saveStepData, setActiveS
         return;
       }
 
-      // 2. Collect both forms data
       const fundPayload = fundForm.getValues();
+
       const ratingPayload = {
         ...ratingForm.getValues(),
         ratings: ratingList,
+        creditRatingLetter: ratingForm.getValues().creditRatingLetter?.fileUrl
+          ? { fileUrl: ratingForm.getValues().creditRatingLetter.fileUrl }
+          : ratingForm.getValues().creditRatingLetter,
       };
 
-      saveStepData(payloadData);
+      saveStepData('fund_position', {
+        ...fundPayload,
+        creditRating: ratingPayload,
+      });
+
       setActiveStepId('audited_financial');
       enqueueSnackbar('Created Successfully!', { variant: 'success' });
-      // 4. Go to next page
     } catch (error) {
       enqueueSnackbar('Something went wrong', { variant: 'error' });
       console.error(error);
@@ -323,8 +328,47 @@ export default function FundPositionForm({ currentFund, saveStepData, setActiveS
   const ratingValues = watchRating();
 
   useEffect(() => {
-    if (currentFund?.creditRating?.ratings) {
-      setRatingList(currentFund.creditRating.ratings);
+    if (currentFund) {
+      resetFund({
+        cashBalance: currentFund.cashBalance || '',
+        cashBalanceDate: currentFund.cashBalanceDate ? new Date(currentFund.cashBalanceDate) : null,
+        bankBalance: currentFund.bankBalance || '',
+        bankBalanceDate: currentFund.bankBalanceDate ? new Date(currentFund.bankBalanceDate) : null,
+      });
+
+      resetRating({
+        hasCredit: currentFund?.hasCredit || 'yes',
+        selectedAgency: currentFund?.creditRating?.selectedAgency || '',
+        selectedRating: currentFund?.creditRating?.selectedRating || '',
+        valid: currentFund?.creditRating?.valid || '',
+        additionalRating: currentFund?.creditRating?.additionalRating || '',
+        creditRatingLetter: currentFund?.creditRating?.creditRatingLetter
+          ? {
+              fileUrl: currentFund.creditRating.creditRatingLetter.fileUrl,
+              preview: currentFund.creditRating.creditRatingLetter.fileUrl,
+            }
+          : null,
+      });
+
+      if (currentFund?.creditRating?.ratings) {
+        setRatingList(currentFund.creditRating.ratings);
+      }
+
+      if (
+        currentFund.cashBalance &&
+        currentFund.cashBalanceDate &&
+        currentFund.bankBalance &&
+        currentFund.bankBalanceDate
+      ) {
+        setFundCompleted(true);
+      }
+
+      if (
+        currentFund?.creditRating &&
+        (currentFund.creditRating.selectedAgency || currentFund.creditRating.ratings?.length > 0)
+      ) {
+        setRatingCompleted(true);
+      }
     }
   }, [currentFund]);
 

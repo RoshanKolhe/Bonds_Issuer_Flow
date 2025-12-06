@@ -161,14 +161,20 @@ export default function MyBondNewIssue({ currentIssue, saveStepData, setActiveSt
       //   await axiosInstance.patch(`/bonds/new-issue/${currentIssue.id}`, payload);
       // }
 
-      saveStepData(payload);
-      setActiveStepId("fund_position");
+      saveStepData(formData);
+      setActiveStepId('fund_position');
       enqueueSnackbar(currentIssue ? 'Updated Successfully!' : 'Created Successfully!');
     } catch (err) {
       console.error(err);
       enqueueSnackbar(err.message || 'Error saving issue', { variant: 'error' });
     }
   });
+
+  useEffect(() => {
+    if (currentIssue) {
+      reset(currentIssue);
+    }
+  }, [currentIssue]);
 
   useEffect(() => {
     const size = parseFloat(issueSize);

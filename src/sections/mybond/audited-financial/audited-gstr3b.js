@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { alpha, styled } from '@mui/material/styles';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
@@ -43,7 +43,7 @@ const StyledDropZone = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function AuditedGST3B() {
+export default function AuditedGST3B({ setData, currentAuditedGST3B, setPercent, setProgress }) {
   const [auditorName, setAuditorName] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
 
@@ -107,46 +107,45 @@ export default function AuditedGST3B() {
 
   const [documents, setDocuments] = useState([]);
 
-  // const handleFileUpload = (event, id) => {
-  //   const file = event.target.files[0];
-  //   if (file) {
-  //     setDocuments((docs) =>
-  //       docs.map((doc) =>
-  //         doc.id === id ? { ...doc, file: file, status: 'Uploaded', reportDate: new Date() } : doc
-  //       )
-  //     );
-  //     // Reset the file input to allow re-uploading the same file
-  //     event.target.value = null;
-  //   }
-  // };
-
-  // const handleDateChange = (date, id) => {
-  //   setDocuments((docs) => docs.map((doc) => (doc.id === id ? { ...doc, reportDate: date } : doc)));
-  // };
-
-  // const handleDelete = (id) => {
-  //   setDocuments((docs) =>
-  //     docs.map((doc) =>
-  //       doc.id === id ? { ...doc, file: null, status: 'Pending', reportDate: null } : doc
-  //     )
-  //   );
-  // };
-
-  // const getStatusColor = (status) => {
-  //   switch (status) {
-  //     case 'Uploaded':
-  //       return 'success';
-  //     case 'Invalid':
-  //       return 'error';
-  //     default:
-  //       return 'warning';
-  //   }
-  // };
-
   const handleDateChange = (date, id) => {
     setDocuments((docs) => docs.map((doc) => (doc.id === id ? { ...doc, reportDate: date } : doc)));
   };
 
+  const calculateCompletion = () => {
+    let score = 0;
+
+    // Auditor Name max: 5%
+    if (auditorName?.trim()) score += 5;
+
+    const totalDocs = documents.length;
+
+    if (totalDocs > 0) {
+      const uploadCount = documents.filter((doc) => !!doc.file).length;
+      const dateCount = documents.filter((doc) => !!doc.reportDate).length;
+
+      // Files max 7.5%
+      score += Math.min(uploadCount * (7.5 / totalDocs), 7.5);
+
+      // Dates max 7.5%
+      score += Math.min(dateCount * (7.5 / totalDocs), 7.5);
+    }
+
+    const percent = Math.min(20, Math.round(score));
+    setPercent(percent);
+    setProgress(percent === 20);
+  };
+
+  useEffect(() => {
+    calculateCompletion();
+  }, [auditorName, documents]);
+
+  useEffect(() => {
+    if (currentAuditedGST3B) {
+      setAuditorName(currentAuditedGST3B.auditorName || '');
+      setDocuments(currentAuditedGST3B.documents || documents);
+      setSelectedMonth(currentAuditedGST3B.selectedMonth || '');
+    }
+  }, [currentAuditedGST3B]);
   return (
     <Container disableGutters>
       <Grid
@@ -575,6 +574,23 @@ export default function AuditedGST3B() {
             ))}
           </Box>
         </Grid>
+        <Box
+          sx={{
+            mt: 3,
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: 2,
+            width: '100%',
+          }}
+        >
+          <Button
+            variant="contained"
+            sx={{ color: '#fff' }}
+            onClick={() => setData({ documents, auditorName, selectedMonth })}
+          >
+            Save
+          </Button>
+        </Box>
       </Grid>
     </Container>
   );

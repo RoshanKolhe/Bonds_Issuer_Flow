@@ -25,8 +25,15 @@ import YupErrorMessage from 'src/components/error-field/yup-error-messages';
 import { DatePicker } from '@mui/x-date-pickers';
 import { enqueueSnackbar } from 'notistack';
 
-export default function RegulatoryFiling({ saveStepData, setActiveStepId, percent }) {
-  const [authority, setAuthority] = useState();
+export default function RegulatoryFiling({
+  currentRegulatory,
+  saveStepData,
+  setActiveStepId,
+  percent,
+}) {
+  const [sebiAuthority, setSebiAuthority] = useState('');
+  const [inPrincipleAuthority, setInPrincipleAuthority] = useState('');
+  const [rocAuthority, setRocAuthority] = useState('');
 
   const RegulatoryFilingSchema = Yup.object().shape({
     // PAS-4
@@ -63,7 +70,6 @@ export default function RegulatoryFiling({ saveStepData, setActiveStepId, percen
     // SEBI/NHB/RBI Approvals
     sebiApprovalNo: Yup.string().required('Approval number is required'),
     sebiDate: Yup.date().nullable().required('Date is required'),
-    authorityType: Yup.string().required('Authority is required'),
     sebi: Yup.mixed()
       .required('Upload required')
       .test('fileSize', 'Max size is 5MB', (value) => {
@@ -80,6 +86,10 @@ export default function RegulatoryFiling({ saveStepData, setActiveStepId, percen
     rocApprovalNo: Yup.string().required('Approval number is required'),
     rocDate: Yup.date().nullable().required('Date is required'),
     roc: Yup.mixed().required('Upload required'),
+
+    sebiAuthority: Yup.string().required('Authority required'),
+    inPrincipleAuthority: Yup.string().required('Authority required'),
+    rocAuthority: Yup.string().required('Authority required'),
   });
 
   const defaultValues = {
@@ -97,7 +107,10 @@ export default function RegulatoryFiling({ saveStepData, setActiveStepId, percen
     // SEBI Approvals
     sebiApprovalNo: '',
     sebiDate: null,
-    authorityType: '', // 👈 stored here (SEBI / NHB / RBI)
+    sebiAuthority: '',
+    inPrincipleAuthority: '',
+    rocAuthority: '',
+
     sebi: null,
 
     // In-principle
@@ -126,19 +139,80 @@ export default function RegulatoryFiling({ saveStepData, setActiveStepId, percen
   const onSubmit = (data) => {
     console.log('🟢 Regulatory Filing Submit Data:', data);
 
-    saveStepData({ regulatoryFiling: data });
+    // ---------------- CREATE GROUPED PAYLOAD HERE -------------------
+    const payload = {
+      pas4: {
+        filingDatePas4: data.filingDatePas4,
+        fileNamePas4: data.fileNamePas4,
+        referenceNoPas4: data.referenceNoPas4,
+        approvalNoPas4: data.approvalNoPas4,
+        pas4: data.pas4,
+      },
+
+      memorandum: {
+        filingDateMemorandum: data.filingDateMemorandum,
+        fileNameMemorandum: data.fileNameMemorandum,
+        referenceNoMemorandum: data.referenceNoMemorandum,
+        informationMemorandum: data.informationMemorandum,
+      },
+
+      sebiApprovals: {
+        sebiApprovalNo: data.sebiApprovalNo,
+        sebiDate: data.sebiDate,
+        sebiAuthority: data.sebiAuthority,
+        sebi: data.sebi,
+      },
+
+      inPrinciple: {
+        principleApprovalNo: data.principleApprovalNo,
+        principleDate: data.principleDate,
+        inPrincipleAuthority: data.inPrincipleAuthority,
+        principle: data.principle,
+      },
+
+      rocApprovals: {
+        rocApprovalNo: data.rocApprovalNo,
+        rocDate: data.rocDate,
+        rocAuthority: data.rocAuthority,
+        roc: data.roc,
+      },
+    };
+    // ---------------------------------------------------------------
+
+    saveStepData('regulatory_filing', {
+      pas4: payload.pas4 || {},
+      memorandum: payload.memorandum || {},
+      sebiApprovals: payload.sebiApprovals || {},
+      inPrinciple: payload.inPrinciple || {},
+      rocApprovals: payload.rocApprovals || {},
+    });
 
     setActiveStepId('isin_activation');
     enqueueSnackbar('Created Successfully!', { variant: 'success' });
   };
 
   const requiredFields = [
+    'filingDatePas4',
+    'fileNamePas4',
+    'referenceNoPas4',
+    'approvalNoPas4',
     'pas4',
+    'filingDateMemorandum',
+    'fileNameMemorandum',
+    'referenceNoMemorandum',
     'informationMemorandum',
+    'sebiApprovalNo',
+    'sebiDate',
+    'sebiAuthority',
     'sebi',
+    'principleApprovalNo',
+    'principleDate',
+    'inPrincipleAuthority',
     'principle',
+    'rocApprovalNo',
+    'rocDate',
+    'rocAuthority',
     'roc',
-    'authorityType',
   ];
 
   const calculatePercentUsingYup = () => {
@@ -166,11 +240,39 @@ export default function RegulatoryFiling({ saveStepData, setActiveStepId, percen
     calculatePercentUsingYup();
   }, [methods.watch(), errors]);
 
+  // SEBI
   useEffect(() => {
-    if (authority) {
-      setValue('authorityType', authority);
-    }
-  }, [authority]);
+    setValue('sebiAuthority', sebiAuthority);
+  }, [sebiAuthority]);
+
+  // In-Principle
+  useEffect(() => {
+    setValue('inPrincipleAuthority', inPrincipleAuthority);
+  }, [inPrincipleAuthority]);
+
+  // ROC
+  useEffect(() => {
+    setValue('rocAuthority', rocAuthority);
+  }, [rocAuthority]);
+  useEffect(() => {
+    if (!currentRegulatory) return;
+
+    methods.reset({
+      ...defaultValues,
+
+      ...(currentRegulatory.pas4 || {}),
+      ...(currentRegulatory.memorandum || {}),
+      ...(currentRegulatory.sebiApprovals || {}),
+      ...(currentRegulatory.inPrinciple || {}),
+      ...(currentRegulatory.rocApprovals || {}),
+    });
+
+    setSebiAuthority(currentRegulatory.sebiApprovals?.sebiAuthority || '');
+    setInPrincipleAuthority(currentRegulatory.inPrinciple?.inPrincipleAuthority || '');
+    setRocAuthority(currentRegulatory.rocApprovals?.rocAuthority || '');
+
+    percent?.(100);
+  }, [currentRegulatory]);
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
@@ -274,9 +376,9 @@ export default function RegulatoryFiling({ saveStepData, setActiveStepId, percen
                 </Typography>
 
                 <ToggleButtonGroup
-                  value={authority}
+                  value={sebiAuthority}
                   exclusive
-                  onChange={(e, val) => val && setAuthority(val)}
+                  onChange={(e, val) => val && setSebiAuthority(val)}
                   sx={{
                     height: 48,
                     border: 'none !important', // remove outer group border
@@ -363,9 +465,9 @@ export default function RegulatoryFiling({ saveStepData, setActiveStepId, percen
                 </Typography>
 
                 <ToggleButtonGroup
-                  value={authority}
+                  value={inPrincipleAuthority}
                   exclusive
-                  onChange={(e, val) => val && setAuthority(val)}
+                  onChange={(e, val) => val && setInPrincipleAuthority(val)}
                   sx={{
                     height: 48,
                     border: 'none !important', // remove outer group border
@@ -452,9 +554,9 @@ export default function RegulatoryFiling({ saveStepData, setActiveStepId, percen
                 </Typography>
 
                 <ToggleButtonGroup
-                  value={authority}
+                  value={rocAuthority}
                   exclusive
-                  onChange={(e, val) => val && setAuthority(val)}
+                  onChange={(e, val) => val && setRocAuthority(val)}
                   sx={{
                     height: 48,
                     border: 'none !important', // remove outer group border
@@ -512,7 +614,7 @@ export default function RegulatoryFiling({ saveStepData, setActiveStepId, percen
             {/* <Button variant="outlined" sx={{ color: '#000000' }}>
               Cancel
             </Button> */}
-            <LoadingButton variant="contained" type='submit' sx={{ color: '#fff' }}>
+            <LoadingButton variant="contained" type="submit" sx={{ color: '#fff' }}>
               Next
             </LoadingButton>
           </Box>

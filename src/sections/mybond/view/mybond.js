@@ -1,4 +1,3 @@
-import AuditedFinancial from '../audited-financial/audited-financial';
 import MainFile from '../borrowing/main';
 import FinancialDetails from '../financial-details';
 import FundPositionForm from '../fund-positions';
