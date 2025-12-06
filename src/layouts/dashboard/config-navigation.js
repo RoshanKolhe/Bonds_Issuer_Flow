@@ -94,6 +94,7 @@ export function useNavData() {
             icon: ICONS.company,
             children: [
               { title: t('ROI guidance'), path: paths.dashboard.issureservices.roi },
+              { title: t('Document Drafting'), path: paths.dashboard.documentDrafting.documentDrafting },
             ],
           },
 
@@ -112,6 +113,15 @@ export function useNavData() {
             icon: <Iconify icon="mdi:file-certificate-outline" width={24} />,
             children: [
               { title: t('create'), path: paths.dashboard.mybond.create },
+            ],
+          },
+            {
+            title: t('signatories'),
+            path: paths.dashboard.signatories.root,
+            icon: <Iconify icon="mdi:file-certificate-outline" width={24} />,
+            children: [
+              { title: t('create'), path: paths.dashboard.signatories.new },
+                { title: t('list'), path: paths.dashboard.signatories.list },
             ],
           },
 

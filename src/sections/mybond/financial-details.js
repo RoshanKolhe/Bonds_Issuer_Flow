@@ -1,12 +1,6 @@
 /* eslint-disable no-useless-escape */
 import React, { useEffect, useMemo } from 'react';
-import {
-  Box,
-  Grid,
-  Card,
-  Typography,
-  Button
-} from '@mui/material';
+import { Box, Grid, Card, Typography, Button } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -14,8 +8,12 @@ import * as Yup from 'yup';
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
 import PropTypes from 'prop-types';
 
-export default function FinancialDetails({ currentFinancial, setActiveStep, onSave, percent }) {
-
+export default function FinancialDetails({
+  currentFinancial,
+  saveStepData,
+  setActiveStepId,
+  percent,
+}) {
   const MainSchema = Yup.object().shape({
     debtEquityRatio: Yup.string().required('Equity ratio is required'),
     currentRatio: Yup.string().required('Current ratio is required'),
@@ -26,15 +24,44 @@ export default function FinancialDetails({ currentFinancial, setActiveStep, onSa
     debtServiceCoverageRatio: Yup.string().required('DSCR is required'),
   });
 
-  const defaultValues = useMemo(() => ({
-    debtEquityRatio: currentFinancial?.debtEquityRatio || '',
-    currentRatio: currentFinancial?.currentRatio || '',
-    netWorth: currentFinancial?.netWorth || '',
-    quickRatio: currentFinancial?.quickRatio || '',
-    returnOnEquity: currentFinancial?.returnOnEquity || '',
-    returnOnAssets: currentFinancial?.returnOnAssets || '',
-    debtServiceCoverageRatio: currentFinancial?.debtServiceCoverageRatio || '',
-  }), [currentFinancial]);
+  const randomRatio = (min, max) => (Math.random() * (max - min) + min).toFixed(2);
+
+  const defaultValues = useMemo(
+    () => ({
+      debtEquityRatio: currentFinancial?.debtEquityRatio || randomRatio(0.2, 3),
+      currentRatio: currentFinancial?.currentRatio || randomRatio(0.5, 2.5),
+      netWorth: currentFinancial?.netWorth || randomRatio(1, 500), // crores/lakhs depending on unit
+      quickRatio: currentFinancial?.quickRatio || randomRatio(0.3, 2),
+      returnOnEquity: currentFinancial?.returnOnEquity || randomRatio(5, 25), // %
+      returnOnAssets: currentFinancial?.returnOnAssets || randomRatio(2, 15), // %
+      debtServiceCoverageRatio: currentFinancial?.debtServiceCoverageRatio || randomRatio(0.5, 2),
+    }),
+    [currentFinancial]
+  );
+
+  const requiredFields = [
+    'debtEquityRatio',
+    'currentRatio',
+    'netWorth',
+    'quickRatio',
+    'returnOnEquity',
+    'returnOnAssets',
+    'debtServiceCoverageRatio',
+  ];
+
+  const calculatePercent = (values) => {
+    let filled = 0;
+
+    requiredFields.forEach((field) => {
+      const v = values[field];
+      if (v !== null && v !== undefined && v !== '') {
+        filled++;
+      }
+    });
+
+    const p = Math.round((filled / requiredFields.length) * 100);
+    percent?.(p);
+  };
 
   const methods = useForm({
     resolver: yupResolver(MainSchema),
@@ -57,12 +84,20 @@ export default function FinancialDetails({ currentFinancial, setActiveStep, onSa
     if (!isValid) return;
 
     const values = methods.getValues();
-    onSave("financialDetails", values);
+    saveStepData('financialDetails', values);
 
     percent?.(100); // ######## Progress fully completed #######
 
-    setActiveStep( 4);
+    setActiveStepId('preliminary_bond_requirements');
   };
+
+  useEffect(() => {
+    const subscription = methods.watch((values) => {
+      calculatePercent(values);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [methods.watch]);
 
   return (
     <>
@@ -123,9 +158,9 @@ export default function FinancialDetails({ currentFinancial, setActiveStep, onSa
 
       {/* Footer Buttons Section */}
       <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-        <Button variant="outlined" sx={{ color: '#000' }} onClick={() => setActiveStep(2)}>
+        {/* <Button variant="outlined" sx={{ color: '#000' }} onClick={() => setActiveStep(2)}>
           Cancel
-        </Button>
+        </Button> */}
 
         <LoadingButton variant="contained" sx={{ color: '#fff' }} onClick={handleNext}>
           Next

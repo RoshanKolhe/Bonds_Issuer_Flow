@@ -64,7 +64,12 @@ export const endpoints = {
   companyInfo: {
     list: '/api/kyc/issuer_kyc/company-info/',
     filterList: (filter) => `/api/kyc/issuer_kyc/company-info/?filter=${filter}`,
-    details: (id) => `/api/kyc/issuer_kyc/company-info//${id}`,
+    details: (id) => `/api/kyc/issuer_kyc/company-info/${id}`,
+  },
+  signatories: {
+    list: '/company-profiles/authorize-signatory',
+    filterList: (filter) => `/company-profiles/authorize-signatory?filter=${filter}`,
+    details: (id) => `/company-profiles/authorize-signatory${id}`,
   },
   designation: {
     list: '/designations',
@@ -81,5 +86,11 @@ export const endpoints = {
   },
   creditRatings: {
     list: '/credit-ratings',
+  },
+  
+  bankDetails: {
+    list: '/company-profiles/bank-details',
+    filterList: (filter) => `/company-profiles/bank-details?filter=${filter}`,
+    details: (id) => `/company-profiles/bank-details/${id}`,
   }
 };

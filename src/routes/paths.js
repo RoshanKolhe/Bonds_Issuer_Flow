@@ -1,7 +1,7 @@
 // utils
 import { paramCase } from 'src/utils/change-case';
 import { _id, _postTitles } from 'src/_mock/assets';
-import KYCBankDetails from 'src/sections/kyc/kyc-bank-details';
+
 
 // ----------------------------------------------------------------------
 
@@ -26,6 +26,8 @@ export const paths = {
   KYCSucessfull: '/kyc/sucessfull',
   KYCSignatories: '/kyc/signatories',
   KYCPending: '/kyc/pending',
+
+
 
   // kycCompanyDetails: '/kyc/kyc-company-details',
   kycAddressInfo: '/kyc/kyc-address-info',
@@ -129,6 +131,7 @@ export const paths = {
       list: `${ROOTS.DASHBOARD}/company/list`,
       // cards: `${ROOTS.DASHBOARD}/company/cards`,
       profile: `${ROOTS.DASHBOARD}/company/profile`,
+      view : `${ROOTS.DASHBOARD}/company/view`,
       // account: `${ROOTS.DASHBOARD}/company/account`,
       // edit: (id) => `${ROOTS.DASHBOARD}/company/${id}/edit`,
       // demo: {
@@ -144,26 +147,28 @@ export const paths = {
     trustee: {
       root: `${ROOTS.DASHBOARD}/trustee`,
       list: `${ROOTS.DASHBOARD}/trustee/list`,
-      details:`${ROOTS.DASHBOARD}/trustee/details`,
-      update:`${ROOTS.DASHBOARD}/trustee/update`,
-      compare:`${ROOTS.DASHBOARD}/trustee/compare`
+      details: `${ROOTS.DASHBOARD}/trustee/details`,
+      update: `${ROOTS.DASHBOARD}/trustee/update`,
+      compare: `${ROOTS.DASHBOARD}/trustee/compare`
+    },
+    documentDrafting: {
+      root: `${ROOTS.DASHBOARD}/documentDrafting`,
+      documentDrafting: `${ROOTS.DASHBOARD}/documentDrafting/document-drafting`,
+
     },
     mybond: {
       root: `${ROOTS.DASHBOARD}/mybond`,
       list: `${ROOTS.DASHBOARD}/mybond/list`,
       create: `${ROOTS.DASHBOARD}/mybond/create`,
+      bondIssue: `${ROOTS.DASHBOARD}/mybond/bond-issue`,
       investor: `${ROOTS.DASHBOARD}/mybond/investor`,
     },
-    //   product: {
-    //     root: `${ROOTS.DASHBOARD}/product`,
-    //     new: `${ROOTS.DASHBOARD}/product/new`,
-    //     details: (id) => `${ROOTS.DASHBOARD}/product/${id}`,
-    //     edit: (id) => `${ROOTS.DASHBOARD}/product/${id}/edit`,
-    //     demo: {
-    //       details: `${ROOTS.DASHBOARD}/product/${MOCK_ID}`,
-    //       edit: `${ROOTS.DASHBOARD}/product/${MOCK_ID}/edit`,
-    //     },
-    //   },
+    signatories: {
+      root: `${ROOTS.DASHBOARD}/signatories`,
+      new: `${ROOTS.DASHBOARD}/signatories/new`,
+      list: `${ROOTS.DASHBOARD}/signatories/list`,
+      edit: (id) => `${ROOTS.DASHBOARD}/signatories/${id}/edit`,
+    },
     //   invoice: {
     //     root: `${ROOTS.DASHBOARD}/invoice`,
     //     new: `${ROOTS.DASHBOARD}/invoice/new`,

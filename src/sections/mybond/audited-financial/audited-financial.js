@@ -41,7 +41,7 @@ import KYCTitle from 'src/pages/components/audited-financial/title';
 
 // ----------------------------------------------------------------------
 
-export default function AuditedFinancial({ setActiveStep }) {
+export default function AuditedFinancial({ currentIssue, saveStepData, setActiveStepId, percent }) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 10 }, (_, i) => {
     const year = currentYear - i;
@@ -50,6 +50,18 @@ export default function AuditedFinancial({ setActiveStep }) {
       label: `${year - 1} - ${year}`, // Shows as "2023 - 2024" for FY 2023-24
     };
   });
+
+  const calculatePercent = () => {
+      let p = 100;
+      if (typeof percent === 'function') {
+        percent(p); // send to parent stepper
+        console.log('🟠 Fund Position Percent Calculation Triggered',p);
+      }
+    };
+  
+    useEffect(() => {
+      calculatePercent();
+    }, []);
 
   const methods = useForm({
     defaultValues: {
@@ -70,7 +82,7 @@ export default function AuditedFinancial({ setActiveStep }) {
     console.log('✅ Full Form Data:', data);
 
     // if API success
-    setActiveStep(2);
+    setActiveStepId('borrowing_details');
   };
 
   return (
@@ -83,110 +95,6 @@ export default function AuditedFinancial({ setActiveStep }) {
         }
       />
       <FormProvider methods={methods} onSubmit={onSubmit}>
-        {/* <Grid
-          container
-          sx={{
-            border: (theme) => `1px solid ${theme.palette.divider}`,
-            borderRadius: 1.5,
-            p: 3,
-            mb: 3,
-          }}
-        >
-          <Grid xs={12}>
-            <Typography variant="h6" sx={{ mb: 3 }}>
-              Select Document type
-            </Typography>
-          </Grid>
-
-          <FormControl component="fieldset" sx={{ width: '100%' }}>
-            <RadioGroup
-              row
-              aria-labelledby="document-type-radio-buttons"
-              name="documentType"
-              sx={{ width: '100%' }}
-            >
-              <Grid container spacing={3} sx={{ width: '100%', m: 0 }}>
-                <Grid xs={12} md={6} sx={{ p: 0, pr: { md: 1.5 } }}>
-                  <label
-                    htmlFor="audited-radio"
-                    style={{ width: '100%', cursor: 'pointer', display: 'block' }}
-                  >
-                    <Grid
-                      container
-                      sx={{
-                        p: 3,
-                        borderRadius: 1.5,
-                        border: (theme) => `1px solid ${theme.palette.divider}`,
-                        height: '100%',
-                        width: '100%',
-                        m: 0,
-                        '&:hover': {
-                          borderColor: 'primary.main',
-                        },
-                      }}
-                    >
-                      <Grid item xs container direction="column" sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography variant="subtitle1" noWrap>
-                          Audited Document
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-                          Financial Statement, IT Returns, GST returns (Monthly 3B & Annual 9)
-                        </Typography>
-                      </Grid>
-                      <Grid item sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Radio
-                          id="audited-radio"
-                          value="audited"
-                          sx={{ p: 0, ml: 1 }}
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                      </Grid>
-                    </Grid>
-                  </label>
-                </Grid>
-
-                <Grid xs={12} md={6} sx={{ p: 0, pl: { md: 1.5 } }}>
-                  <label
-                    htmlFor="provisional-radio"
-                    style={{ width: '100%', cursor: 'pointer', display: 'block' }}
-                  >
-                    <Grid
-                      container
-                      sx={{
-                        p: 3,
-                        borderRadius: 1.5,
-                        border: (theme) => `1px solid ${theme.palette.divider}`,
-                        height: '100%',
-                        width: '100%',
-                        m: 0,
-                        '&:hover': {
-                          borderColor: 'primary.main',
-                        },
-                      }}
-                    >
-                      <Grid item xs container direction="column" sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography variant="subtitle1" noWrap>
-                          Provisional Document
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-                          Monthly/Quarterly GST Returns (GSTR-3B & GSTR-1)
-                        </Typography>
-                      </Grid>
-                      <Grid item sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Radio
-                          id="provisional-radio"
-                          value="provisional"
-                          sx={{ p: 0, ml: 1 }}
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                      </Grid>
-                    </Grid>
-                  </label>
-                </Grid>
-              </Grid>
-            </RadioGroup>
-          </FormControl>
-        </Grid> */}
         <AuditedFinancialDocument />
         <Grid item xs={12}>
           <Box
@@ -197,15 +105,15 @@ export default function AuditedFinancial({ setActiveStep }) {
               gap: 2,
             }}
           >
-            <Button
+            {/* <Button
               variant="outlined"
               sx={{ color: '#000000' }}
               onClick={() => setActiveStep(0)}
             >
               Cancel
-            </Button>
+            </Button> */}
 
-            <LoadingButton variant="contained" sx={{ color: '#fff' }}>
+            <LoadingButton variant="contained" type='submit' sx={{ color: '#fff' }}>
               Next
             </LoadingButton>
           </Box>

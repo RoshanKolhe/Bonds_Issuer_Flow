@@ -41,16 +41,23 @@ const UserEditPage = lazy(() => import('src/pages/dashboard/user/edit'));
 
 // COMPANY PROFILE
 const CompanyProfilePage = lazy(() => import('src/pages/dashboard/company/profile'));
+const NewBankPage = lazy(() => import('src/pages/dashboard/company/new'))
 
 // COMPANY
 const ROIGuidancePage = lazy(() => import('src/pages/dashboard/issure-services/roi'));
 const ROIFundFormPage = lazy(() => import('src/pages/dashboard/issure-services/roi-fund-form'));
-const AfterCompleteRoiStagePage = lazy(()=> import('src/pages/dashboard/issure-services/view'))
+const AfterCompleteRoiStagePage = lazy(() => import('src/pages/dashboard/issure-services/view'));
+
+// Companyyyy
+const BankViewPage = lazy(()=> import('src/pages/dashboard/company/view'))
 //
 const MyBondCreatePage = lazy(() => import('src/pages/dashboard/mybond/create'))
+const MyBondNewIssuePage = lazy(() => import('src/pages/dashboard/mybond/bond-issue'))
 
 // WORKFLOW
 const ReactFlowPage = lazy(() => import('src/pages/dashboard/react-flow/board'));
+// DOCUMENT DRAFTING
+const DocumentDraftingFormPage = lazy(() => import('src/pages/dashboard/document-drafting/document-drafting-forms'))
 // SCHEDULER
 const SchedulerNewPage = lazy(() => import('src/pages/dashboard/scheduler/new'));
 const SchedulerListPage = lazy(() => import('src/pages/dashboard/scheduler/list'));
@@ -69,14 +76,18 @@ const BlogEditPostPage = lazy(() => import('src/pages/dashboard/post/edit'))
 // Trusteeee
 const TrusteeListPage = lazy(() => import('src/pages/dashboard/trustee/list'));
 const TrusteeDetailsPage = lazy(() => import('src/pages/dashboard/trustee/details'));
-const TrusteeEditPage= lazy(()=> import('src/pages/dashboard/trustee/edit'));
-const TrusteeComparePage= lazy(()=> import('src/pages/dashboard/trustee/comapre'))
+const TrusteeEditPage = lazy(() => import('src/pages/dashboard/trustee/edit'));
+const TrusteeComparePage = lazy(() => import('src/pages/dashboard/trustee/comapre'))
 
 // JOB
 const JobDetailsPage = lazy(() => import('src/pages/dashboard/job/details'));
 const JobListPage = lazy(() => import('src/pages/dashboard/job/list'));
 const JobCreatePage = lazy(() => import('src/pages/dashboard/job/new'));
 const JobEditPage = lazy(() => import('src/pages/dashboard/job/edit'));
+// SIGNATORIES
+const SignatoriesCreatePage = lazy(() => import('src/pages/dashboard/signatories/new'));
+const SignatoriesListPage = lazy(() => import('src/pages/dashboard/signatories/list'));
+const SignatoriesEditPage = lazy(() => import('src/pages/dashboard/signatories/edit'));
 // TOUR
 const TourDetailsPage = lazy(() => import('src/pages/dashboard/tour/details'));
 const TourListPage = lazy(() => import('src/pages/dashboard/tour/list'));
@@ -101,11 +112,11 @@ export const dashboardRoutes = [
     path: 'dashboard',
     element: (
       <AuthGuard>
-      <DashboardLayout>
-        <Suspense fallback={<LoadingScreen />}>
-          <Outlet />
-        </Suspense>
-      </DashboardLayout>
+        <DashboardLayout>
+          <Suspense fallback={<LoadingScreen />}>
+            <Outlet />
+          </Suspense>
+        </DashboardLayout>
       </AuthGuard>
     ),
     children: [
@@ -132,6 +143,8 @@ export const dashboardRoutes = [
         children: [
           { element: <CompanyProfilePage />, index: true },
           { path: 'profile', element: <CompanyProfilePage /> },
+          { path: 'new', element: <NewBankPage /> },
+          {path: 'view', element:<BankViewPage/>}
         ],
       },
       {
@@ -149,7 +162,8 @@ export const dashboardRoutes = [
           { element: <MyBondCreatePage />, index: true },
           { path: 'list', element: <ROIGuidancePage /> },
           { path: 'create', element: <MyBondCreatePage /> },
-          {path:'investor', element:<AfterCompleteRoiStagePage/>},
+          { path: 'bond-issue', element: <MyBondNewIssuePage /> },
+          { path: 'investor', element: <AfterCompleteRoiStagePage /> },
         ],
       },
       {
@@ -170,6 +184,15 @@ export const dashboardRoutes = [
           { path: ':id', element: <OrderDetailsPage /> },
         ],
       },
+      {
+        path: 'signatories',
+        children: [
+          { element: <SignatoriesListPage />, index: true },
+          { path: 'list', element: <SignatoriesListPage /> },
+          { path: ':id/edit', element: <SignatoriesEditPage /> },
+          {path:'new', element:<SignatoriesCreatePage/>}
+        ],
+      },
 
       {
         path: 'reactflow',
@@ -181,7 +204,13 @@ export const dashboardRoutes = [
           // { path: 'new', element: <InvoiceCreatePage /> },
         ],
       },
-
+      {
+        path: 'documentDrafting',
+        children: [
+          { element: <DocumentDraftingFormPage />, index: true },
+          { path: 'document-drafting', element: <DocumentDraftingFormPage /> },
+        ],
+      },
       {
         path: 'scheduler',
         children: [
@@ -189,6 +218,16 @@ export const dashboardRoutes = [
           { path: 'list', element: <SchedulerListPage /> },
           { path: ':id', element: <SchedulerViewPage /> },
           { path: ':id/edit', element: <SchedulerEditPage /> },
+          { path: 'new', element: <SchedulerNewPage /> },
+        ],
+      },
+      {
+        path: 'trustee',
+        children: [
+          { element: <TrusteeListPage />, index: true },
+          { path: 'list', element: <TrusteeListPage /> },
+          { path: ':id', element: <TrusteeComparePage /> },
+          { path: 'details', element: <TrusteeDetailsPage /> },
           { path: 'new', element: <SchedulerNewPage /> },
         ],
       },

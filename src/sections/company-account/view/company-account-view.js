@@ -15,7 +15,10 @@ import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import CompanyAccountGeneral from '../company-account-general';
 import CompanyAccountAddress from '../company-account-address';
 import CompanyAccountChangePassword from '../company-account-change-password';
-import BankDematNewForm from '../company-account-bank-demat';
+
+import BankNewForm from '../company-account-bank';
+import DematNewForm from '../company-account-demat';
+import CompanyBankPage from '../company-account-bank';
 
 // ----------------------------------------------------------------------
 
@@ -32,7 +35,12 @@ const TABS = [
   },
   {
     value: 'bank',
-    label: 'Bank & Demat',
+    label: 'Bank',
+    icon: <Iconify icon="fluent:building-bank-16-filled" width={24} />,
+  },
+    {
+    value: 'demat',
+    label: 'Demat',
     icon: <Iconify icon="fluent:building-bank-16-filled" width={24} />,
   },
   {
@@ -80,7 +88,8 @@ export default function CompanyAccountView() {
 
       {currentTab === 'general' && <CompanyAccountGeneral />}
       {currentTab === 'address' && <CompanyAccountAddress />}
-      {currentTab === 'bank' && <BankDematNewForm />}
+      {currentTab === 'bank' && <CompanyBankPage />}
+       {currentTab === 'demat' && <DematNewForm />}
 
       {/* {currentTab === 'billing' && (
         <AccountBilling

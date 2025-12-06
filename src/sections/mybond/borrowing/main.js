@@ -11,10 +11,10 @@ import BorrowingDetails from './borrowing-details';
 import ProfitabilityDetails from './profitable-details';
 import CapitalDetails from './capital-details';
 
-export default function MainFile({ setActiveStep, currentDetails, onSave, percent, }) {
+export default function MainFile({ currentDetails, saveStepData, setActiveStepId, percent }) {
   const [currentFormCount, setCurrentFormCount] = useState(0);
+  const [payloadData, setpayloadData] = useState(null);
   const { enqueueSnackbar } = useSnackbar();
-
 
   const getPercent = (count) => {
     switch (count) {
@@ -29,53 +29,49 @@ export default function MainFile({ setActiveStep, currentDetails, onSave, percen
     }
   };
 
-
   useEffect(() => {
     const p = getPercent(currentFormCount);
 
-    if (typeof percent === "function") {
+    if (typeof percent === 'function') {
       percent(p);
     }
   }, [currentFormCount]);
 
-
-
   const handleNextClick = async () => {
     if (currentFormCount === 3) {
-
-      enqueueSnackbar("Step completed!", { variant: "success" });
-
-      setActiveStep(3);
-
-
+      enqueueSnackbar('Step completed!', { variant: 'success' });
+      saveStepData(payloadData);
+      setActiveStepId('financial_details');
     } else {
-      enqueueSnackbar("Please complete the form", { variant: "error" });
+      enqueueSnackbar('Please complete the form', { variant: 'error' });
       return;
     }
   };
-
-
 
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
         <BorrowingDetails
           currentDetails={currentDetails?.borrowings}
-          onSave={(data) => onSave("borrowings", data)}
+          onSave={(data) => setpayloadData((prev) => ({ ...prev, borrowings: data }))}
           setCurrentFormCount={setCurrentFormCount}
         />
       </Grid>
 
       <Grid item xs={12}>
-        <CapitalDetails currentCapitals={currentDetails?.capitalDetails}
-        onSave={(data)=> onSave("capitalDetails", data)} 
-        setCurrentFormCount={setCurrentFormCount} />
+        <CapitalDetails
+          currentCapitals={currentDetails?.capitalDetails}
+          onSave={(data) => setpayloadData((prev) => ({ ...prev, capitalDetails: data }))}
+          setCurrentFormCount={setCurrentFormCount}
+        />
       </Grid>
 
       <Grid item xs={12}>
-        <ProfitabilityDetails currentProfitable={currentDetails?.profitDetails}
-          onSave={(data) => onSave("profitDetails", data)}
-          setCurrentFormCount={setCurrentFormCount} />
+        <ProfitabilityDetails
+          currentProfitable={currentDetails?.profitDetails}
+          onSave={(data) => setpayloadData((prev) => ({ ...prev, profitDetails: data }))}
+          setCurrentFormCount={setCurrentFormCount}
+        />
       </Grid>
 
       <Grid item xs={12}>
@@ -87,21 +83,25 @@ export default function MainFile({ setActiveStep, currentDetails, onSave, percen
             gap: 2,
           }}
         >
-          <Button
+          {/* <Button
             variant="outlined"
             sx={{ color: '#000000' }}
             onClick={() => setActiveStep(1)}
           >
             Cancel
-          </Button>
+          </Button> */}
 
-          <LoadingButton variant="contained" sx={{ color: '#fff' }} onClick={handleNextClick}>
+          <LoadingButton
+            variant="contained"
+            type="submit"
+            sx={{ color: '#fff' }}
+            onClick={handleNextClick}
+          >
             Next
           </LoadingButton>
         </Box>
       </Grid>
     </Grid>
-
   );
 }
 
@@ -109,5 +109,5 @@ MainFile.propTypes = {
   setActiveStep: PropTypes.func,
   currentDetails: PropTypes.object,
   onSave: PropTypes.func,
-  percent: PropTypes.func
+  percent: PropTypes.func,
 };

@@ -28,10 +28,6 @@ const OPTIONS = [
     linkTo: '/',
   },
   {
-    label: 'Profile',
-    linkTo: paths.dashboard.user.profile,
-  },
-  {
     label: 'Company Profile',
     linkTo: paths.dashboard.company.profile,
   },

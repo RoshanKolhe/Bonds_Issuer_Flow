@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import * as Yup from 'yup';
 import {
   Card,
@@ -32,11 +32,13 @@ import { paths } from 'src/routes/paths';
 import { DatePicker } from '@mui/x-date-pickers';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
 import { LoadingButton } from '@mui/lab';
+import { enqueueSnackbar } from 'notistack';
 
 export default function PreliminaryBondRequirements({
   currentBondRequirements,
-  setActiveStep,
-  onSave,
+  saveStepData,
+  setActiveStepId,
+  percent,
 }) {
   const [security, setSecurity] = useState('secured');
   const [investorCategory, setInvestorCategory] = useState('retail');
@@ -57,6 +59,9 @@ export default function PreliminaryBondRequirements({
   const [securityDocRef, setSecurityDocRef] = useState('4576/2024');
   const [trustName, setTrustName] = useState('Axis Trustee Service');
   const [remarks, setRemarks] = useState('Collateral For Series -A Secured Bonds');
+  const [bondCompleted, setBondCompleted] = useState(false);
+  const [collateralCompleted, setCollateralCompleted] = useState(false);
+  const [payloadData, setpayloadData] = useState(null);
 
   const BondSchema = Yup.object().shape({
     issueAmount: Yup.number()
@@ -83,7 +88,7 @@ export default function PreliminaryBondRequirements({
     estimatedValue: Yup.string().required('Estimated Value is required'),
     valuationDate: Yup.date().required('Valuation Date is required'),
     ownershipType: Yup.string().required('Ownership Type is required'),
-    securityDocument: Yup.mixed().required('Security Document is required'),
+    // securityDocument: Yup.mixed().required('Security Document is required'),
     securityDocRef: Yup.string().required('Security Document Ref is required'),
     trustName: Yup.string().required('Trust Name is required'),
     remarks: Yup.string().required('Remarks are required'),
@@ -126,6 +131,19 @@ export default function PreliminaryBondRequirements({
 
   console.log('🟣 React Hook Form methods:', bondMethods, collateralMethods);
 
+  const calculatePercent = () => {
+    let p = 0;
+    if (bondCompleted) p += 50;
+    if (collateralCompleted) p += 50;
+
+    percent?.(p);
+    console.log('🟠 Preliminary Bond % =', p);
+  };
+
+  useEffect(() => {
+    calculatePercent();
+  }, [bondCompleted, collateralCompleted]);
+
   const {
     handleSubmit: handleBondSubmit,
     control: bondControl,
@@ -140,20 +158,14 @@ export default function PreliminaryBondRequirements({
 
   const onSubmitBond = async (data) => {
     console.log('Card 1 submitted:', data);
-
-    onSave({
-      ...currentBondRequirements,
-      ...data,
-    });
+    setpayloadData((prev) => ({ ...prev, bondRequirements: data }));
+    setBondCompleted(true);
   };
 
   const onSubmitCollateral = async (data) => {
     console.log('Card 2 submitted:', data);
-
-    onSave({
-      ...currentBondRequirements,
-      ...data,
-    });
+    setpayloadData((prev) => ({ ...prev, collateralRequirement: data }));
+    setCollateralCompleted(true);
   };
 
   const handleNextClick = async () => {
@@ -172,25 +184,9 @@ export default function PreliminaryBondRequirements({
       const collateralPayload = collateralMethods.getValues();
 
       // 3️⃣ Save in parent (so values persist)
-      onSave('preliminaryBond', {
-        bondRequirements: bondPayload,
-        collateralRequirements: collateralPayload,
-        security,
-        investorCategory,
-        paymentCycle,
-      });
-
-      console.log('✅ Final Data Sent:', {
-        bondRequirements: bondPayload,
-        collateralRequirements: collateralPayload,
-        security,
-        investorCategory,
-        paymentCycle,
-      });
-
-      // 4️⃣ Move to next step
-      // setActiveStep(1);
-      router.push(paths.dashboard.issureservices.view);
+      saveStepData(payloadData);
+      setActiveStepId('regulatory_filing');
+      enqueueSnackbar('Created Successfully!', { variant: 'success' });
     } catch (err) {
       console.error(err);
     }
@@ -209,12 +205,7 @@ export default function PreliminaryBondRequirements({
 
   const handleRemoveCollateralFile = (fieldName, setValue) => {
     setValue(fieldName, null, { shouldValidate: true });
-
-
   };
-
-
-
 
   // const onSubmit = async (data) => {
   //   console.log('✅ Submitted Data:', {
@@ -526,8 +517,7 @@ export default function PreliminaryBondRequirements({
                       Security Document
                     </Typography>
                   </Grid>
-                  <Grid item xs={8} md={9}>
-                  </Grid>
+                  <Grid item xs={8} md={9}></Grid>
                 </Grid>
               </Grid>
 
@@ -688,15 +678,19 @@ export default function PreliminaryBondRequirements({
         sx={{ maxWidth: 400, ml: 'auto', mt: 5 }}
       >
         <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-          <Button variant="outlined" sx={{ color: '#000' }} onClick={() => setActiveStep(3)}>
+          {/* <Button variant="outlined" sx={{ color: '#000' }} onClick={() => setActiveStep(3)}>
             Cancel
-          </Button>
+          </Button> */}
 
-          <LoadingButton variant="contained" sx={{ color: '#fff' }} onClick={handleNextClick}>
-            Calculate ROI
+          <LoadingButton
+            variant="contained"
+            type="submit"
+            sx={{ color: '#fff' }}
+            onClick={handleNextClick}
+          >
+            Next
           </LoadingButton>
         </Box>
-
       </Grid>
     </>
   );

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Button,
@@ -22,14 +22,29 @@ import RHFDateTimePicker from 'src/components/custom-date-range-picker/rhf-date-
 import { DatePicker } from '@mui/x-date-pickers';
 import { Icon } from '@iconify/react';
 import { LoadingButton } from '@mui/lab';
+import { enqueueSnackbar } from 'notistack';
 
-export default function LaunchIssue() {
+export default function LaunchIssue({ saveStepData, setActiveStepId, percent }) {
   const LaunchIssueSchema = Yup.object().shape({
     listingExchange: Yup.string().required('Listing exchange is required'),
+    subscriptionStartDateTime: Yup.date().nullable().required('Start date & time is required'),
+    subscriptionEndDateTime: Yup.date().nullable().required('End date & time is required'),
+    dateOfAllotment: Yup.date().nullable().required('Date of allotment is required'),
+    dateOfMaturity: Yup.date().nullable().required('Date of maturity is required'),
+    depository: Yup.string().required('Depository selection is required'),
+    issueOpeningDate: Yup.date().nullable().required('Issue opening date is required'),
+    issueClosingDate: Yup.date().nullable().required('Issue closing date is required'),
   });
 
   const defaultValues = {
     listingExchange: 'nse',
+    subscriptionStartDateTime: null,
+    subscriptionEndDateTime: null,
+    dateOfAllotment: null,
+    dateOfMaturity: null,
+    depository: '',
+    issueOpeningDate: null,
+    issueClosingDate: null,
   };
 
   const methods = useForm({
@@ -37,12 +52,60 @@ export default function LaunchIssue() {
     defaultValues,
   });
 
-  const { watch, setValue, control } = methods;
+  const {
+    handleSubmit,
+    watch,
+    setValue,
+    control,
+    formState: { errors = {} },
+  } = methods;
 
   const currentAction = watch('listingExchange');
 
+  const requiredFields = [
+    'listingExchange',
+    'subscriptionStartDateTime',
+    'subscriptionEndDateTime',
+    'dateOfAllotment',
+    'dateOfMaturity',
+    'depository',
+    'issueOpeningDate',
+    'issueClosingDate',
+  ];
+
+  const calculatePercentUsingYup = () => {
+    let completed = 0;
+
+    requiredFields.forEach((field) => {
+      const value = methods.getValues(field);
+
+      // Count only when NO Yup error + value exists
+      if (value && !errors[field]) {
+        completed += 1;
+      }
+    });
+
+    const p = Math.round((completed / requiredFields.length) * 100);
+
+    if (typeof percent === 'function') {
+      percent(p);
+    }
+  };
+
+  // auto recalc when values or errors change
+  useEffect(() => {
+    calculatePercentUsingYup();
+  }, [watch(), errors]);
+
+  const onSubmit = (data) => {
+    saveStepData({ launchIssue: data });
+
+    // setActiveStepId('next_step_here');
+    enqueueSnackbar('Created Successfully!', { variant: 'success' });
+  };
+
   return (
-    <FormProvider methods={methods}>
+    <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Container>
         <Card sx={{ p: 3 }}>
           <Grid container spacing={4}>
@@ -116,10 +179,10 @@ export default function LaunchIssue() {
               </Typography>
             </Grid>
             <Grid item xs={12} md={6}>
-              <RHFDateTimePicker name="subscriptionStartDateTime*" label="Start Date & Time*" />
+              <RHFDateTimePicker name="subscriptionStartDateTime" label="Start Date & Time*" />
             </Grid>
             <Grid item xs={12} md={6}>
-              <RHFDateTimePicker name="subscriptionEndDateTime*" label="End Date & Time*" />
+              <RHFDateTimePicker name="subscriptionEndDateTime" label="End Date & Time*" />
             </Grid>
             <Grid item xs={12}>
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 0 }}>
@@ -271,7 +334,7 @@ export default function LaunchIssue() {
             </Grid>
             <Grid item xs={12} md={6}>
               <Controller
-                name="issueOpeningDate "
+                name="issueOpeningDate"
                 control={control}
                 render={({ field, fieldState: { error } }) => (
                   <DatePicker
@@ -336,10 +399,10 @@ export default function LaunchIssue() {
               gap: 2,
             }}
           >
-            <Button variant="outlined" sx={{ color: '#000000' }}>
+            {/* <Button variant="outlined" sx={{ color: '#000000' }}>
               Cancel
-            </Button>
-            <LoadingButton variant="contained" sx={{ color: '#fff' }}>
+            </Button> */}
+            <LoadingButton variant="contained" type="submit" sx={{ color: '#fff' }}>
               Launch Issue
             </LoadingButton>
           </Box>

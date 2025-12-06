@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Card, CardContent, Grid, Typography, Button, Stack } from '@mui/material';
 
 import Iconify from 'src/components/iconify';
+import MybondStepper from './stepper';
+import { paths } from 'src/routes/paths';
+import { useNavigate } from 'react-router';
 
 const features = [
   { icon: 'mdi:file-document-edit-outline', text: 'Easy Compliance' },
@@ -11,6 +14,9 @@ const features = [
 ];
 
 export default function MyBondStar() {
+  const navigate = useNavigate();
+  const [showStepper, setShowStepper] = useState(false);
+
   return (
     <Card sx={{ borderRadius: 3, overflow: 'hidden', py: 5 }}>
       <CardContent sx={{ p: { xs: 3, md: 5 } }}>
@@ -59,6 +65,7 @@ export default function MyBondStar() {
                   py: 1.5,
                   mb: 2,
                 }}
+                onClick={() => navigate(paths.dashboard.mybond.bondIssue)}
               >
                 Start Issuing Bonds
               </Button>
