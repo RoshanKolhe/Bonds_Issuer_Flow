@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Container,
   Grid,
@@ -13,17 +13,29 @@ import {
 import RoiDetailCard from './roi-detail-card';
 import { useNavigate } from 'react-router';
 import { paths } from 'src/routes/paths';
+import axiosInstance from 'src/utils/axios';
+import { LoadingButton } from '@mui/lab';
 
 export default function ROIGuidance() {
   const navigate = useNavigate();
-
+  const [isLoading, setIsLoading] = useState(false);
   const [activeStep, setActiveStep] = React.useState(0);
   const [open, setOpen] = React.useState(false);
   const steps = ['1', '2', '3', '4', '5'];
 
-  const handleStart = () => {
-    // ✅ navigate using your defined route path
-    navigate(paths.dashboard.issureservices.roifundform);
+  const handleStart = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axiosInstance.post('/bond-estimations/initialize');
+      if (response.data.success) {
+        navigate(paths.dashboard.issureservices.roifundform(response.data?.application?.id));
+      }
+    } catch (error) {
+      console.error('error while starting bond estimation :', error);
+
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleOpen = () => setOpen(true);
@@ -34,52 +46,6 @@ export default function ROIGuidance() {
       {/* Main Content */}
       <Container maxWidth="md" sx={{ py: 6 }}>
         <Grid container spacing={4}>
-          {/* Stepper */}
-          {/* <Grid item xs={12}>
-            <Stepper
-              activeStep={activeStep}
-              alternativeLabel
-              connector={null}
-              sx={{
-                justifyContent: 'center',
-                '& .MuiStep-root': {
-                  flex: '0 0 auto',
-                  maxWidth: '100px',
-                },
-                '& .MuiStepLabel-root': {
-                  padding: 0,
-                },
-              }}
-            >
-              {steps.map((_, index) => (
-                <Step key={index}>
-                  <StepLabel
-                    StepIconComponent={(props) => (
-                      <Box
-                        sx={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: '50%',
-                          border: `3px solid ${
-                            props.active || props.completed ? '#ffa726' : '#ccc'
-                          }`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: props.active || props.completed ? '#000' : '#000',
-                          fontWeight: 600,
-                          fontSize: 14,
-                        }}
-                      >
-                        {index + 1}
-                      </Box>
-                    )}
-                  />
-                </Step>
-              ))}
-            </Stepper>
-          </Grid> */}
-
           {/* Main Card */}
           <Grid item xs={12}>
             {/* Illustration */}
@@ -121,7 +87,7 @@ export default function ROIGuidance() {
               }}
             >
               <Box component="span" sx={{ color: '#1976d2' }}>
-                Bond 
+                Bond
               </Box>{' '}
               Estimation
             </Typography>
@@ -144,7 +110,8 @@ export default function ROIGuidance() {
                 mx: 'auto',
               }}
             >
-              <Button
+              <LoadingButton
+                loading={isLoading}
                 variant="contained"
                 size="large"
                 sx={{
@@ -161,7 +128,7 @@ export default function ROIGuidance() {
                 onClick={handleStart}
               >
                 Start
-              </Button>
+              </LoadingButton>
 
               <Button
                 variant="text"

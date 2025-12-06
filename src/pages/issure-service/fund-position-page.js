@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import FundPositionForm from 'src/sections/issure-services/fund-positions';
+import FundPositionForm from 'src/sections/issure-services/creditRatings';
 
 
 // ----------------------------------------------------------------------

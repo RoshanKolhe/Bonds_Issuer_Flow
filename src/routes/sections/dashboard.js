@@ -139,7 +139,7 @@ export const dashboardRoutes = [
         children: [
           { element: <ROIGuidancePage />, index: true },
           { path: 'roi', element: <ROIGuidancePage /> },
-          { path: 'fund-position-form', element: <ROIFundFormPage /> },
+          { path: 'fund-position-form/:applicationId', element: <ROIFundFormPage /> },
           {path:'view', element:<AfterCompleteRoiStagePage/>},
         ],
       },

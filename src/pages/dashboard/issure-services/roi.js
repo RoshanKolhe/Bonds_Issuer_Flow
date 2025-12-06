@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 // sections
-import ROIGuidance from 'src/sections/issure-services/roi-guidance';
+import { BondEstimationsInitialPageView } from 'src/sections/issure-services/view';
 // ----------------------------------------------------------------------
 
 export default function ROIGuidancePage() {
@@ -10,7 +10,7 @@ export default function ROIGuidancePage() {
         <title> Dashboard: Company List</title>
       </Helmet>
 
-      <ROIGuidance />
+      <BondEstimationsInitialPageView />
     </>
   );
 }

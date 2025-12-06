@@ -138,7 +138,7 @@ export const paths = {
     issureservices: {
       root: `${ROOTS.DASHBOARD}/issureservices`,
       roi: `${ROOTS.DASHBOARD}/issureservices/roi`,
-      roifundform: `${ROOTS.DASHBOARD}/issureservices/fund-position-form`,
+      roifundform: (applicationId) => `${ROOTS.DASHBOARD}/issureservices/fund-position-form/${applicationId}`,
       view: `${ROOTS.DASHBOARD}/issureservices/view`,
     },
     trustee: {
