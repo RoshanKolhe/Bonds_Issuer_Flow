@@ -52,7 +52,7 @@ export default function BankDetailsCard({ bank, onViewRow }) {
 
                         <Stack direction="row" alignItems="center">
                             <Typography
-                                variant="h6"
+                               
                                 sx={{
                                     cursor: 'pointer',
                                     transition: '0.2s',
@@ -112,7 +112,7 @@ export default function BankDetailsCard({ bank, onViewRow }) {
                         <Iconify icon="mdi:home-city-outline" width={22} />
                         <Box>
                             <Typography variant="caption" color="text.secondary">Branch Name</Typography>
-                            <Typography variant="subtitle1">{bank?.branchName || '-'}</Typography>
+                            <Typography>{bank?.branchName || '-'}</Typography>
                         </Box>
                     </Stack>
                 </Grid>
@@ -123,7 +123,7 @@ export default function BankDetailsCard({ bank, onViewRow }) {
                         <Iconify icon="mdi:web" width={22} />
                         <Box>
                             <Typography variant="caption" color="text.secondary">IFSC Code</Typography>
-                            <Typography variant="subtitle1">{bank?.ifscCode || '-'}</Typography>
+                            <Typography >{bank?.ifscCode || '-'}</Typography>
                         </Box>
                     </Stack>
                 </Grid>
@@ -134,7 +134,7 @@ export default function BankDetailsCard({ bank, onViewRow }) {
                         <Iconify icon="mdi:card-account-details" width={22} />
                         <Box>
                             <Typography variant="caption" color="text.secondary">Account Number</Typography>
-                            <Typography variant="subtitle1">{maskAccountNumber(bank?.accountNumber)}</Typography>
+                            <Typography >{maskAccountNumber(bank?.accountNumber)}</Typography>
                         </Box>
                     </Stack>
                 </Grid>
@@ -150,7 +150,7 @@ export default function BankDetailsCard({ bank, onViewRow }) {
                             </Typography>
 
                             <Typography
-                                variant="subtitle1"
+                            
                                 sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                             >
                                 {bankProof[bank?.bankAccountProofType]?.label || 'Unknown'}
