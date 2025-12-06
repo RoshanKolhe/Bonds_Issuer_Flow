@@ -48,8 +48,6 @@ const ROIGuidancePage = lazy(() => import('src/pages/dashboard/issure-services/r
 const ROIFundFormPage = lazy(() => import('src/pages/dashboard/issure-services/roi-fund-form'));
 const AfterCompleteRoiStagePage = lazy(() => import('src/pages/dashboard/issure-services/view'));
 
-// Companyyyy
-const BankViewPage = lazy(()=> import('src/pages/dashboard/company/view'))
 //
 const MyBondCreatePage = lazy(() => import('src/pages/dashboard/mybond/create'))
 const MyBondNewIssuePage = lazy(() => import('src/pages/dashboard/mybond/bond-issue'))
@@ -78,7 +76,8 @@ const TrusteeListPage = lazy(() => import('src/pages/dashboard/trustee/list'));
 const TrusteeDetailsPage = lazy(() => import('src/pages/dashboard/trustee/details'));
 const TrusteeEditPage = lazy(() => import('src/pages/dashboard/trustee/edit'));
 const TrusteeComparePage = lazy(() => import('src/pages/dashboard/trustee/comapre'))
-
+// BANK DETAILS
+const BankDetailsPage =  lazy(()=> import('src/pages/dashboard/bank-details/details'))
 // JOB
 const JobDetailsPage = lazy(() => import('src/pages/dashboard/job/details'));
 const JobListPage = lazy(() => import('src/pages/dashboard/job/list'));
@@ -88,6 +87,7 @@ const JobEditPage = lazy(() => import('src/pages/dashboard/job/edit'));
 const SignatoriesCreatePage = lazy(() => import('src/pages/dashboard/signatories/new'));
 const SignatoriesListPage = lazy(() => import('src/pages/dashboard/signatories/list'));
 const SignatoriesEditPage = lazy(() => import('src/pages/dashboard/signatories/edit'));
+const SignatoriesDetailsPage = lazy(()=> import('src/pages/dashboard/signatories/details'))
 // TOUR
 const TourDetailsPage = lazy(() => import('src/pages/dashboard/tour/details'));
 const TourListPage = lazy(() => import('src/pages/dashboard/tour/list'));
@@ -144,7 +144,14 @@ export const dashboardRoutes = [
           { element: <CompanyProfilePage />, index: true },
           { path: 'profile', element: <CompanyProfilePage /> },
           { path: 'new', element: <NewBankPage /> },
-          {path: 'view', element:<BankViewPage/>}
+          // { path: 'view', element: <BankViewPage /> }
+        ],
+      },
+        {
+        path: 'bankDetails',
+        children: [
+ 
+          { path: ':id', element: <BankDetailsPage /> }
         ],
       },
       {
@@ -190,7 +197,8 @@ export const dashboardRoutes = [
           { element: <SignatoriesListPage />, index: true },
           { path: 'list', element: <SignatoriesListPage /> },
           { path: ':id/edit', element: <SignatoriesEditPage /> },
-          {path:'new', element:<SignatoriesCreatePage/>}
+          { path: 'new', element: <SignatoriesCreatePage /> },
+          { path: ':id', element: <SignatoriesDetailsPage /> },
         ],
       },
 

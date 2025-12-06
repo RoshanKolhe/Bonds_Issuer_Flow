@@ -29,13 +29,16 @@ const ICONS = {
   lock: icon('ic_lock'),
   tour: icon('ic_tour'),
   order: icon('ic_order'),
+  intermediate: icon('ic_intermediate'),
   label: icon('ic_label'),
   blank: icon('ic_blank'),
   kanban: icon('ic_kanban'),
+  bonds: icon('ic_bonds'),
   folder: icon('ic_folder'),
   banking: icon('ic_banking'),
   booking: icon('ic_booking'),
   invoice: icon('ic_invoice'),
+  signatories: icon('ic_signatories'),
   product: icon('ic_product'),
   calendar: icon('ic_calendar'),
   disabled: icon('ic_disabled'),
@@ -101,7 +104,7 @@ export function useNavData() {
             {
             title: t('intermediates'),
             path: paths.dashboard.trustee.root,
-            icon: ICONS.company,
+            icon: ICONS.intermediate,
             children: [
               { title: t('Debenture Trustees'), path: paths.dashboard.trustee.list },
             ],
@@ -110,7 +113,7 @@ export function useNavData() {
           {
             title: t('my bonds'),
             path: paths.dashboard.mybond.root,
-            icon: <Iconify icon="mdi:file-certificate-outline" width={24} />,
+            icon: ICONS.bonds,
             children: [
               { title: t('create'), path: paths.dashboard.mybond.create },
             ],
@@ -118,10 +121,10 @@ export function useNavData() {
             {
             title: t('signatories'),
             path: paths.dashboard.signatories.root,
-            icon: <Iconify icon="mdi:file-certificate-outline" width={24} />,
+            icon: ICONS.signatories,
             children: [
-              { title: t('create'), path: paths.dashboard.signatories.new },
                 { title: t('list'), path: paths.dashboard.signatories.list },
+                { title: t('create'), path: paths.dashboard.signatories.new },
             ],
           },
 

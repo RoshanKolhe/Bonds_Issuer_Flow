@@ -1,17 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import axiosInstance from 'src/utils/axios';
 
 import { CircularProgress, Box, Button, Stack, Typography, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import BankDetailsView from './company-bank-cards';
+
 import { paths } from 'src/routes/paths';
+import BankDetailsCard from './company-bank-cards';
+import { useRouter } from 'src/routes/hook';
 
 export default function CompanyBankPage() {
   const [bankData, setBankData] = useState(null);
   const [loading, setLoading] = useState(true);
-
+const router = useRouter();
   const navigate = useNavigate();
 
+  const handleViewRow = useCallback(
+    (id) => {
+      router.push(paths.dashboard.bankDetails.details(id));
+    },
+    [router]
+  );
 
   useEffect(() => {
     fetchBankDetails();
@@ -58,8 +66,10 @@ export default function CompanyBankPage() {
       ) : (
         <Grid container spacing={3}>
           {bankData?.map((item) => (
-            <Grid key={item.id} item xs={12}  md={6}>
-              <BankDetailsView bank={item} />
+            <Grid key={item.id} item xs={12} md={6}>
+              <BankDetailsCard bank={item}
+                onViewRow={() => handleViewRow(item.id)}
+              />
             </Grid>
           ))}
         </Grid>

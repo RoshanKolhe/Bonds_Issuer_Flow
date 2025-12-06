@@ -69,7 +69,7 @@ export const endpoints = {
   signatories: {
     list: '/company-profiles/authorize-signatory',
     filterList: (filter) => `/company-profiles/authorize-signatory?filter=${filter}`,
-    details: (id) => `/company-profiles/authorize-signatory${id}`,
+    details: (signatoryId) => `/company-profiles/authorize-signatory/${signatoryId}`,
   },
   designation: {
     list: '/designations',
@@ -91,6 +91,6 @@ export const endpoints = {
   bankDetails: {
     list: '/company-profiles/bank-details',
     filterList: (filter) => `/company-profiles/bank-details?filter=${filter}`,
-    details: (id) => `/company-profiles/bank-details/${id}`,
+    details: (accountId) => `/company-profiles/bank-details/${accountId}`,
   }
 };

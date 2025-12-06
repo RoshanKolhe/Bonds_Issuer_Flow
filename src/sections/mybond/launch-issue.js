@@ -389,6 +389,24 @@ export default function LaunchIssue({ saveStepData, setActiveStepId, percent }) 
               />
             </Grid>
           </Grid>
+
+          <Grid item xs={12}>
+            <Box
+              sx={{
+                mt: 3,
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: 2,
+              }}
+            >
+              <Button variant="outlined" sx={{ color: '#000000' }}>
+                Cancel
+              </Button>
+              <LoadingButton variant="contained" sx={{ color: '#fff' }}>
+                Launch Issue
+              </LoadingButton>
+            </Box>
+          </Grid>
         </Card>
         <Grid item xs={12}>
           <Box

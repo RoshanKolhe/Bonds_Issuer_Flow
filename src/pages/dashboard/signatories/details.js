@@ -1,18 +1,20 @@
 import { Helmet } from 'react-helmet-async';
+import { SignatoiresDetailsView } from 'src/sections/signatories/view';
+
 // sections
 
-import { JobsDetailsView } from 'src/sections/jobList/view';
+
 
 // ----------------------------------------------------------------------
 
-export default function JobDetailsPage() {
+export default function SignatoriesDetailsPage() {
   return (
     <>
       <Helmet>
-        <title> Dashboard: Job Details</title>
+        <title> Dashboard: Signatoires Details</title>
       </Helmet>
 
-      <JobsDetailsView />
+      <SignatoiresDetailsView />
     </>
   );
 }

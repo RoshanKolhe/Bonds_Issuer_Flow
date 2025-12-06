@@ -29,6 +29,7 @@ export const paths = {
 
 
 
+
   // kycCompanyDetails: '/kyc/kyc-company-details',
   kycAddressInfo: '/kyc/kyc-address-info',
   comingSoon: '/coming-soon',
@@ -131,7 +132,7 @@ export const paths = {
       list: `${ROOTS.DASHBOARD}/company/list`,
       // cards: `${ROOTS.DASHBOARD}/company/cards`,
       profile: `${ROOTS.DASHBOARD}/company/profile`,
-      view : `${ROOTS.DASHBOARD}/company/view`,
+      view: `${ROOTS.DASHBOARD}/company/view`,
       // account: `${ROOTS.DASHBOARD}/company/account`,
       // edit: (id) => `${ROOTS.DASHBOARD}/company/${id}/edit`,
       // demo: {
@@ -168,6 +169,10 @@ export const paths = {
       new: `${ROOTS.DASHBOARD}/signatories/new`,
       list: `${ROOTS.DASHBOARD}/signatories/list`,
       edit: (id) => `${ROOTS.DASHBOARD}/signatories/${id}/edit`,
+      details: (id) => `${ROOTS.DASHBOARD}/signatories/${id}`,
+    },
+     bankDetails: {
+      details: (id) => `${ROOTS.DASHBOARD}/bankDetails/${id}`,
     },
     //   invoice: {
     //     root: `${ROOTS.DASHBOARD}/invoice`,

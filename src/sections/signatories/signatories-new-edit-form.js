@@ -21,7 +21,7 @@ import axios from 'axios';
 import { useAuthContext } from 'src/auth/hooks';
 import { DatePicker } from '@mui/x-date-pickers';
 import axiosInstance from 'src/utils/axios';
-import { Card } from '@mui/material';
+import { Card, Grid } from '@mui/material';
 
 const ROLES = [
   { value: 'DIRECTOR', label: 'Director' },
@@ -261,136 +261,118 @@ export default function SignatoriesNewEditForm({
   }, [currentUser, defaultValues, reset]);
 
   return (
-    <Card sx={{p:4}}>
+    <Card sx={{ p: 4 }}>
       <FormProvider methods={methods} onSubmit={onSubmit}>
 
 
-        <Box rowGap={3} display="grid" mt={2}>
-          <RHFTextField
-            name="name"
-            label="Name*"
-            InputLabelProps={{ shrink: true }}
-            disabled={isViewMode}
-          />
+        <Grid container spacing={3} mt={2}>
 
-          <RHFTextField
-            name="email"
-            label="Email*"
-            type="email"
-            InputLabelProps={{ shrink: true }}
-            disabled={isViewMode}
-          />
+          <Grid item xs={12} sm={6}>
+            <RHFTextField name="name" label="Name*" disabled={isViewMode} InputLabelProps={{ shrink: true }} />
+          </Grid>
 
-          <RHFTextField
-            name="phoneNumber"
-            label="Phone Number*"
-            type="tel"
-            disabled={isViewMode}
-            InputLabelProps={{ shrink: true }}
-            inputProps={{ maxLength: 10 }}
-          />
-          <RHFSelect
-            name="role"
-            label="Designation*"
-            InputLabelProps={{ shrink: true }}
-            disabled={isViewMode}
-          >
-            {ROLES.map((role) => (
-              <MenuItem key={role.value} value={role.value}>
-                {role.label}
-              </MenuItem>
-            ))}
-          </RHFSelect>
+          <Grid item xs={12} sm={6}>
+            <RHFTextField name="email" label="Email*" type="email" disabled={isViewMode} InputLabelProps={{ shrink: true }} />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <RHFTextField name="phoneNumber" label="Phone Number*" type="tel" disabled={isViewMode}
+              InputLabelProps={{ shrink: true }} inputProps={{ maxLength: 10 }} />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <RHFSelect name="role" label="Designation*" disabled={isViewMode} InputLabelProps={{ shrink: true }}>
+              {ROLES.map((role) => (
+                <MenuItem key={role.value} value={role.value}>
+                  {role.label}
+                </MenuItem>
+              ))}
+            </RHFSelect>
+          </Grid>
 
           {watchRole === 'OTHER' && !isViewMode && (
+            <Grid item xs={12} sm={6}>
+              <RHFTextField
+                name="customDesignation"
+                label="Enter Custom Designation*"
+                placeholder="Enter custom designation"
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+          )}
+
+
+          <Grid item xs={12}>
+            <RHFFileUploadBox
+              name="panCard"
+              label="Upload PAN*"
+              accept="application/pdf,image/*"
+              fileType="pan"
+              required={!isEditMode}
+              error={!!errors.panCard}
+              onDrop={async (files) => {
+                const file = files[0];
+                if (!file) return;
+                methods.setValue('panCard', file, { shouldValidate: true });
+                await handlePanUpload(file);
+              }}
+            />
+            {getErrorMessage('panCard')}
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
             <RHFTextField
-              name="customDesignation"
-              label="Enter Custom Designation*"
-              placeholder="Enter custom designation"
+              name="submittedPanFullName"
+              label="PAN Holder Full Name*"
+              disabled={!isPanUploaded || isViewMode}
               InputLabelProps={{ shrink: true }}
             />
-          )}
+          </Grid>
 
-          {isViewMode ? (
-            <>
-              <RHFTextField
-                name="panNumber"
-                label="PAN Number*"
-                InputLabelProps={{ shrink: true }}
-                disabled
-              />
-              <RHFTextField
-                name="boardResolution"
-                label="Board Resolution*"
-                InputLabelProps={{ shrink: true }}
-                disabled
-              />
-            </>
-          ) : (
-            <>
-              <RHFFileUploadBox
-                name="panCard"
-                label="Upload PAN*"
-                accept="application/pdf,image/*"
-                fileType="pan"
-                required={!isEditMode}
-                error={!!errors.panCard}
-                onDrop={async (files) => {
-                  const file = files[0];
-                  if (!file) return;
-                  methods.setValue('panCard', file, { shouldValidate: true });
-                  await handlePanUpload(file);
-                }}
-              />
-              {getErrorMessage('panCard')}
-              <RHFTextField
-                name="submittedPanFullName"
-                label="PAN Holder Full Name*"
-                InputLabelProps={{ shrink: true }}
-                disabled={!isPanUploaded || isViewMode}
-              />
+          <Grid item xs={12} sm={6}>
+            <RHFTextField
+              name="submittedPanNumber"
+              label="PAN Number*"
+              disabled={!isPanUploaded || isViewMode}
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
 
-              <RHFTextField
-                name="submittedPanNumber"
-                label="PAN Number*"
-                InputLabelProps={{ shrink: true }}
-                disabled={!isPanUploaded || isViewMode}
-              />
+          <Grid item xs={12} sm={6}>
+            <Controller
+              name="submittedDateOfBirth"
+              control={control}
+              render={({ field, fieldState: { error } }) => (
+                <DatePicker
+                  {...field}
+                  label="PAN Date of Birth*"
+                  disabled={!isPanUploaded || isViewMode}
+                  value={field.value ? new Date(field.value) : null}
+                  onChange={(newValue) => field.onChange(newValue)}
+                  format="dd/MM/yyyy"
+                  slotProps={{
+                    textField: { fullWidth: true, error: !!error, helperText: error?.message },
+                  }}
+                />
+              )}
+            />
+          </Grid>
 
-              <Controller
-                name="submittedDateOfBirth"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <DatePicker
-                    {...field}
-                    label="PAN Date of Birth*"
-                    disabled={!isPanUploaded || isViewMode}
-                    value={field.value ? new Date(field.value) : null}
-                    onChange={(newValue) => field.onChange(newValue)}
-                    format="dd/MM/yyyy"
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        error: !!error,
-                        helperText: error?.message,
-                      },
-                    }}
-                  />
-                )}
-              />
+     
+          <Grid item xs={12}>
+            <RHFFileUploadBox
+              name="boardResolution"
+              label="Board Resolution*"
+              accept="application/pdf,image/*"
+              fileType="boardResolution"
+              required={!isEditMode}
+              error={!!errors.boardResolution}
+            />
+            {getErrorMessage('boardResolution')}
+          </Grid>
 
-              <RHFFileUploadBox
-                name="boardResolution"
-                label="Board Resolution*"
-                accept="application/pdf,image/*"
-                fileType="boardResolution"
-                required={!isEditMode}
-                error={!!errors.boardResolution}
-              />
-              {getErrorMessage('boardResolution')}
-            </>
-          )}
-        </Box>
+        </Grid>
+
 
 
 

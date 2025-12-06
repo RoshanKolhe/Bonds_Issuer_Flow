@@ -18,7 +18,7 @@ const statusMap = {
 };
 
 
-export default function SchedulerTableRow({ row, selected, onSelectRow, onViewRow, onEditRow }) {
+export default function SignatoiresTableRow({ row, selected, onSelectRow, onViewRow, onEditRow }) {
   const { fullName, email, roleValue, phone, extractedDateOfBirth, panCardFile, boardResolutionFile, status } = row;
 
   return (
@@ -78,9 +78,9 @@ export default function SchedulerTableRow({ row, selected, onSelectRow, onViewRo
               <Iconify icon="carbon:view-filled" />
             </IconButton>
           </Tooltip> */}
-        <Tooltip title="Edit" placement="top" arrow>
-          <IconButton onClick={onEditRow}>
-            <Iconify icon="solar:pen-bold" />
+        <Tooltip title="View" placement="top" arrow>
+          <IconButton onClick={onViewRow}>
+            <Iconify icon="mdi:eye" width={20} />
           </IconButton>
         </Tooltip>
       </TableCell>
@@ -88,7 +88,7 @@ export default function SchedulerTableRow({ row, selected, onSelectRow, onViewRo
   );
 }
 
-SchedulerTableRow.propTypes = {
+SignatoiresTableRow.propTypes = {
   onSelectRow: PropTypes.func,
   row: PropTypes.object,
   selected: PropTypes.bool,
