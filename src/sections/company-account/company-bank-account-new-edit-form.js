@@ -61,6 +61,7 @@ export default function BankNewForm({ bankDetails }) {
       addressProof: null,
       accountHolderName: '',
       bankAddress: '',
+      bankAccountProofId: null,
     },
   });
 
@@ -77,12 +78,45 @@ export default function BankNewForm({ bankDetails }) {
   const values = watch();
   const documentType = useWatch({ control, name: 'documentType' });
 
-  const handleDrop = (acceptedFiles) => {
-    const file = acceptedFiles[0];
-    if (file) {
-      setValue('addressProof', file, { shouldValidate: true });
+  const handleProofUpload = async (file) => {
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+
+      const uploadRes = await axiosInstance.post('/files', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      const proofId = uploadRes?.data?.files?.[0]?.id;
+
+      if (!proofId) {
+        enqueueSnackbar('Failed to upload file', { variant: 'error' });
+        return;
+      }
+
+      // Store uploaded file ID in form
+      setValue('bankAccountProofId', proofId);
+
+      enqueueSnackbar('File uploaded successfully!', { variant: 'success' });
+
+    } catch (error) {
+      console.error(error);
+      enqueueSnackbar('Upload failed!', { variant: 'error' });
     }
   };
+
+
+  const handleDrop = async (acceptedFiles) => {
+    const file = acceptedFiles[0];
+
+    if (file) {
+      setValue('addressProof', file, { shouldValidate: true });
+
+      // Upload instantly
+      await handleProofUpload(file);
+    }
+  };
+
 
   const existingProof = bankDetails?.bankAccountProof
     ? {
@@ -96,25 +130,6 @@ export default function BankNewForm({ bankDetails }) {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const proofFile = data.addressProof;
-      let uploadedProofId = null;
-
-      if (proofFile) {
-        const fd = new FormData();
-        fd.append('file', proofFile);
-
-        const uploadRes = await axiosInstance.post('/files', fd, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-
-        uploadedProofId = uploadRes?.data?.files?.[0]?.id;
-
-        if (!uploadedProofId) {
-          enqueueSnackbar('Failed to upload address proof', { variant: 'error' });
-          return;
-        }
-      }
-
       const payload = {
         bankDetails: {
           bankName: data.bankName,
@@ -126,27 +141,24 @@ export default function BankNewForm({ bankDetails }) {
           accountHolderName: data.accountHolderName,
           accountNumber: String(data.accountNumber),
           bankAccountProofType: Number(data.documentType),
-          bankAccountProofId: uploadedProofId,
+          bankAccountProofId: data.bankAccountProofId, 
         },
       };
-
-      console.log('📤 FINAL BANK PAYLOAD:', payload);
 
       const res = await axiosInstance.post('/company-profiles/bank-details', payload);
 
       if (res?.data?.success) {
         enqueueSnackbar('Bank details submitted successfully!', { variant: 'success' });
-        router.push(paths.dashboard.company.profile);
+        navigate(paths.dashboard.company.profile);
       } else {
-        enqueueSnackbar(res?.data?.message || 'Something went wrong!', {
-          variant: 'error',
-        });
+        enqueueSnackbar(res?.data?.message || 'Something went wrong!', { variant: 'error' });
       }
     } catch (error) {
       console.error(error);
       enqueueSnackbar('Failed to submit bank details', { variant: 'error' });
     }
   });
+
 
   const requiredFields = ['addressProof', 'bankName', 'branchName', 'accountNumber', 'ifscCode'];
 
@@ -366,7 +378,7 @@ export default function BankNewForm({ bankDetails }) {
             </Button> */}
             <Button
               variant="outlined"
-           
+
             >
               Cancel
             </Button>
