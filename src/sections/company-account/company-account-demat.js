@@ -138,7 +138,7 @@ export default function DematNewForm({ onClose }) {
      <Stack component={Card} spacing={3} sx={{ p: 3 }}>
         {/* Demat fields - shown after verify */}
           <Paper
-            variant="outlined"
+            // variant="outlined"
             sx={{
               mt: 3,
               p: 3,
