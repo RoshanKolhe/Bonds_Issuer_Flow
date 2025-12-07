@@ -87,7 +87,6 @@ export default function PreliminaryBondRequirements({
     securityDocRef: Yup.string().required('Security Document Ref is required'),
     trustName: Yup.string().required('Trust Name is required'),
     remarks: Yup.string().required('Remarks are required'),
-
     creditRatingLetter: Yup.mixed().required('Asset Cover Certificate is required'),
     valuationReport: Yup.mixed().required('Valuation Report is required'),
   });

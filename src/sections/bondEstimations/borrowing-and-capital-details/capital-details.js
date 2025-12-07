@@ -2,17 +2,19 @@ import React, { useEffect, useMemo } from 'react';
 import { Box, Grid, Card, Typography } from '@mui/material';
 
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
-import { useForm, useFieldArray, useFormContext } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import PropTypes from 'prop-types';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
+import { useParams } from 'src/routes/hook';
+import { useSnackbar } from 'notistack';
+import axiosInstance from 'src/utils/axios';
 
-export default function CapitalDetails({ currentCapitals, onSave, setCurrentFormCount }) {
-
-
-
-
+export default function CapitalDetails({ currentCapitalDetails, setPercent, setProgress }) {
+  const params = useParams();
+  const { applicationId } = params;
+  const { enqueueSnackbar } = useSnackbar();
 
   const capitalSchema = Yup.object().shape({
     shareCapital: Yup.number()
@@ -32,12 +34,11 @@ export default function CapitalDetails({ currentCapitals, onSave, setCurrentForm
 
   const defaultValues = useMemo(
     () => ({
-      shareCapital: currentCapitals?.shareCapital || null,
-      reserveSurplus: currentCapitals?.reserveSurplus || null,
-      netWorth: currentCapitals?.netWorth || null,
-
+      shareCapital: currentCapitalDetails?.shareCapital || null,
+      reserveSurplus: currentCapitalDetails?.reserveSurplus || null,
+      netWorth: currentCapitalDetails?.netWorth || null,
     }),
-    [currentCapitals]
+    [currentCapitalDetails]
   );
 
   const methods = useForm({
@@ -46,11 +47,51 @@ export default function CapitalDetails({ currentCapitals, onSave, setCurrentForm
     mode: 'onSubmit',
   });
 
-
-  const { control, setValue, watch, handleSubmit, reset } = methods;
+  const {
+    setValue,
+    watch,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting }
+  } = methods;
 
   const shareCapital = watch('shareCapital');
   const reserveSurplus = watch('reserveSurplus');
+
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      const payload = data;
+
+      const response = await axiosInstance.patch(`/bond-estimations/capital-details/${applicationId}`, payload);
+
+      if (response?.data?.success) {
+        enqueueSnackbar('Capital details submitted', { variant: 'success' });
+        setProgress(true);
+      }
+    } catch (error) {
+      console.error('Error while submitting capital details form :', error);
+    }
+  });
+
+  const calculateCompletion = () => {
+    const sc = parseFloat(shareCapital);
+    const rs = parseFloat(reserveSurplus);
+    const nw = parseFloat(watch('netWorth'));
+
+    let score = 0;
+
+    if (sc || sc === 0) score += 10;
+    if (rs || rs === 0) score += 10;
+    if (nw || nw === 0) score += 10;
+
+    const percentage = Math.min(30, score);
+    setPercent?.(percentage);
+  };
+
+  useEffect(() => {
+    calculateCompletion();
+  }, [shareCapital, reserveSurplus, watch('netWorth')]);
+
 
   useEffect(() => {
     const total =
@@ -58,19 +99,12 @@ export default function CapitalDetails({ currentCapitals, onSave, setCurrentForm
     setValue('netWorth', total.toFixed(2)); // keep 2 decimals
   }, [shareCapital, reserveSurplus, setValue]);
 
-
-
-
   useEffect(() => {
-    if (currentCapitals) reset(defaultValues);
-  }, [currentCapitals, reset, defaultValues]);
-
-  const onSubmit = (data) => {
-    console.log('✅ Full Form Data:', data);
-    onSave(data);
-    setCurrentFormCount(2);
-  };
-
+    if (currentCapitalDetails) {
+      reset(defaultValues);
+      setProgress(true);
+    }
+  }, [currentCapitalDetails, reset, defaultValues, setProgress]);
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
@@ -136,6 +170,7 @@ export default function CapitalDetails({ currentCapitals, onSave, setCurrentForm
           <Grid container justifyContent="flex-end" sx={{ mt: 3 }}>
             <Grid item xs={12} md={3} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
               <LoadingButton
+                loading={isSubmitting}
                 type="submit"
                 variant="contained"
                 sx={{ color: '#fff' }}
@@ -151,8 +186,7 @@ export default function CapitalDetails({ currentCapitals, onSave, setCurrentForm
 }
 
 CapitalDetails.propTypes = {
-  setActiveStep: PropTypes.func,
-  currentCapitals: PropTypes.object,
-  onSave: PropTypes.func,
-  setCurrentFormCount: PropTypes.func
+  currentCapitalDetails: PropTypes.object,
+  setPercent: PropTypes.func,
+  setProgress: PropTypes.func
 };

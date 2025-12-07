@@ -4,30 +4,36 @@ import React, { useEffect, useMemo } from 'react';
 import { Box, Grid, Card, Typography } from '@mui/material';
 
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
-import { useForm, useFieldArray, useFormContext } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import PropTypes from 'prop-types';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
-export default function ProfitabilityDetails({ currentProfitable, onSave, setCurrentFormCount }) {
+import { useParams } from 'src/routes/hook';
+import { useSnackbar } from 'notistack';
+import axiosInstance from 'src/utils/axios';
 
+export default function ProfitabilityDetails({ currentProfitabilityDetails, setPercent, setProgress }) {
+  const params = useParams();
+  const { applicationId } = params;
+  const { enqueueSnackbar } = useSnackbar();
 
   const profitableSchema = Yup.object().shape({
     netProfit: Yup.number()
       .typeError('Net Profit must be a number')
       .required('Net Profit is required'),
-    ebidta: Yup.number()
+    EBIDTA: Yup.number()
       .typeError('EBIDTA must be a number')
       .required('EBIDTA amount is required'),
   });
 
   const defaultValues = useMemo(
     () => ({
-      netProfit: currentProfitable?.netProfit || '',
-      ebidta: currentProfitable?.ebidta || '',
+      netProfit: currentProfitabilityDetails?.netProfit || '',
+      EBIDTA: currentProfitabilityDetails?.EBIDTA || '',
 
     }),
-    [currentProfitable]
+    [currentProfitabilityDetails]
   );
 
   const methods = useForm({
@@ -36,30 +42,49 @@ export default function ProfitabilityDetails({ currentProfitable, onSave, setCur
     mode: 'onSubmit',
   });
 
+  const { handleSubmit, reset, formState: { isSubmitting } } = methods;
 
-  const { control, setValue, watch, handleSubmit, reset } = methods;
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      const payload = data;
 
-  const shareCapital = watch('shareCapital');
-  const reserveSurplus = watch('reserveSurplus');
+      const response = await axiosInstance.patch(`/bond-estimations/profitability-details/${applicationId}`, payload);
 
-  useEffect(() => {
-    const total =
-      (parseFloat(shareCapital) || 0) + (parseFloat(reserveSurplus) || 0);
-    setValue('netWorth', total.toFixed(2)); // keep 2 decimals
-  }, [shareCapital, reserveSurplus, setValue]);
+      if (response?.data?.success) {
+        enqueueSnackbar('Profitability details submitted', { variant: 'success' });
+        setProgress(true);
+      }
+    } catch (error) {
+      console.error('Error while submitting profitability details form :', error);
+    }
+  });
 
+  const calculateCompletion = () => {
+    const np = methods.watch('netProfit');
+    const eb = methods.watch('EBIDTA');
 
+    let score = 0;
 
+    if (np || np === 0) score += 15;
+    if (eb || eb === 0) score += 15;
 
-  useEffect(() => {
-    if (currentProfitable) reset(defaultValues);
-  }, [currentProfitable, reset, defaultValues]);
-
-  const onSubmit = (data) => {
-    console.log('✅ Full Form Data:', data);
-    onSave(data);
-    setCurrentFormCount(3);
+    const percentValue = Math.min(30, score);
+    setPercent(percentValue);
   };
+
+  useEffect(() => {
+    const subscription = methods.watch(() => {
+      calculateCompletion();
+    });
+    return () => subscription.unsubscribe();
+  }, [methods.watch]);
+
+  useEffect(() => {
+    if (currentProfitabilityDetails) {
+      reset(defaultValues);
+      setProgress(true);
+    }
+  }, [currentProfitabilityDetails, reset, defaultValues, setProgress]);
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
@@ -89,7 +114,7 @@ export default function ProfitabilityDetails({ currentProfitable, onSave, setCur
 
             <Grid item xs={12} md={6}>
               <RHFTextField
-                name="ebidta"
+                name="EBIDTA"
                 label="Enter EBIDTA Amount"
                 fullWidth
                 type="number"
@@ -100,6 +125,7 @@ export default function ProfitabilityDetails({ currentProfitable, onSave, setCur
           <Grid container justifyContent="flex-end" sx={{ mt: 3 }}>
             <Grid item xs={12} md={3} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
               <LoadingButton
+                loading={isSubmitting}
                 type="submit"
                 variant="contained"
                 sx={{ color: '#fff' }}
@@ -114,10 +140,8 @@ export default function ProfitabilityDetails({ currentProfitable, onSave, setCur
   );
 }
 
-
 ProfitabilityDetails.propTypes = {
-  setActiveStep: PropTypes.func,
-  currentProfitable: PropTypes.object,
-  onSave: PropTypes.func,
-  setCurrentFormCount: PropTypes.func
+  currentProfitabilityDetails: PropTypes.object,
+  setPercent: PropTypes.func,
+  setProgress: PropTypes.func
 };

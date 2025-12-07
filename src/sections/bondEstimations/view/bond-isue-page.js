@@ -11,11 +11,11 @@ import {
   Divider,
 } from '@mui/material';
 import Chart, { useChart } from 'src/components/chart';
-import BondIssueParameters from '../afterAllSteps/issue-parameter';
-import IssueInvestmentMatrics from '../afterAllSteps/issue-investement-matrics';
-import ScenarioComparison from '../afterAllSteps/scenario-comparison';
-import CostsBreakdown from '../afterAllSteps/costs-breakdown';
-import MarketComparisons from '../afterAllSteps/market-comparisons';
+import BondIssueParameters from '../bond-estimation-report/issue-parameter';
+import IssueInvestmentMatrics from '../bond-estimation-report/issue-investement-matrics';
+import ScenarioComparison from '../bond-estimation-report/scenario-comparison';
+import CostsBreakdown from '../bond-estimation-report/costs-breakdown';
+import MarketComparisons from '../bond-estimation-report/market-comparisons';
 import { m } from 'framer-motion';
 
 

@@ -5,6 +5,8 @@ import { useGetBondEstimation } from 'src/api/bondEstimations';
 import { useParams } from 'src/routes/hook';
 import NotFoundPage from 'src/pages/404';
 import AuditedFinancialDocument from './audited-financial/audited-financial-document';
+import MainFile from './borrowing-and-capital-details/main';
+import FinancialDetails from './financial-ratios/financial-details';
 
 // -------------------- Dynamic Stepper ------------------------
 function DynamicStepper({ steps, activeStepId, stepsProgress, onStepClick }) {
@@ -80,6 +82,7 @@ export default function Stepper() {
   const [activeStepId, setActiveStepId] = useState('fund_position_and_credit_ratings');
   const [estimationData, setEstimationData] = useState(null);
   const { bondEstimation, bondEstimationLoading } = useGetBondEstimation(applicationId);
+  const [dataInitialized, setDataInitialized] = useState(false);
 
   const steps = [
     {
@@ -156,16 +159,65 @@ export default function Stepper() {
           />
         );
 
+      case 'borrowing_details':
+        return (
+          <MainFile
+            percent={(p) => updateStepPercent('borrowing_details', p)}
+            setActiveStepId={() => setActiveStepId('financial_details')}
+            currentBorrowingDetails={estimationData ? estimationData?.estimationBorrowingDetails : null}
+            currentCapitalDetails={estimationData ? estimationData?.capitalDetails : null}
+            currentProfitabilityDetails={estimationData ? estimationData?.profitabilityDetails : null}
+          />
+        );
+
+      case 'financial_details':
+        return (
+          <FinancialDetails
+            percent={(p) => updateStepPercent('financial_details', p)}
+            setActiveStepId={() => setActiveStepId('preliminary_bond_requirements')}
+            currentFinancialRatios={estimationData ? estimationData?.financialRatios : null}
+          />
+        );
+
       default:
         return <NotFoundPage />;
     }
   };
 
   useEffect(() => {
-    if (bondEstimation && !bondEstimationLoading) {
+    if (bondEstimation && !bondEstimationLoading && !dataInitialized) {
+
       setEstimationData(bondEstimation);
+      let currentStep = 'fund_position_and_credit_ratings';
+
+      if (
+        bondEstimation.currentProgress.includes('fund_position') &&
+        bondEstimation.currentProgress.includes('credit_ratings')
+      ) {
+        updateStepPercent('fund_position_and_credit_ratings', 100);
+        currentStep = 'borrowing_details';
+      }
+
+      if (
+        bondEstimation.currentProgress.includes('profitability_details') &&
+        bondEstimation.currentProgress.includes('capital_details') &&
+        bondEstimation.currentProgress.includes('borrowing_details')
+      ) {
+        updateStepPercent('audited_financial', 100);
+        updateStepPercent('borrowing_details', 100);
+        currentStep = 'financial_details';
+      }
+
+      if (bondEstimation.currentProgress.includes('financial_details')) {
+        updateStepPercent('financial_details', 100);
+        currentStep = 'preliminary_bond_requirements';
+      }
+
+      setActiveStepId(currentStep);
+
+      setDataInitialized(true);
     }
-  }, [bondEstimation, bondEstimationLoading])
+  }, [bondEstimation, bondEstimationLoading, dataInitialized]);
 
   return (
     <Box sx={{ p: 3 }}>

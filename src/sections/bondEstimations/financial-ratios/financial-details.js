@@ -5,7 +5,6 @@ import {
   Grid,
   Card,
   Typography,
-  Button
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useForm } from 'react-hook-form';
@@ -13,8 +12,13 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
 import PropTypes from 'prop-types';
+import { useParams } from 'src/routes/hook';
+import { useGetBondEstimation } from 'src/api/bondEstimations';
 
-export default function FinancialDetails({ currentFinancial, setActiveStep, onSave, percent }) {
+export default function FinancialDetails({ setActiveStepId, percent }) {
+  const params = useParams();
+  const { applicationId } = params;
+  const { bondEstimation, bondEstimationLoading } = useGetBondEstimation(applicationId);
 
   const MainSchema = Yup.object().shape({
     debtEquityRatio: Yup.string().required('Equity ratio is required'),
@@ -27,14 +31,14 @@ export default function FinancialDetails({ currentFinancial, setActiveStep, onSa
   });
 
   const defaultValues = useMemo(() => ({
-    debtEquityRatio: currentFinancial?.debtEquityRatio || '',
-    currentRatio: currentFinancial?.currentRatio || '',
-    netWorth: currentFinancial?.netWorth || '',
-    quickRatio: currentFinancial?.quickRatio || '',
-    returnOnEquity: currentFinancial?.returnOnEquity || '',
-    returnOnAssets: currentFinancial?.returnOnAssets || '',
-    debtServiceCoverageRatio: currentFinancial?.debtServiceCoverageRatio || '',
-  }), [currentFinancial]);
+    debtEquityRatio: bondEstimation?.financialRatios.debtEquityRatio || '',
+    currentRatio: bondEstimation?.financialRatios.currentRatio || '',
+    netWorth: bondEstimation?.financialRatios.netWorth || '',
+    quickRatio: bondEstimation?.financialRatios.quickRatio || '',
+    returnOnEquity: bondEstimation?.financialRatios.returnOnEquity || '',
+    returnOnAssets: bondEstimation?.financialRatios.returnOnAsset || '',
+    debtServiceCoverageRatio: bondEstimation?.financialRatios.debtServiceCoverageRatio || '',
+  }), [bondEstimation]);
 
   const methods = useForm({
     resolver: yupResolver(MainSchema),
@@ -45,23 +49,13 @@ export default function FinancialDetails({ currentFinancial, setActiveStep, onSa
   const { reset } = methods;
 
   useEffect(() => {
-    if (currentFinancial) {
+    if (bondEstimation && !bondEstimationLoading) {
       reset(defaultValues);
-      // Auto set percent 100% if data already exists (edit mode or refresh)
-      percent?.(100);
     }
-  }, [currentFinancial, reset, defaultValues, percent]);
+  }, [bondEstimation, bondEstimationLoading, reset, defaultValues]);
 
   const handleNext = async () => {
-    const isValid = await methods.trigger();
-    if (!isValid) return;
-
-    const values = methods.getValues();
-    onSave("financialDetails", values);
-
-    percent?.(100); // ######## Progress fully completed #######
-
-    setActiveStep( 4);
+    setActiveStepId();
   };
 
   return (
@@ -123,10 +117,6 @@ export default function FinancialDetails({ currentFinancial, setActiveStep, onSa
 
       {/* Footer Buttons Section */}
       <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-        <Button variant="outlined" sx={{ color: '#000' }} onClick={() => setActiveStep(2)}>
-          Cancel
-        </Button>
-
         <LoadingButton variant="contained" sx={{ color: '#fff' }} onClick={handleNext}>
           Next
         </LoadingButton>
@@ -136,8 +126,7 @@ export default function FinancialDetails({ currentFinancial, setActiveStep, onSa
 }
 
 FinancialDetails.propTypes = {
-  setActiveStep: PropTypes.func,
-  currentFinancial: PropTypes.object,
-  onSave: PropTypes.func,
-  percent: PropTypes.func,
+  setActiveStepId: PropTypes.func,
+  currentFinancialRatios: PropTypes.object,
+  percent: PropTypes.func
 };

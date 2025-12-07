@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 // sections
-import { BondEstimationsInitialPageView } from 'src/sections/issure-services/view';
+import { BondEstimationsInitialPageView } from 'src/sections/bondEstimations/view';
+
 // ----------------------------------------------------------------------
 
 export default function ROIGuidancePage() {
