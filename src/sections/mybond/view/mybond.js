@@ -1,6 +1,5 @@
 import MainFile from '../borrowing/main';
 import FinancialDetails from '../financial-details';
-import FundPositionForm from '../fund-positions';
 import IsinActivation from '../isin-activation';
 import LaunchIssue from '../launch-issue';
 import MyBondNewIssue from '../mybond-new-issue';

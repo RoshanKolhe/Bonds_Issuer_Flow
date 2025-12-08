@@ -4,7 +4,6 @@ import { Box, Card, Stack, Typography } from '@mui/material';
 import PreliminaryBondRequirements from './preliminary-bond-requirements';
 import MyBondStar from './mybond-start';
 import MyBondNewIssue from './mybond-new-issue';
-import FundPositionForm from './fund-positions';
 import MainFile from './borrowing/main';
 import FinancialDetails from './financial-details';
 import LaunchIssue from './launch-issue';
