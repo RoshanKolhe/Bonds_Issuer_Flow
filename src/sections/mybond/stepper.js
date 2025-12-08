@@ -11,6 +11,7 @@ import LaunchIssue from './launch-issue';
 import IsinActivation from './isin-activation';
 import RegulatoryFiling from './regulatory-filing';
 import AuditedFinancialDocument from './audited-financial/audited-financial-document';
+import FundAndCreditForm from './fund-position-and-credit-rating/fundAndCreditForm';
 
 // -------------------- Dynamic Stepper ------------------------
 function DynamicStepper({ steps, activeStepId, stepsProgress, onStepClick }) {
@@ -200,7 +201,7 @@ export default function MybondStepper() {
 
       case 'fund_position':
         return (
-          <FundPositionForm
+          <FundAndCreditForm
             currentFund={formData.fund_position}
             percent={(p) => updateStepPercent('fund_position', p)}
             setActiveStepId={setActiveStepId}
