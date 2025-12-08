@@ -249,19 +249,44 @@ export default function CompanyAccountGeneral() {
           }}
         >
           <Grid container spacing={3}>
-            <Grid xs={12} md={12}>
+            <Grid xs={12} md={4}>
+              <Card sx={{ pt: 10, pb: 5, px: 3, textAlign: 'center' }}>
+                <RHFUploadAvatar
+                  name="companyLogo"
+                  maxSize={3145728}
+                  onDrop={handleDrop}
+                  helperText={
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        mt: 3,
+                        mx: 'auto',
+                        display: 'block',
+                        textAlign: 'center',
+                        color: 'text.disabled',
+                      }}
+                    >
+                      Allowed *.jpeg, *.jpg, *.png, *.gif
+                      <br /> max size of {fData(3145728)}
+                    </Typography>
+                  }
+                />
+              </Card>
+            </Grid>
+
+            <Grid xs={12} md={8}>
               <Stack spacing={3}>
                 <Grid container spacing={3}>
                   <Grid xs={12} md={6}>
-                    <RHFTextField name="cin" label="CIN" disabled={true} />
+                    <RHFTextField name="cin" label="CIN" disabled />
                   </Grid>
 
                   <Grid xs={12} md={6}>
-                    <RHFTextField name="companyName" label="Company Name" disabled={true} />
+                    <RHFTextField name="companyName" label="Company Name" disabled />
                   </Grid>
 
                   <Grid xs={12} md={6}>
-                    <RHFTextField name="gstin" label="GSTIN" disabled={true} />
+                    <RHFTextField name="gstin" label="GSTIN" disabled />
                   </Grid>
 
                   <Grid xs={12} md={6}>
@@ -270,7 +295,7 @@ export default function CompanyAccountGeneral() {
                       control={control}
                       render={({ field, fieldState: { error } }) => (
                         <DatePicker
-                          disabled={true}
+                          disabled
                           value={field.value}
                           onChange={(newValue) => field.onChange(newValue)}
                           format="dd-MM-yyyy"
@@ -290,21 +315,16 @@ export default function CompanyAccountGeneral() {
                     <RHFTextField
                       name="msmeUdyamRegistrationNo"
                       label="MSME/Udyam Registration No.*"
-                      disabled={true}
+                      disabled
                     />
                   </Grid>
 
                   <Grid xs={12} md={6}>
                     <Stack spacing={2} direction={{ xs: 'column', sm: 'row' }}>
-                      <RHFTextField
-                        name="city"
-                        placeholder="City"
-                        disabled={true}
-                        sx={{ flex: 1 }}
-                      />
+                      <RHFTextField name="city" placeholder="City" disabled sx={{ flex: 1 }} />
                       <RHFSelect
                         name="state"
-                        disabled={true}
+                        disabled
                         sx={{ flex: 1 }}
                         SelectProps={{ displayEmpty: true }}
                       >
@@ -312,7 +332,7 @@ export default function CompanyAccountGeneral() {
                       </RHFSelect>
                       <RHFAutocomplete
                         name="country"
-                        disabled={true}
+                        disabled
                         placeholder="Country"
                         sx={{ flex: 1 }}
                         readOnly
@@ -368,7 +388,7 @@ export default function CompanyAccountGeneral() {
               <RHFTextField
                 name="panNumber"
                 label="PAN Number*"
-                disabled={true}
+                disabled
                 placeholder="Your PAN Number"
               />
             </Grid>
@@ -381,7 +401,7 @@ export default function CompanyAccountGeneral() {
                 render={({ field, fieldState: { error } }) => (
                   <DatePicker
                     value={field.value}
-                    disabled={true}
+                    disabled
                     onChange={(newValue) => field.onChange(newValue)}
                     format="dd-MM-yyyy"
                     slotProps={{
@@ -397,11 +417,7 @@ export default function CompanyAccountGeneral() {
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <RHFTextField
-                name="panHoldersName"
-                disabled={true}
-                placeholder="Enter Name as per PAN"
-              />
+              <RHFTextField name="panHoldersName" disabled placeholder="Enter Name as per PAN" />
             </Grid>
             <Grid item xs={12} md={12}>
               <RHFTextField
