@@ -27,7 +27,7 @@ const ROLES = [
   { value: 'DIRECTOR', label: 'Director' },
   { value: 'SIGNATORY', label: 'Signatory' },
   { value: 'MANAGER', label: 'Manager' },
-  { value: 'OTHER', label: 'Other' }, // ✅ Add this
+  { value: 'OTHER', label: 'Other' }, 
 ];
 
 export default function SignatoriesNewEditForm({
