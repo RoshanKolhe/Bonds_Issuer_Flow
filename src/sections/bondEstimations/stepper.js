@@ -7,6 +7,7 @@ import NotFoundPage from 'src/pages/404';
 import AuditedFinancialDocument from './audited-financial/audited-financial-document';
 import MainFile from './borrowing-and-capital-details/main';
 import FinancialDetails from './financial-ratios/financial-details';
+import PreliminaryBondRequirements from './preliminary-bond-requirements';
 
 // -------------------- Dynamic Stepper ------------------------
 function DynamicStepper({ steps, activeStepId, stepsProgress, onStepClick }) {
@@ -176,6 +177,15 @@ export default function Stepper() {
             percent={(p) => updateStepPercent('financial_details', p)}
             setActiveStepId={() => setActiveStepId('preliminary_bond_requirements')}
             currentFinancialRatios={estimationData ? estimationData?.financialRatios : null}
+          />
+        );
+
+      case 'preliminary_bond_requirements':
+        return (
+          <PreliminaryBondRequirements
+            percent={(p) => updateStepPercent('preliminary_bond_requirements', p)}
+            // setActiveStepId={() => setActiveStepId('preliminary_bond_requirements')}
+            currentPrliminaryRequirements={estimationData ? estimationData?.estimationPriliminaryRequirements : null}
           />
         );
 

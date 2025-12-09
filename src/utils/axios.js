@@ -87,10 +87,13 @@ export const endpoints = {
   creditRatings: {
     list: '/credit-ratings',
   },
-  
   bankDetails: {
     list: '/company-profiles/bank-details',
     filterList: (filter) => `/company-profiles/bank-details?filter=${filter}`,
     details: (accountId) => `/company-profiles/bank-details/${accountId}`,
+  },
+  investorCategories: {
+    list: '/investor-categories',
+    filterList: (filter) => `/investor-categories?filter=${filter}`,
   }
 };
