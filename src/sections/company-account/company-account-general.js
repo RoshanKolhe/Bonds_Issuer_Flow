@@ -125,17 +125,14 @@ export default function CompanyAccountGeneral() {
             state: companyData.stateOfIncorporation || '',
             country: companyData.countryOfIncorporation || 'India',
 
-
             entityType: companyData.companyEntityType?.value || '',
             sector: companyData.companySectorType?.value || '',
-
 
             panNumber: companyData.companyPanCards?.submittedPanNumber || '',
             dateOfBirth: companyData.companyPanCards?.submittedDateOfBirth
               ? dayjs(companyData.companyPanCards.submittedDateOfBirth).toDate()
               : null,
             panHoldersName: companyData.companyPanCards?.submittedCompanyName || '',
-
 
             companyAbout: companyData.companyAbout || '',
 
@@ -156,7 +153,6 @@ export default function CompanyAccountGeneral() {
   }, []);
 
   // --------------------------- PAN extraction ------------------------------
-
 
   // --------------------------- Avatar upload (/files) ----------------------
   const handleAvatarDrop = useCallback(
@@ -192,61 +188,54 @@ export default function CompanyAccountGeneral() {
   );
 
   // optional small dropzone wrapper for RHFUploadAvatar if you want to use useDropzone directly
-  const handleDrop = useCallback(async (acceptedFiles) => {
-    const file = acceptedFiles[0];
-    if (!file) return;
+  const handleDrop = useCallback(
+    async (acceptedFiles) => {
+      const file = acceptedFiles[0];
+      if (!file) return;
 
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
 
-      const { data } = await axiosInstance.post('/files', formData);
+        const { data } = await axiosInstance.post('/files', formData);
 
-      const uploaded = data?.files?.[0];
+        const uploaded = data?.files?.[0];
 
-      if (uploaded) {
+        if (uploaded) {
+          setValue('companyLogo', uploaded, { shouldValidate: true });
 
+          console.log('Saved companyLogoId:', uploaded.id);
 
-        setValue('companyLogo', uploaded, { shouldValidate: true });
-
-        console.log('Saved companyLogoId:', uploaded.id);
-
-        enqueueSnackbar('Logo uploaded!', { variant: 'success' });
+          enqueueSnackbar('Logo uploaded!', { variant: 'success' });
+        }
+      } catch (err) {
+        console.error(err);
+        enqueueSnackbar('Upload failed', { variant: 'error' });
       }
-    } catch (err) {
-      console.error(err);
-      enqueueSnackbar('Upload failed', { variant: 'error' });
-    }
-  }, [setValue, enqueueSnackbar]);
-
+    },
+    [setValue, enqueueSnackbar]
+  );
 
   // --------------------------- submit handler -----------------------------
   const onSubmit = handleSubmit(async (formData) => {
     try {
-
       const payload = {
         companyLogo: formData.companyLogo.id ? String(formData.companyLogo.id) : null,
         companyAbout: formData.companyAbout?.trim() || '',
       };
 
-      const response = await axiosInstance.patch(
-        '/company-profiles/update-general-info',
-        payload
-      );
+      const response = await axiosInstance.patch('/company-profiles/update-general-info', payload);
 
       if (response?.data?.success) {
         enqueueSnackbar('Company profile updated successfully!', { variant: 'success' });
       } else {
         enqueueSnackbar(response?.data?.message || 'Update failed', { variant: 'error' });
       }
-
     } catch (error) {
       console.error('Update error:', error);
       enqueueSnackbar('Something went wrong. Try again.', { variant: 'error' });
     }
   });
-
-
 
   // --------------------------- render -------------------------------------
   return (
@@ -260,7 +249,6 @@ export default function CompanyAccountGeneral() {
           }}
         >
           <Grid container spacing={3}>
-            {/* LEFT: Avatar card */}
             <Grid xs={12} md={4}>
               <Card sx={{ pt: 10, pb: 5, px: 3, textAlign: 'center' }}>
                 <RHFUploadAvatar
@@ -286,24 +274,19 @@ export default function CompanyAccountGeneral() {
               </Card>
             </Grid>
 
-            {/* RIGHT: KYC Form fields */}
             <Grid xs={12} md={8}>
               <Stack spacing={3}>
                 <Grid container spacing={3}>
                   <Grid xs={12} md={6}>
-                    <RHFTextField
-                      name="cin"
-                      label="CIN"
-                      disabled={true}
-                    />
+                    <RHFTextField name="cin" label="CIN" disabled />
                   </Grid>
 
                   <Grid xs={12} md={6}>
-                    <RHFTextField name="companyName" label="Company Name" disabled={true} />
+                    <RHFTextField name="companyName" label="Company Name" disabled />
                   </Grid>
 
                   <Grid xs={12} md={6}>
-                    <RHFTextField name="gstin" label="GSTIN" disabled={true} />
+                    <RHFTextField name="gstin" label="GSTIN" disabled />
                   </Grid>
 
                   <Grid xs={12} md={6}>
@@ -312,7 +295,7 @@ export default function CompanyAccountGeneral() {
                       control={control}
                       render={({ field, fieldState: { error } }) => (
                         <DatePicker
-                          disabled={true}
+                          disabled
                           value={field.value}
                           onChange={(newValue) => field.onChange(newValue)}
                           format="dd-MM-yyyy"
@@ -329,18 +312,27 @@ export default function CompanyAccountGeneral() {
                   </Grid>
 
                   <Grid xs={12} md={6}>
-                    <RHFTextField name="msmeUdyamRegistrationNo" label="MSME/Udyam Registration No.*" disabled={true} />
+                    <RHFTextField
+                      name="msmeUdyamRegistrationNo"
+                      label="MSME/Udyam Registration No.*"
+                      disabled
+                    />
                   </Grid>
 
                   <Grid xs={12} md={6}>
                     <Stack spacing={2} direction={{ xs: 'column', sm: 'row' }}>
-                      <RHFTextField name="city" placeholder="City" disabled={true} sx={{ flex: 1 }} />
-                      <RHFSelect name="state" disabled={true} sx={{ flex: 1 }} SelectProps={{ displayEmpty: true }}>
+                      <RHFTextField name="city" placeholder="City" disabled sx={{ flex: 1 }} />
+                      <RHFSelect
+                        name="state"
+                        disabled
+                        sx={{ flex: 1 }}
+                        SelectProps={{ displayEmpty: true }}
+                      >
                         <MenuItem value="Maharashtra">Maharashtra</MenuItem>
                       </RHFSelect>
                       <RHFAutocomplete
                         name="country"
-                        disabled={true}
+                        disabled
                         placeholder="Country"
                         sx={{ flex: 1 }}
                         readOnly
@@ -373,7 +365,6 @@ export default function CompanyAccountGeneral() {
                           <MenuItem value="llp">LLP</MenuItem>
                           <MenuItem value="opc">OPC</MenuItem>
                         </RHFSelect>
-
                       </Box>
 
                       <Box sx={{ flex: 1 }}>
@@ -383,7 +374,6 @@ export default function CompanyAccountGeneral() {
                           <MenuItem value="infrastructure">Infrastructure</MenuItem>
                           <MenuItem value="others">Others</MenuItem>
                         </RHFSelect>
-
                       </Box>
                     </Stack>
                   </Grid>
@@ -394,11 +384,13 @@ export default function CompanyAccountGeneral() {
 
           {/* PAN Upload */}
           <Grid container spacing={3}>
-
-
             <Grid item xs={12} md={6}>
-
-              <RHFTextField name="panNumber" label="PAN Number*" disabled={true} placeholder="Your PAN Number" />
+              <RHFTextField
+                name="panNumber"
+                label="PAN Number*"
+                disabled
+                placeholder="Your PAN Number"
+              />
             </Grid>
 
             {/* -------------------- DATE OF BIRTH -------------------- */}
@@ -409,7 +401,7 @@ export default function CompanyAccountGeneral() {
                 render={({ field, fieldState: { error } }) => (
                   <DatePicker
                     value={field.value}
-                    disabled={true}
+                    disabled
                     onChange={(newValue) => field.onChange(newValue)}
                     format="dd-MM-yyyy"
                     slotProps={{
@@ -425,17 +417,24 @@ export default function CompanyAccountGeneral() {
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <RHFTextField name="panHoldersName" disabled={true} placeholder="Enter Name as per PAN" />
+              <RHFTextField name="panHoldersName" disabled placeholder="Enter Name as per PAN" />
             </Grid>
             <Grid item xs={12} md={12}>
-              <RHFTextField name="companyAbout" placeholder="Enter abount company"
+              <RHFTextField
+                name="companyAbout"
+                placeholder="Enter abount company"
                 multiline
                 rows={4}
               />
             </Grid>
           </Grid>
           <Stack spacing={3} alignItems="flex-end" sx={{ mt: 3 }}>
-            <LoadingButton type="submit" variant="contained" loading={isSubmitting} sx={{ ml: 'auto' }}>
+            <LoadingButton
+              type="submit"
+              variant="contained"
+              loading={isSubmitting}
+              sx={{ ml: 'auto' }}
+            >
               Save Changes
             </LoadingButton>
           </Stack>
