@@ -52,6 +52,9 @@ import BondEstimationsTableRow from '../bond-estimations-table-row';
 import BondEstimationsTableToolbar from '../bond-estimations-table-toolbar';
 import BondEstimationsTableFiltersResult from '../bond-estimations-filters-result';
 import { useGetBondEstimations } from 'src/api/bondEstimations';
+import { useNavigate } from 'react-router';
+import axiosInstance from 'src/utils/axios';
+import { LoadingButton } from '@mui/lab';
 
 // ----------------------------------------------------------------------
 
@@ -75,7 +78,8 @@ const defaultFilters = {
 
 export default function BondsEstimationListView({ bondEstimations, bondEstimationsLoading, count }) {
   const table = useTable();
-
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const settings = useSettingsContext();
 
   const router = useRouter();
@@ -158,6 +162,21 @@ export default function BondsEstimationListView({ bondEstimations, bondEstimatio
     setFilters(defaultFilters);
   }, []);
 
+  const handleStart = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axiosInstance.post('/bond-estimations/initialize');
+      if (response.data.success) {
+        navigate(paths.dashboard.issureservices.roifundform(response.data?.application?.id));
+      }
+    } catch (error) {
+      console.error('error while starting bond estimation :', error);
+
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (bondEstimations && !bondEstimationsLoading) {
       setTableData(bondEstimations);
@@ -174,16 +193,16 @@ export default function BondsEstimationListView({ bondEstimations, bondEstimatio
             { name: 'Bond Estimations', href: paths.dashboard.issureservices.roi },
             { name: 'List' },
           ]}
-          // action={
-          //   <Button
-          //     component={RouterLink}
-          //     href={paths.dashboard.user.new}
-          //     variant="contained"
-          //     startIcon={<Iconify icon="mingcute:add-line" />}
-          //   >
-          //     New User
-          //   </Button>
-          // }
+          action={
+            <LoadingButton
+              onClick={() => handleStart()}
+              variant="contained"
+              loading={isLoading}
+              startIcon={<Iconify icon="mingcute:add-line" />}
+            >
+              New Estimation
+            </LoadingButton>
+          }
           sx={{
             mb: { xs: 3, md: 5 },
           }}

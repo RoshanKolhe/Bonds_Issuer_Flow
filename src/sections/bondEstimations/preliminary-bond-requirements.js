@@ -140,19 +140,19 @@ export default function PreliminaryBondRequirements({
   const onSubmitBond = async (data) => {
     console.log('Card 1 submitted:', data);
 
-    onSave({
-      ...currentBondRequirements,
-      ...data,
-    });
+    // onSave({
+    //   ...currentBondRequirements,
+    //   ...data,
+    // });
   };
 
   const onSubmitCollateral = async (data) => {
     console.log('Card 2 submitted:', data);
 
-    onSave({
-      ...currentBondRequirements,
-      ...data,
-    });
+    // onSave({
+    //   ...currentBondRequirements,
+    //   ...data,
+    // });
   };
 
   const handleNextClick = async () => {
@@ -171,13 +171,13 @@ export default function PreliminaryBondRequirements({
       const collateralPayload = collateralMethods.getValues();
 
       // 3️⃣ Save in parent (so values persist)
-      onSave('preliminaryBond', {
-        bondRequirements: bondPayload,
-        collateralRequirements: collateralPayload,
-        security,
-        investorCategory,
-        paymentCycle,
-      });
+      // onSave('preliminaryBond', {
+      //   bondRequirements: bondPayload,
+      //   collateralRequirements: collateralPayload,
+      //   security,
+      //   investorCategory,
+      //   paymentCycle,
+      // });
 
       console.log('✅ Final Data Sent:', {
         bondRequirements: bondPayload,
