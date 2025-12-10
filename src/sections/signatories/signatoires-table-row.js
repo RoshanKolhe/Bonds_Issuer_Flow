@@ -9,6 +9,7 @@ import { format } from 'date-fns';
 import { Chip, IconButton, Tooltip } from '@mui/material';
 import Iconify from 'src/components/iconify';
 import { color } from 'framer-motion';
+import Label from 'src/components/label';
 
 // ----------------------------------------------------------------------
 
@@ -70,7 +71,9 @@ export default function SignatoiresTableRow({ row, selected, onSelectRow, onView
         )}
       </TableCell>
       <TableCell>
-        <Chip label={statusMap[status].label} color={statusMap[status].color} variant="soft" />
+        <Label color={statusMap[status].color} variant="soft">
+          {statusMap[status].label}
+        </Label>
       </TableCell>
       <TableCell>
         {/* <Tooltip title="View Events">
