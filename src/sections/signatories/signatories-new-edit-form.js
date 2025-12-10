@@ -22,6 +22,8 @@ import { useAuthContext } from 'src/auth/hooks';
 import { DatePicker } from '@mui/x-date-pickers';
 import axiosInstance from 'src/utils/axios';
 import { Card, Grid } from '@mui/material';
+import { paths } from 'src/routes/paths';
+import { useRouter } from 'src/routes/hook';
 
 const ROLES = [
   { value: 'DIRECTOR', label: 'Director' },
@@ -39,6 +41,7 @@ export default function SignatoriesNewEditForm({
   isViewMode,
   isEditMode,
 }) {
+  const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const [isPanUploaded, setIsPanUploaded] = useState(false);
   const [extractedPan, setExtractedPan] = useState(null);
@@ -244,7 +247,8 @@ export default function SignatoriesNewEditForm({
 
       if (res?.data?.success) {
         enqueueSnackbar('Signatory added successfully', { variant: 'success' });
-        reset()
+        reset();
+        router.push(paths.dashboard.signatories.list);
       } else {
         enqueueSnackbar(res?.data?.message || 'Something went wrong', {
           variant: 'error',
