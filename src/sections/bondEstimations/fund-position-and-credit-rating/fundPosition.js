@@ -55,6 +55,7 @@ export default function FundPosition({ currentFundPosition, setPercent, setProgr
         try {
             const response = await axiosInstance.patch(`/bond-estimations/fund-positions/${applicationId}`, data);
             if (response.data.success) {
+                setProgress(true);
                 enqueueSnackbar('Fund position saved', { variant: 'success' });
             }
         } catch (error) {

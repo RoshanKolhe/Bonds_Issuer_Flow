@@ -142,6 +142,7 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
       const response = await axiosInstance.patch(`/bond-estimations/credit-ratings/${applicationId}`, payload);
 
       if (response.data?.success) {
+        setProgress(true);
         enqueueSnackbar('Credit ratings updated', { variant: 'success' });
       }
 
