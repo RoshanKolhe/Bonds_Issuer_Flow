@@ -7,14 +7,14 @@ import { SignatoriesCreateView } from 'src/sections/signatories/view';
 
 // ----------------------------------------------------------------------
 
-export default function SignatoriesCreatePage() {
-  return (
-    <>
-      <Helmet>
-        <title> Dashboard: Create a new job</title>
-      </Helmet>
+// export default function SignatoriesCreatePage() {
+//   return (
+//     <>
+//       <Helmet>
+//         <title> Dashboard: Create a new job</title>
+//       </Helmet>
 
-      <SignatoriesCreateView />
-    </>
-  );
-}
+//       <SignatoriesCreateView />
+//     </>
+//   );
+// }

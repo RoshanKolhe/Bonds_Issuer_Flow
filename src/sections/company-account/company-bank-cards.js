@@ -52,7 +52,7 @@ export default function BankDetailsCard({ bank, onViewRow }) {
 
                         <Stack direction="row" alignItems="center">
                             <Typography
-                               
+
                                 sx={{
                                     cursor: 'pointer',
                                     transition: '0.2s',
@@ -150,18 +150,20 @@ export default function BankDetailsCard({ bank, onViewRow }) {
                             </Typography>
 
                             <Typography
-                            
+
                                 sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                             >
                                 {bankProof[bank?.bankAccountProofType]?.label || 'Unknown'}
 
                                 <IconButton
                                     size="small"
-                                    onClick={() => {
+                                    onClick={(e) => {
                                         if (bank?.bankAccountProof?.fileUrl) {
+                                            e.stopPropagation();
                                             window.open(bank.bankAccountProof.fileUrl, "_blank");
                                         }
                                     }}
+                                    
                                     sx={{ ml: 0.5 }}
                                 >
                                     <Iconify icon="mdi:eye" width={20} />

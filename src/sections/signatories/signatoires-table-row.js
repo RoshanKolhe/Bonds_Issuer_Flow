@@ -76,11 +76,12 @@ export default function SignatoiresTableRow({ row, selected, onSelectRow, onView
         </Label>
       </TableCell>
       <TableCell>
-        {/* <Tooltip title="View Events">
-            <IconButton onClick={onViewRow}>
-              <Iconify icon="carbon:view-filled" />
-            </IconButton>
-          </Tooltip> */}
+        {/* <Tooltip title="Edit">
+          <IconButton onClick={onEditRow}>
+             <Iconify icon="solar:pen-bold" />
+
+          </IconButton>
+        </Tooltip> */}
         <Tooltip title="View" placement="top" arrow>
           <IconButton onClick={onViewRow}>
             <Iconify icon="mdi:eye" width={20} />

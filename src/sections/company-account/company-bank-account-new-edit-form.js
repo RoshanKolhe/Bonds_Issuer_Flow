@@ -25,6 +25,7 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router';
 import { LoadingButton } from '@mui/lab';
+import Iconify from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 const documentOptions = [
@@ -32,14 +33,28 @@ const documentOptions = [
   { label: 'Bank Statement', value: 1 },
 ]
 
-export default function BankNewForm({ bankDetails }) {
+export default function BankNewForm({ bankDetails, refreshBankDetail }) {
   const router = useRouter();
   const navigate = useNavigate();
+  const [isEdit, setIsEdit] = useState();
+
+  useEffect(() => {
+    if (bankDetails?.status === 1) {
+      setIsEdit(false);  // View only
+    } else {
+      setIsEdit(true);   // Edit mode
+    }
+  }, [bankDetails?.status]);
+
 
   // ---------------- VALIDATION ----------------
   const NewSchema = Yup.object().shape({
     documentType: Yup.string().required('Document Type is required'),
-    addressProof: Yup.mixed().required('Address proof is required'),
+    addressProof: Yup.mixed().when([], {
+      is: () => !bankDetails?.id,
+      then: (schema) => schema.required('Address proof is required'),
+      otherwise: (schema) => schema.nullable(),
+    }),
     bankName: Yup.string().required('Bank Name is required'),
     branchName: Yup.string().required('Branch Name is required'),
     accountNumber: Yup.number().required('Account Number is required'),
@@ -128,28 +143,46 @@ export default function BankNewForm({ bankDetails }) {
     }
     : null;
 
+
+
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const payload = {
-        bankDetails: {
-          bankName: data.bankName,
-          bankShortCode: data.bankShortCode,
-          ifscCode: data.ifscCode,
-          branchName: data.branchName,
-          bankAddress: data.bankAddress,
-          accountType: data.accountType === 'CURRENT' ? 1 : 0,
-          accountHolderName: data.accountHolderName,
-          accountNumber: String(data.accountNumber),
-          bankAccountProofType: Number(data.documentType),
-          bankAccountProofId: data.bankAccountProofId, 
-        },
-      };
 
-      const res = await axiosInstance.post('/company-profiles/bank-details', payload);
+      const accountId = bankDetails?.id
+
+      const payload = {
+        bankName: data.bankName,
+        bankShortCode: data.bankShortCode,
+        ifscCode: data.ifscCode,
+        branchName: data.branchName,
+        bankAddress: data.bankAddress,
+        accountType: data.accountType === 'CURRENT' ? 1 : 0,
+        accountHolderName: data.accountHolderName,
+        accountNumber: String(data.accountNumber),
+        bankAccountProofType: Number(data.documentType),
+        bankAccountProofId: data.bankAccountProofId,
+      };
+      console.log('📤 FINAL BANK PAYLOAD:', payload);
+      let finalPayload;
+
+      if (!accountId) {
+        finalPayload = { bankDetails: payload };
+      } else {
+        finalPayload = payload;
+      }
+
+      let res;
+
+      if (!bankDetails?.id) {
+        res = await axiosInstance.post('/company-profiles/bank-details', finalPayload);
+      } else {
+        res = await axiosInstance.patch(`/company-profiles/bank-details/${accountId}`, finalPayload);
+      }
 
       if (res?.data?.success) {
-        enqueueSnackbar('Bank details submitted successfully!', { variant: 'success' });
-        navigate(paths.dashboard.company.profile);
+        enqueueSnackbar('Bank details saved successfully!', { variant: 'success' });
+        refreshBankDetail();
+        router.push(paths.dashboard.company.profile);
       } else {
         enqueueSnackbar(res?.data?.message || 'Something went wrong!', { variant: 'error' });
       }
@@ -209,7 +242,7 @@ export default function BankNewForm({ bankDetails }) {
           </Typography>
 
           <Box sx={{ width: 200, mb: 3 }}>
-            <RHFSelect name="documentType" label="Document Type" sx={{ width: 200 }}>
+            <RHFSelect name="documentType" label="Document Type" disabled={!isEdit} sx={{ width: 200 }}>
               {documentOptions.map((item) => (
                 <MenuItem key={item.value} value={item.value}>
                   {item.label}
@@ -220,16 +253,56 @@ export default function BankNewForm({ bankDetails }) {
           </Box>
 
           {/* ---------------- ADDRESS PROOF UPLOAD ---------------- */}
-          <RHFFileUploadBox
-            name="addressProof"
-            label={`Upload ${documentType === 'cheque' ? 'Cheque' : 'Bank Statement'}`}
-            icon="mdi:file-document-outline"
-            color="#1e88e5"
-            acceptedTypes="pdf,xls,docx,jpeg"
-            maxSizeMB={10}
-            existing={existingProof}
-            onDrop={(files) => handleDrop(files)}
-          />
+          {isEdit &&
+            <RHFFileUploadBox
+              name="addressProof"
+              label={`Upload ${documentType === 'cheque' ? 'Cheque' : 'Bank Statement'}`}
+              icon="mdi:file-document-outline"
+              color="#1e88e5"
+              acceptedTypes="pdf,xls,docx,jpeg"
+              maxSizeMB={10}
+              existing={existingProof}
+              onDrop={(files) => handleDrop(files)}
+            />
+          }
+          {!isEdit &&
+            <Box sx={{ mb: 3 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  flexWrap: 'wrap',
+                  mb: 1,
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography sx={{ fontWeight: 600 }}>
+                    Check  Uploaded PanCard :
+                  </Typography>
+                </Box>
+
+                {bankDetails?.bankAccountProof?.fileUrl ? (
+                  <Button
+                    variant="outlined"
+                    color="primary"
+
+                    startIcon={<Iconify icon="mdi:eye" />}
+                    sx={{
+                      height: 36,
+                      textTransform: 'none',
+                      fontWeight: 600,
+                    }}
+                    onClick={() => window.open(bankDetails.bankAccountProof.fileUrl, '_blank')}
+                  >
+                    Preview Document
+                  </Button>
+                ) : (
+                  <Typography color="text.secondary">No file uploaded.</Typography>
+                )}
+              </Box>
+            </Box>
+          }
 
           {/* ---------------- BANK FIELDS ---------------- */}
           <Box sx={{ py: 4 }}>
@@ -240,6 +313,7 @@ export default function BankNewForm({ bankDetails }) {
                     <RHFTextField
                       name="ifscCode"
                       label="IFSC Code"
+                      disabled={!isEdit}
                       placeholder="Enter IFSC Code"
                       InputProps={{
                         endAdornment: (
@@ -247,6 +321,7 @@ export default function BankNewForm({ bankDetails }) {
                             variant="contained"
                             loading={isSubmitting}
                             size="small"
+                            disabled={!isEdit}
                             sx={{
                               ml: 1,
                               bgcolor: '#00328A',
@@ -309,12 +384,13 @@ export default function BankNewForm({ bankDetails }) {
                   </Box>
 
                   <Box>
-                    <RHFTextField name="bankName" label="Bank Name" placeholder="Enter Bank Name" />
+                    <RHFTextField name="bankName" disabled={!isEdit} label="Bank Name" placeholder="Enter Bank Name" />
                   </Box>
                   <Box>
                     <RHFTextField
                       name="branchName"
                       label="Branch Name"
+                      disabled={!isEdit}
                       placeholder="Enter Branch Name"
                     />
                   </Box>
@@ -322,6 +398,7 @@ export default function BankNewForm({ bankDetails }) {
                     <RHFTextField
                       name="accountHolderName"
                       label="Account Holder Name"
+                      disabled={!isEdit}
                       placeholder="Enter Account Holder Name"
                     />
                   </Box>
@@ -329,6 +406,7 @@ export default function BankNewForm({ bankDetails }) {
                     <RHFTextField
                       name="accountNumber"
                       label="Account Number"
+                      disabled={!isEdit}
                       placeholder="Enter Account Number"
                     />
                   </Box>
@@ -337,6 +415,7 @@ export default function BankNewForm({ bankDetails }) {
                       name="bankAddress"
                       label="Bank Address"
                       placeholder="Bank Address"
+                      disabled={!isEdit}
                       InputLabelProps={{
                         shrink: Boolean(getValues('bankAddress')),
                       }}
@@ -357,6 +436,7 @@ export default function BankNewForm({ bankDetails }) {
                     <RHFTextField
                       name="bankShortCode"
                       label="Bank Short Code"
+                      disabled={!isEdit}
                       placeholder="Bank Short Code"
                       InputLabelProps={{
                         shrink: Boolean(getValues('bankShortCode')),
@@ -376,16 +456,17 @@ export default function BankNewForm({ bankDetails }) {
             >
               Back
             </Button> */}
-            <Button
+            {/* <Button
               variant="outlined"
 
             >
               Cancel
-            </Button>
-
-            <LoadingButton type="submit" variant="contained" loading={isSubmitting} sx={{ ml: 'auto' }}>
-              Create
-            </LoadingButton>
+            </Button> */}
+            {isEdit &&
+              <LoadingButton type="submit" variant="contained" loading={isSubmitting} sx={{ ml: 'auto' }}>
+                Save
+              </LoadingButton>
+            }
           </Box>
         </Paper>
 
@@ -399,4 +480,5 @@ export default function BankNewForm({ bankDetails }) {
 
 BankNewForm.propTypes = {
   bankDetails: PropTypes.object,
+  refreshBankDetail: PropTypes.func
 }

@@ -92,7 +92,7 @@ console.log(Signatories);
 
    const handleEditRow = useCallback(
     (id) => {
-      router.push(paths.dashboard.scheduler.edit(id));
+      router.push(paths.dashboard.signatories.edit(id));
     },
     [router]
   );

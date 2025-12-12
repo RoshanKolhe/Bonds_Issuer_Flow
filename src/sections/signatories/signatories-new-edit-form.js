@@ -29,7 +29,7 @@ const ROLES = [
   { value: 'DIRECTOR', label: 'Director' },
   { value: 'SIGNATORY', label: 'Signatory' },
   { value: 'MANAGER', label: 'Manager' },
-  { value: 'OTHER', label: 'Other' }, 
+  { value: 'OTHER', label: 'Other' },
 ];
 
 export default function SignatoriesNewEditForm({
@@ -45,6 +45,8 @@ export default function SignatoriesNewEditForm({
   const { enqueueSnackbar } = useSnackbar();
   const [isPanUploaded, setIsPanUploaded] = useState(false);
   const [extractedPan, setExtractedPan] = useState(null);
+
+  const router = useRouter();
 
   const NewUserSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
@@ -79,21 +81,47 @@ export default function SignatoriesNewEditForm({
     ),
   });
 
-  const defaultValues = useMemo(
-    () => ({
+  const defaultValues = useMemo(() => {
+    const isCustom = currentUser?.designationType === 'custom';
+
+    return {
       name: currentUser?.fullName || '',
       email: currentUser?.email || '',
       phoneNumber: currentUser?.phone || '',
-      role: currentUser?.designationType || '',
-      panCard: '',
-      customDesignation: '',
-      boardResolution: '',
-      submittedPanFullName: '',
-      submittedPanNumber: '',
-      submittedDateOfBirth: '',
-    }),
-    [currentUser]
-  );
+      panCard: currentUser?.panCardFile
+        ? {
+          id: currentUser.panCardFile.id,
+          name: currentUser.panCardFile.fileOriginalName,
+          url: currentUser.panCardFile.fileUrl,
+        }
+        : null,
+
+      boardResolution: currentUser?.boardResolutionFile
+        ? {
+          id: currentUser.boardResolutionFile.id,
+          name: currentUser.boardResolutionFile.fileOriginalName,
+          url: currentUser.boardResolutionFile.fileUrl,
+        }
+        : null,
+
+      role: !isCustom
+        ? ROLES.find((r) => r.label === currentUser?.designationValue)?.value || ''
+        : 'OTHER',
+
+
+      customDesignation: isCustom ? currentUser?.designationValue || '' : '',
+
+      submittedPanFullName:
+        currentUser?.submittedPanFullName || currentUser?.extractedPanFullName || '',
+      submittedPanNumber:
+        currentUser?.submittedPanNumber || currentUser?.extractedPanNumber || '',
+      submittedDateOfBirth:
+        currentUser?.submittedDateOfBirth || currentUser?.extractedDateOfBirth || '',
+
+
+    };
+  }, [currentUser]);
+
 
   const methods = useForm({
     resolver: yupResolver(NewUserSchema),
@@ -216,9 +244,9 @@ export default function SignatoriesNewEditForm({
 
 
       const isCustom = data.role === 'OTHER';
+      const signatoryId = currentUser?.id;
 
       const payload = {
-
         signatory: {
           fullName: data.name,
           email: data.email,
@@ -234,8 +262,8 @@ export default function SignatoriesNewEditForm({
           submittedPanNumber: data.submittedPanNumber,
           submittedDateOfBirth: data.submittedDateOfBirth,
 
-          panCardFileId: panFileId,
-          boardResolutionFileId: boardFileId,
+          panCardFileId: String(panFileId),
+          boardResolutionFileId: String(boardFileId),
           designationType: isCustom ? 'custom' : 'dropdown',
           designationValue: isCustom
             ? data.customDesignation
@@ -243,7 +271,16 @@ export default function SignatoriesNewEditForm({
         },
       };
 
-      const res = await axiosInstance.post('/company-profiles/authorize-signatory', payload);
+      let res
+
+      if (!currentUser?.id) {
+        res = await axiosInstance.post('/company-profiles/authorize-signatory', payload);
+      } else {
+        res = await axiosInstance.patch(
+          `/company-profiles/authorize-signatory/${signatoryId}`,
+          payload
+        );
+      }
 
       if (res?.data?.success) {
         enqueueSnackbar('Signatory added successfully', { variant: 'success' });
@@ -260,9 +297,12 @@ export default function SignatoriesNewEditForm({
     }
   });
 
+
   useEffect(() => {
     reset(defaultValues);
   }, [currentUser, defaultValues, reset]);
+
+
 
   return (
     <Card sx={{ p: 4 }}>
@@ -362,7 +402,7 @@ export default function SignatoriesNewEditForm({
             />
           </Grid>
 
-     
+
           <Grid item xs={12}>
             <RHFFileUploadBox
               name="boardResolution"

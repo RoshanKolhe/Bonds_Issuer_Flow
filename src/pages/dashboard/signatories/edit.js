@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 // sections
-import { JobEditView } from 'src/sections/job/view';
+import { SignatoriesEditView } from 'src/sections/signatories/view';
 
 // ----------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ export default function SignatoriesEditPage() {
         <title> Dashboard: Dashboard: Job Edit</title>
       </Helmet>
 
-      <JobEditView />
+      <SignatoriesEditView />
     </>
   );
 }

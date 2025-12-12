@@ -30,19 +30,18 @@ export function useGetBankDetails() {
 export function useGetBankDetail(accountId) {
   const URL = accountId ? endpoints.bankDetails.details(accountId) : null;
 
-  const { data, isLoading, error, isValidating } = useSWR(URL, fetcher);
+  const { data, isLoading, error, isValidating, mutate } = useSWR(URL, fetcher);
+  const refreshBankDetail = () => {
+    mutate();
+  };
 
-  const memoizedValue = useMemo(
-    () => ({
-      bankDetail: data?.bankDetails || [],
-      bankDetailLoading: isLoading,
-      bankDetailError: error,
-      bankDetailValidating: isValidating,
-    }),
-    [data, error, isLoading, isValidating]
-  );
-
-  return memoizedValue;
+return {
+  bankDetail: data?.bankDetails || [],
+  bankDetailLoading: isLoading,
+  bankDetailError: error,
+  bankDetailValidating: isValidating,
+  refreshBankDetail,
+};
 }
 
 // ----------------------------------------------------------------------
