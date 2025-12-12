@@ -6,7 +6,6 @@ import axios, { endpoints } from 'src/utils/axios';
 import { AuthContext } from './auth-context';
 import { isValidToken, setSession } from './utils';
 
-
 // ----------------------------------------------------------------------
 
 // NOTE:
@@ -65,10 +64,10 @@ export function AuthProvider({ children }) {
 
         const response = await axios.get(endpoints.auth.me);
 
-        const  user  = response.data;
-        if(!user.roles.includes('company')){
-          logout();  
-        } 
+        const user = response.data;
+        if (!user.roles.includes('company')) {
+          logout();
+        }
 
         dispatch({
           type: 'INITIAL',
@@ -104,7 +103,7 @@ export function AuthProvider({ children }) {
     const data = {
       email,
       password,
-      rememberMe
+      rememberMe,
     };
 
     const response = await axios.post(endpoints.auth.login, data);
@@ -153,6 +152,26 @@ export function AuthProvider({ children }) {
     });
   }, []);
 
+  const forgotPassword = useCallback(async (email) => {
+    const payload = {
+      email,
+      role: 'company',
+    };
+
+    await axios.post(endpoints.auth.forgotPassword, payload);
+  }, []);
+
+  const newPassword = useCallback(async (email, otp, newPassword) => {
+    const payload = {
+      email,
+      otp,
+      role: 'company',
+      newPassword,
+    };
+
+    await axios.post(endpoints.auth.newPassword, payload);
+  }, []);
+
   // ----------------------------------------------------------------------
 
   const checkAuthenticated = state.user ? 'authenticated' : 'unauthenticated';
@@ -170,8 +189,10 @@ export function AuthProvider({ children }) {
       login,
       register,
       logout,
+      forgotPassword,
+      newPassword,
     }),
-    [login, logout, register, state.user, status]
+    [login, logout, register, forgotPassword, newPassword, state.user, status]
   );
 
   return <AuthContext.Provider value={memoizedValue}>{children}</AuthContext.Provider>;
