@@ -41,7 +41,6 @@ export default function SignatoriesNewEditForm({
   isViewMode,
   isEditMode,
 }) {
-  const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const [isPanUploaded, setIsPanUploaded] = useState(false);
   const [extractedPan, setExtractedPan] = useState(null);
