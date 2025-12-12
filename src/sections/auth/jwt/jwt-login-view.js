@@ -46,13 +46,13 @@ export default function JwtLoginView() {
   const LoginSchema = Yup.object().shape({
     email: Yup.string().required('Email is required').email('Email must be a valid email address'),
     password: Yup.string().required('Password is required'),
-    remember: Yup.boolean(),
+    rememberMe: Yup.boolean(),
   });
 
   const defaultValues = {
     email: '',
     password: '',
-    remember: false,
+    rememberMe: true,
   };
 
   const methods = useForm({
@@ -68,7 +68,7 @@ export default function JwtLoginView() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await login?.(data.email, data.password, data.remember);
+      await login?.(data.email, data.password, data.rememberMe);
 
       router.push(returnTo || PATH_AFTER_LOGIN);
     } catch (error) {
@@ -91,28 +91,14 @@ export default function JwtLoginView() {
     }
   });
 
-  const renderHead = (
-    <Stack spacing={2} sx={{ mb: 5 }}>
-      <Typography variant="h4">Sign in to Minimal</Typography>
-
-      <Stack direction="row" spacing={0.5}>
-        <Typography variant="body2">New user?</Typography>
-
-        <Link component={RouterLink} href={paths.auth.jwt.register} variant="subtitle2">
-          Create an account
-        </Link>
-      </Stack>
-    </Stack>
-  );
-
   const renderForm = (
     <Stack spacing={2.5}>
       {!!errorMsg && <Alert severity="error">{errorMsg}</Alert>}
 
-      <Typography variant="h4" sx={{ display: 'flex', justifyContent: 'center' }}>
-        Login
+      <Typography variant="h4" sx={{ display: 'flex', justifyContent: 'start' }}>
+        Sign in To Issure Portal
       </Typography>
-      <Typography variant="body1" sx={{ textAlign: 'center' }}>
+      <Typography variant="body1" sx={{ textAlign: 'start' }}>
         Log in securely to manage your account, protect your personal information, and stay safe
         with advanced security features
       </Typography>
@@ -133,7 +119,7 @@ export default function JwtLoginView() {
         }}
       />
       <Stack direction="row" alignItems="center" justifyContent="space-between">
-        <RHFCheckbox name="remember" label="Remember me" sx={{ m: 0 }} />
+        <RHFCheckbox name="rememberMe" label="Remember me" sx={{ m: 0 }} />
         <Link
           variant="body2"
           color="inherit"
