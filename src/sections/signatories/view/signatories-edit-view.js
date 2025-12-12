@@ -10,6 +10,8 @@ import { useGetScheduler } from 'src/api/scheduler';
 import { useSettingsContext } from 'src/components/settings';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import SchedulerNewEditForm from '../signatories-new-edit-form';
+import { useGetSignatorie } from 'src/api/signatories';
+import SignatoriesNewEditForm from '../signatories-new-edit-form';
 
 
 //
@@ -17,16 +19,16 @@ import SchedulerNewEditForm from '../signatories-new-edit-form';
 
 // ----------------------------------------------------------------------
 
-export default function SchedulerEditView() {
+export default function SignatoriesEditView() {
   const settings = useSettingsContext();
 
   const params = useParams();
 
   const { id } = params;
 
-  const {scheduler: currentScheduler}=useGetScheduler(id)
+  const {signatorie: currentSignatoy}= useGetSignatorie(id);
 
- console.log('currentScheduler', currentScheduler)
+ console.log('currentScheduler', currentSignatoy)
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
@@ -39,10 +41,10 @@ export default function SchedulerEditView() {
           },
           {
             name: 'Scheduler',
-            href: paths.dashboard.scheduler.root,
+            href: paths.dashboard.signatories.root,
           },
           {
-            name: currentScheduler?.platformName,
+            name: currentSignatoy?.platformName,
           },
         ]}
         sx={{
@@ -50,7 +52,7 @@ export default function SchedulerEditView() {
         }}
       />
 
-      <SchedulerNewEditForm currentScheduler={currentScheduler} />
+      <SignatoriesNewEditForm currentUser={currentSignatoy} />
     </Container>
   );
 }

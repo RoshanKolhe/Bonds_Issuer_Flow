@@ -11,7 +11,8 @@ import { useGetSignatorie } from 'src/api/signatories';
 
 
 import { useGetBankDetail } from 'src/api/bank-details';
-import BankDetialsViewForm from '../bank-detials-view-form';
+// import BankDetialsViewForm from '../bank-detials-view-form';
+import BankNewForm from '../company-bank-account-new-edit-form';
 //
 
 
@@ -22,7 +23,7 @@ export default function BankDetailsView() {
   const settings = useSettingsContext();
   const { id } = useParams();
 
-  const { bankDetail } = useGetBankDetail(id);
+  const { bankDetail , refreshBankDetail } = useGetBankDetail(id);
   console.log(bankDetail);
 
   return (
@@ -39,7 +40,7 @@ export default function BankDetailsView() {
         sx={{ mb: { xs: 3, md: 5 } }}
       />
 
-      <BankDetialsViewForm bankDetails={bankDetail} />
+      <BankNewForm refreshBankDetail={refreshBankDetail} bankDetails={bankDetail} />
     </Container>
   );
 }
