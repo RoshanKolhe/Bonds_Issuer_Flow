@@ -21,14 +21,24 @@ import axios from 'axios';
 import { useAuthContext } from 'src/auth/hooks';
 import { DatePicker } from '@mui/x-date-pickers';
 import axiosInstance from 'src/utils/axios';
-import { Card, Grid } from '@mui/material';
+import { Card, Grid, Typography } from '@mui/material';
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hook';
 
 const ROLES = [
   { value: 'DIRECTOR', label: 'Director' },
-  { value: 'SIGNATORY', label: 'Signatory' },
+  { value: 'MANAGING_DIRECTOR', label: 'Managing Director (MD)' },
+  { value: 'WHOLETIME_DIRECTOR', label: 'Whole-Time Director' },
+  { value: 'CFO', label: 'Chief Financial Officer (CFO)' },
+  { value: 'CEO', label: 'Chief Executive Officer (CEO)' },
+  { value: 'AUTHORISED_SIGNATORY', label: 'Authorised Signatory' },
+  { value: 'PARTNER', label: 'Partner' },
+  { value: 'TRUSTEE', label: 'Trustee' },
+  { value: 'PROPRIETOR', label: 'Proprietor' },
+  { value: 'COMPANY_SECRETARY', label: 'Company Secretary (CS)' },
   { value: 'MANAGER', label: 'Manager' },
+  { value: 'AUTHORIZED_REPRESENTATIVE', label: 'Authorized Representative' },
+  { value: 'NOMINEE', label: 'Nominee' },
   { value: 'OTHER', label: 'Other' },
 ];
 
@@ -44,6 +54,9 @@ export default function SignatoriesNewEditForm({
   const { enqueueSnackbar } = useSnackbar();
   const [isPanUploaded, setIsPanUploaded] = useState(false);
   const [extractedPan, setExtractedPan] = useState(null);
+  const isEditing = Boolean(currentUser?.id);
+  const status = currentUser?.status;
+  const showActionButton = !isEditing || status === 0 || status === 2;
 
   const router = useRouter();
 
@@ -89,38 +102,33 @@ export default function SignatoriesNewEditForm({
       phoneNumber: currentUser?.phone || '',
       panCard: currentUser?.panCardFile
         ? {
-          id: currentUser.panCardFile.id,
-          name: currentUser.panCardFile.fileOriginalName,
-          url: currentUser.panCardFile.fileUrl,
-        }
+            id: currentUser.panCardFile.id,
+            name: currentUser.panCardFile.fileOriginalName,
+            url: currentUser.panCardFile.fileUrl,
+          }
         : null,
 
       boardResolution: currentUser?.boardResolutionFile
         ? {
-          id: currentUser.boardResolutionFile.id,
-          name: currentUser.boardResolutionFile.fileOriginalName,
-          url: currentUser.boardResolutionFile.fileUrl,
-        }
+            id: currentUser.boardResolutionFile.id,
+            name: currentUser.boardResolutionFile.fileOriginalName,
+            url: currentUser.boardResolutionFile.fileUrl,
+          }
         : null,
 
       role: !isCustom
         ? ROLES.find((r) => r.label === currentUser?.designationValue)?.value || ''
         : 'OTHER',
 
-
       customDesignation: isCustom ? currentUser?.designationValue || '' : '',
 
       submittedPanFullName:
         currentUser?.submittedPanFullName || currentUser?.extractedPanFullName || '',
-      submittedPanNumber:
-        currentUser?.submittedPanNumber || currentUser?.extractedPanNumber || '',
+      submittedPanNumber: currentUser?.submittedPanNumber || currentUser?.extractedPanNumber || '',
       submittedDateOfBirth:
         currentUser?.submittedDateOfBirth || currentUser?.extractedDateOfBirth || '',
-
-
     };
   }, [currentUser]);
-
 
   const methods = useForm({
     resolver: yupResolver(NewUserSchema),
@@ -240,8 +248,6 @@ export default function SignatoriesNewEditForm({
       const panFileId = await uploadFile(data.panCard);
       const boardFileId = await uploadFile(data.boardResolution);
 
-
-
       const isCustom = data.role === 'OTHER';
       const signatoryId = currentUser?.id;
 
@@ -270,7 +276,7 @@ export default function SignatoriesNewEditForm({
         },
       };
 
-      let res
+      let res;
 
       if (!currentUser?.id) {
         res = await axiosInstance.post('/company-profiles/authorize-signatory', payload);
@@ -296,35 +302,51 @@ export default function SignatoriesNewEditForm({
     }
   });
 
-
   useEffect(() => {
     reset(defaultValues);
   }, [currentUser, defaultValues, reset]);
 
-
-
   return (
     <Card sx={{ p: 4 }}>
       <FormProvider methods={methods} onSubmit={onSubmit}>
-
-
         <Grid container spacing={3} mt={2}>
-
           <Grid item xs={12} sm={6}>
-            <RHFTextField name="name" label="Name*" disabled={isViewMode} InputLabelProps={{ shrink: true }} />
+            <RHFTextField
+              name="name"
+              label="Name*"
+              disabled={isViewMode}
+              InputLabelProps={{ shrink: true }}
+            />
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <RHFTextField name="email" label="Email*" type="email" disabled={isViewMode} InputLabelProps={{ shrink: true }} />
+            <RHFTextField
+              name="email"
+              label="Email*"
+              type="email"
+              disabled={isViewMode}
+              InputLabelProps={{ shrink: true }}
+            />
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <RHFTextField name="phoneNumber" label="Phone Number*" type="tel" disabled={isViewMode}
-              InputLabelProps={{ shrink: true }} inputProps={{ maxLength: 10 }} />
+            <RHFTextField
+              name="phoneNumber"
+              label="Phone Number*"
+              type="tel"
+              disabled={isViewMode}
+              InputLabelProps={{ shrink: true }}
+              inputProps={{ maxLength: 10 }}
+            />
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <RHFSelect name="role" label="Designation*" disabled={isViewMode} InputLabelProps={{ shrink: true }}>
+            <RHFSelect
+              name="role"
+              label="Designation*"
+              disabled={isViewMode}
+              InputLabelProps={{ shrink: true }}
+            >
               {ROLES.map((role) => (
                 <MenuItem key={role.value} value={role.value}>
                   {role.label}
@@ -344,8 +366,40 @@ export default function SignatoriesNewEditForm({
             </Grid>
           )}
 
-
           <Grid item xs={12}>
+            <Box sx={{ mb: 3 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  flexWrap: 'wrap',
+                  mb: 1,
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography sx={{ fontWeight: 600 }}>Check Uploaded PanCard :</Typography>
+                </Box>
+
+                {currentUser?.panCardFile?.fileUrl ? (
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    startIcon={<Iconify icon="mdi:eye" />}
+                    sx={{
+                      height: 36,
+                      textTransform: 'none',
+                      fontWeight: 600,
+                    }}
+                    onClick={() => window.open(currentUser.panCardFile.fileUrl, '_blank')}
+                  >
+                    Preview Document
+                  </Button>
+                ) : (
+                  <Typography color="text.secondary">No file uploaded.</Typography>
+                )}
+              </Box>
+            </Box>
             <RHFFileUploadBox
               name="panCard"
               label="Upload PAN*"
@@ -401,8 +455,42 @@ export default function SignatoriesNewEditForm({
             />
           </Grid>
 
-
           <Grid item xs={12}>
+            <Box sx={{ mb: 3 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  flexWrap: 'wrap',
+                  mb: 1,
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography sx={{ fontWeight: 600 }}>
+                    Check Uploaded Board Resolution :
+                  </Typography>
+                </Box>
+
+                {currentUser?.boardResolutionFile?.fileUrl ? (
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    startIcon={<Iconify icon="mdi:eye" />}
+                    sx={{
+                      height: 36,
+                      textTransform: 'none',
+                      fontWeight: 600,
+                    }}
+                    onClick={() => window.open(currentUser.boardResolutionFile.fileUrl, '_blank')}
+                  >
+                    Preview Document
+                  </Button>
+                ) : (
+                  <Typography color="text.secondary">No file uploaded.</Typography>
+                )}
+              </Box>
+            </Box>
             <RHFFileUploadBox
               name="boardResolution"
               label="Board Resolution*"
@@ -413,32 +501,26 @@ export default function SignatoriesNewEditForm({
             />
             {getErrorMessage('boardResolution')}
           </Grid>
-
         </Grid>
-
-
-
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, p: 2 }}>
           {/* <Button variant="outlined" onClick={onClose}>
             {isViewMode ? 'Close' : 'Cancel'}
           </Button> */}
 
-          {!isViewMode && (
+          {showActionButton && !isViewMode && (
             <Button
               type="submit"
               variant="contained"
               disabled={isSubmitting}
               startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
             >
-              {isEditMode ? 'Update' : 'Add'}
+              {isEditing ? 'Update' : 'Add'}
             </Button>
           )}
         </Box>
-
       </FormProvider>
     </Card>
-
   );
 }
 

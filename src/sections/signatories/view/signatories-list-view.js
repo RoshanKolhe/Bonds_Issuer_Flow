@@ -57,9 +57,6 @@ const TABLE_HEAD = [
   { id: 'roleValue', label: 'Role' },
   { id: 'email', label: 'Email' },
   { id: 'phone', label: 'Phone' },
-  { id: 'extractedDateOfBirth', label: 'DOB' },
-  { id: 'panCardFile', label: 'PAN' },
-  { id: 'boardResolutionFile', label: 'Board Resolution' },
   { id: 'time', label: 'Status' },
   { id: '', label: 'Actions' },
 ];

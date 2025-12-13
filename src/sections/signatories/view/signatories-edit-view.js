@@ -40,11 +40,11 @@ export default function SignatoriesEditView() {
             href: paths.dashboard.root,
           },
           {
-            name: 'Scheduler',
+            name: 'Signatories',
             href: paths.dashboard.signatories.root,
           },
           {
-            name: currentSignatoy?.platformName,
+            name: currentSignatoy?.fullName,
           },
         ]}
         sx={{
