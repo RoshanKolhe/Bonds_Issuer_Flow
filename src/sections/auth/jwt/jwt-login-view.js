@@ -86,8 +86,6 @@ export default function JwtLoginView() {
       } else {
         setErrorMsg(message);
       }
-
-      reset();
     }
   });
 
