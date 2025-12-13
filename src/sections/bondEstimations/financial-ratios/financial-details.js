@@ -31,13 +31,13 @@ export default function FinancialDetails({ setActiveStepId, percent }) {
   });
 
   const defaultValues = useMemo(() => ({
-    debtEquityRatio: bondEstimation?.financialRatios.debtEquityRatio || '',
-    currentRatio: bondEstimation?.financialRatios.currentRatio || '',
-    netWorth: bondEstimation?.financialRatios.netWorth || '',
-    quickRatio: bondEstimation?.financialRatios.quickRatio || '',
-    returnOnEquity: bondEstimation?.financialRatios.returnOnEquity || '',
-    returnOnAssets: bondEstimation?.financialRatios.returnOnAsset || '',
-    debtServiceCoverageRatio: bondEstimation?.financialRatios.debtServiceCoverageRatio || '',
+    debtEquityRatio: bondEstimation?.financialRatios?.debtEquityRatio || '',
+    currentRatio: bondEstimation?.financialRatios?.currentRatio || '',
+    netWorth: bondEstimation?.financialRatios?.netWorth || '',
+    quickRatio: bondEstimation?.financialRatios?.quickRatio || '',
+    returnOnEquity: bondEstimation?.financialRatios?.returnOnEquity || '',
+    returnOnAssets: bondEstimation?.financialRatios?.returnOnAsset || '',
+    debtServiceCoverageRatio: bondEstimation?.financialRatios?.debtServiceCoverageRatio || '',
   }), [bondEstimation]);
 
   const methods = useForm({
