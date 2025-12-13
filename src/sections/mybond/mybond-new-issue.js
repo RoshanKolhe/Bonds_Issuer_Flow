@@ -303,7 +303,7 @@ export default function MyBondNewIssue({ currentIssue, saveStepData, setActiveSt
             </Grid>
             <Grid item xs={12} sm={4}>
               <Typography variant="body2" color="text.secondary" mb={1}>
-                Totla Units
+                Total Units
               </Typography>
               <RHFTextField
                 name="totalUnit"

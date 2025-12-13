@@ -301,7 +301,7 @@ export default function AuditedFinancialStatement({
                 <Box>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <DatePicker
-                      value={doc.reportDate}
+                      value={doc.reportDate ?  new Date(doc.reportDate) : null}
                       onChange={(newValue) => handleDateChange(newValue, doc.id)}
                       renderInput={({ inputRef, inputProps, InputProps }) => (
                         <Box

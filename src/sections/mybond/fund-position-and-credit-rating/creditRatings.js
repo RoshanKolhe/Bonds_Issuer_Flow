@@ -31,9 +31,14 @@ import { Icon } from '@iconify/react';
 import { LoadingButton } from '@mui/lab';
 import { useGetCreditRatingAgencies, useGetCreditRatings } from 'src/api/creditRatingsAndAgencies';
 import { useParams } from 'src/routes/hook';
-import { format } from 'date-fns';
+import { format, isDate } from 'date-fns';
 
-export default function CreditRating({ currentCreditRatings, setPercent, setProgress }) {
+export default function CreditRating({
+  currentCreditRatings,
+  saveStepData,
+  setPercent,
+  setProgress,
+}) {
   const params = useParams();
   const { applicationId } = params;
   const [agenciesData, setAgenciesData] = useState([]);
@@ -53,12 +58,15 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
     creditRatingLetter: Yup.mixed().required('Credit rating letter required'),
   });
 
-  const defaultValues = useMemo(() => ({
-    selectedAgency: null,
-    selectedRating: null,
-    validFrom: '',
-    creditRatingLetter: null,
-  }), []);
+  const defaultValues = useMemo(
+    () => ({
+      selectedAgency: null,
+      selectedRating: null,
+      validFrom: '',
+      creditRatingLetter: null,
+    }),
+    []
+  );
 
   const methods = useForm({
     resolver: yupResolver(newCreditRatingSchema),
@@ -71,7 +79,7 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
     setValue,
     reset,
     handleSubmit,
-    formState: { isSubmitting }
+    formState: { isSubmitting },
   } = methods;
 
   const values = watch();
@@ -81,7 +89,7 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
       agency: data.selectedAgency,
       rating: data.selectedRating,
       validFrom: data.validFrom,
-      creditRatingLetter: data.creditRatingLetter
+      creditRatingLetter: data.creditRatingLetter,
     };
 
     if (isEditing) {
@@ -115,39 +123,69 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
       });
 
       setValue('creditRatingLetter', uploadRes?.data?.files[0], { shouldValidate: true });
-
     } catch (err) {
       enqueueSnackbar('File upload failed', { variant: 'error' });
     }
   };
 
+  // const onSubmit = async () => {
+  //   try {
+  //     setIsApiSubmitting(true);
+  //     if (!ratingList.length || ratingList.length === 0) {
+  //       enqueueSnackbar('Please add at least one rating', { variant: 'error' });
+  //       return;
+  //     }
+
+  //     const payload = {
+  //       creditRatings: ratingList.map((rating) => ({
+  //         validFrom: rating.validFrom,
+  //         creditRatingsId: rating.rating.id,
+  //         creditRatingAgenciesId: rating.agency.id,
+  //         ratingLetterId: rating.creditRatingLetter.id,
+  //         isActive: true
+  //       }))
+  //     };
+
+  //     const response = await axiosInstance.patch(`/bond-estimations/credit-ratings/${applicationId}`, payload);
+
+  //     if (response.data?.success) {
+  //       setProgress(true);
+  //       enqueueSnackbar('Credit ratings updated', { variant: 'success' });
+  //     }
+
+  //   } catch (error) {
+  //     console.error('error while submitting credit ratings :', error);
+  //   } finally {
+  //     setIsApiSubmitting(false);
+  //   }
+  // };
+
   const onSubmit = async () => {
     try {
       setIsApiSubmitting(true);
-      if (!ratingList.length || ratingList.length === 0) {
+
+      if (!ratingList.length) {
         enqueueSnackbar('Please add at least one rating', { variant: 'error' });
         return;
       }
 
       const payload = {
-        creditRatings: ratingList.map((rating) => ({
-          validFrom: rating.validFrom,
-          creditRatingsId: rating.rating.id,
-          creditRatingAgenciesId: rating.agency.id,
-          ratingLetterId: rating.creditRatingLetter.id,
-          isActive: true
-        }))
+        creditRatings: ratingList.map((r) => ({
+          validFrom: r.validFrom,
+          creditRatingsId: r.rating?.id,
+          creditRatingAgenciesId: r.agency?.id,
+          ratingLetterId: r.creditRatingLetter?.id,
+          isActive: true,
+        })),
       };
 
-      const response = await axiosInstance.patch(`/bond-estimations/credit-ratings/${applicationId}`, payload);
+      console.log('📤 Mock Submit Payload:', payload);
 
-      if (response.data?.success) {
-        setProgress(true);
-        enqueueSnackbar('Credit ratings updated', { variant: 'success' });
-      }
-
+      enqueueSnackbar('Credit ratings saved (mock)', { variant: 'success' });
+      saveStepData(ratingList);
+      setProgress(true);
     } catch (error) {
-      console.error('error while submitting credit ratings :', error);
+      console.error('Mock submit error:', error);
     } finally {
       setIsApiSubmitting(false);
     }
@@ -188,19 +226,21 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
     }
   }, [creditRatings, creditRatingsLoading]);
 
+  // Restore saved list when returning to this step
   useEffect(() => {
-    if (currentCreditRatings?.length && currentCreditRatings?.length > 0) {
-      const newRatingList = currentCreditRatings.map((rating) => ({
-        agency: rating.creditRatingAgencies,
-        rating: rating.creditRatings,
-        validFrom: rating.validFrom,
-        creditRatingLetter: rating.ratingLetter
-      }));
+    if (Array.isArray(currentCreditRatings) && currentCreditRatings.length > 0) {
+      setRatingList(
+        currentCreditRatings.map((r) => ({
+          agency: r.agency,
+          rating: r.rating,
+          validFrom: r.validFrom,
+          creditRatingLetter: r.creditRatingLetter,
+        }))
+      );
 
-      setRatingList(newRatingList);
       setProgress(true);
     }
-  }, [currentCreditRatings, setProgress])
+  }, [currentCreditRatings]);
 
   return (
     <FormProvider methods={methods} onSubmit={handleAddRating}>
@@ -236,7 +276,9 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
                     control={
                       <Radio
                         checked={values.selectedRating?.id === rating?.id}
-                        onChange={() => setValue('selectedRating', rating, { shouldValidate: true })}
+                        onChange={() =>
+                          setValue('selectedRating', rating, { shouldValidate: true })
+                        }
                       />
                     }
                     label={rating.name}
@@ -287,7 +329,7 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
         <YupErrorMessage name="creditRatingLetter" />
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1, mt: 2 }}>
-          <LoadingButton type='submit' loading={isSubmitting}>
+          <LoadingButton type="submit" loading={isSubmitting}>
             {isEditing ? 'Update Rating' : 'Add Rating'}
           </LoadingButton>
         </Box>
@@ -316,7 +358,9 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
                     <TableRow key={index}>
                       <TableCell>{row.agency?.name}</TableCell>
                       <TableCell>{row.rating?.name}</TableCell>
-                      <TableCell>{row.validFrom ? format(new Date(row.validFrom), 'dd/MM/yyyy') : 'NA'}</TableCell>
+                      <TableCell>
+                        {isDate(row.validFrom) ? format(new Date(row.validFrom), 'dd/MM/yyyy') : 'NA'}
+                      </TableCell>
                       <TableCell>
                         <Button
                           variant="text"
@@ -333,8 +377,14 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
                           width="20"
                           style={{ cursor: 'pointer', marginRight: 12 }}
                           onClick={() => {
-                            setValue('selectedAgency', agenciesData.find((a) => a.id === row.agency));
-                            setValue('selectedRating', ratingsData.find((r) => r.id === row.rating));
+                            setValue(
+                              'selectedAgency',
+                              agenciesData.find((a) => a.id === row.agency)
+                            );
+                            setValue(
+                              'selectedRating',
+                              ratingsData.find((r) => r.id === row.rating)
+                            );
                             setValue('validFrom', row.validFrom);
                             setValue('additionalRating', row.additionalRating);
                             setValue('creditRatingLetter', row.creditRatingLetter);
@@ -359,7 +409,12 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
         )}
 
         <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-          <LoadingButton loading={isApiSubmitting} type="button" variant="contained" onClick={onSubmit}>
+          <LoadingButton
+            loading={isApiSubmitting}
+            type="button"
+            variant="contained"
+            onClick={onSubmit}
+          >
             Save
           </LoadingButton>
         </Box>
@@ -371,6 +426,5 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
 CreditRating.propTypes = {
   currentCreditRatings: PropTypes.array,
   setPercent: PropTypes.func,
-  setProgress: PropTypes.func
-}
-
+  setProgress: PropTypes.func,
+};

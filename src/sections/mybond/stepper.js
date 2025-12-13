@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Box, Card, Stack, Typography } from '@mui/material';
 
-import PreliminaryBondRequirements from './preliminary-bond-requirements';
-import MyBondStar from './mybond-start';
 import MyBondNewIssue from './mybond-new-issue';
 import MainFile from './borrowing/main';
 import FinancialDetails from './financial-details';
@@ -11,78 +9,80 @@ import IsinActivation from './isin-activation';
 import RegulatoryFiling from './regulatory-filing';
 import AuditedFinancialDocument from './audited-financial/audited-financial-document';
 import FundAndCreditForm from './fund-position-and-credit-rating/fundAndCreditForm';
+import ProgressStepper from 'src/components/progress-stepper/ProgressStepper';
+import PriliminaryAndCollateralView from './preliminary-requirements-and collatral-details/priliminaryAndCollateralView';
 
-// -------------------- Dynamic Stepper ------------------------
-function DynamicStepper({ steps, activeStepId, stepsProgress, onStepClick }) {
-  const getColor = (percent) => {
-    if (percent === 100) return { border: '#22c55e', text: '#22c55e' };
-    if (percent >= 50) return { border: '#f59e0b', text: '#f59e0b' };
-    return { border: '#ef4444', text: '#ef4444' };
-  };
+// // -------------------- Dynamic Stepper ------------------------
+// function DynamicStepper({ steps, activeStepId, stepsProgress, onStepClick }) {
+//   const getColor = (percent) => {
+//     if (percent === 100) return { border: '#22c55e', text: '#22c55e' };
+//     if (percent >= 50) return { border: '#f59e0b', text: '#f59e0b' };
+//     return { border: '#ef4444', text: '#ef4444' };
+//   };
 
-  return (
-    <Stack
-      direction="row"
-      spacing={3}
-      sx={{ pt: 3, overflowX: 'auto', display: 'flex', justifyContent: 'space-between' }}
-    >
-      {steps.map((step) => {
-        const isActive = step.id === activeStepId;
-        const progress = stepsProgress[step.id]?.percent || 0;
+//   return (
+//     <Stack
+//       direction="row"
+//       spacing={3}
+//       sx={{ pt: 3, overflowX: 'auto', display: 'flex', justifyContent: 'space-between' }}
+//     >
+//       {steps.map((step) => {
+//         const isActive = step.id === activeStepId;
+//         const progress = stepsProgress[step.id]?.percent || 0;
 
-        const color = isActive
-          ? getColor(progress)
-          : progress === 100
-          ? { border: '#22c55e', text: '#22c55e' }
-          : { border: '#d1d5db', text: '#6b7280' };
+//         const color = isActive
+//           ? getColor(progress)
+//           : progress === 100
+//           ? { border: '#22c55e', text: '#22c55e' }
+//           : { border: '#d1d5db', text: '#6b7280' };
 
-        return (
-          <Stack
-            key={step.id}
-            alignItems="center"
-            sx={{ cursor: progress === 100 || isActive ? 'pointer' : 'not-allowed' }}
-            onClick={() => onStepClick(step.id)}
-          >
-            <Box sx={{ width: 40, height: 40, position: 'relative' }}>
-              <svg width="100%" height="100%" viewBox="0 0 36 36">
-                <circle cx="18" cy="18" r="16" stroke="#e5e7eb" strokeWidth="3" fill="none" />
+//         return (
+//           <Stack
+//             key={step.id}
+//             alignItems="center"
+//             sx={{ cursor: progress === 100 || isActive ? 'pointer' : 'not-allowed' }}
+//             onClick={() => onStepClick(step.id)}
+//           >
+//             <Box sx={{ width: 40, height: 40, position: 'relative' }}>
+//               <svg width="100%" height="100%" viewBox="0 0 36 36">
+//                 <circle cx="18" cy="18" r="16" stroke="#e5e7eb" strokeWidth="3" fill="none" />
 
-                <circle
-                  cx="18"
-                  cy="18"
-                  r="16"
-                  stroke={color.border}
-                  strokeWidth="3"
-                  fill="none"
-                  strokeDasharray="100"
-                  strokeDashoffset={100 - progress}
-                  strokeLinecap="round"
-                  transform="rotate(-90 18 18)"
-                />
-              </svg>
+//                 <circle
+//                   cx="18"
+//                   cy="18"
+//                   r="16"
+//                   stroke={color.border}
+//                   strokeWidth="3"
+//                   fill="none"
+//                   strokeDasharray="100"
+//                   strokeDashoffset={100 - progress}
+//                   strokeLinecap="round"
+//                   transform="rotate(-90 18 18)"
+//                 />
+//               </svg>
 
-              <Box
-                sx={{
-                  position: 'absolute',
-                  inset: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Typography fontWeight={600}>{step.number}</Typography>
-              </Box>
-            </Box>
+//               <Box
+//                 sx={{
+//                   position: 'absolute',
+//                   inset: 0,
+//                   display: 'flex',
+//                   alignItems: 'center',
+//                   justifyContent: 'center',
+//                 }}
+//               >
+//                 <Typography fontWeight={600}>{step.number}</Typography>
+//               </Box>
+//             </Box>
 
-            <Typography sx={{ color: color.text, fontSize: '0.75rem', textAlign: 'center' }}>
-              {step.lines.join(' ')}
-            </Typography>
-          </Stack>
-        );
-      })}
-    </Stack>
-  );
-}
+//             <Typography sx={{ color: color.text, fontSize: '0.75rem', textAlign: 'center' }}>
+//               {step.lines.join(' ')}
+//             </Typography>
+//           </Stack>
+//         );
+//       })}
+//     </Stack>
+//   );
+// }
 
 export default function MybondStepper() {
   const [activeStepId, setActiveStepId] = useState('my_bond_new_issue');
@@ -158,6 +158,28 @@ export default function MybondStepper() {
     launch_issue: { percent: 0 },
   });
 
+  useEffect(() => {
+    const savedStep = localStorage.getItem('activeStepId');
+    const savedForm = localStorage.getItem('formData');
+    const savedProgress = localStorage.getItem('stepsProgress');
+
+    if (savedStep) setActiveStepId(savedStep);
+    if (savedForm) setFormData(JSON.parse(savedForm));
+    if (savedProgress) setStepsProgress(JSON.parse(savedProgress));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('activeStepId', activeStepId);
+  }, [activeStepId]);
+
+  useEffect(() => {
+    localStorage.setItem('formData', JSON.stringify(formData));
+  }, [formData]);
+
+  useEffect(() => {
+    localStorage.setItem('stepsProgress', JSON.stringify(stepsProgress));
+  }, [stepsProgress]);
+
   const updateStepPercent = (stepId, percent) => {
     setStepsProgress((prev) => ({
       ...prev,
@@ -201,10 +223,16 @@ export default function MybondStepper() {
       case 'fund_position':
         return (
           <FundAndCreditForm
-            currentFund={formData.fund_position}
+            // currentFund={formData.fund_position}
             percent={(p) => updateStepPercent('fund_position', p)}
             setActiveStepId={setActiveStepId}
-            saveStepData={saveStepData}
+            currentFundPosition={formData.fund_position?.fundData || null}
+            currentCreditRatings={
+              Array.isArray(formData.fund_position?.creditRatingData)
+                ? formData.fund_position.creditRatingData
+                : []
+            }
+            saveStepData={(section, data) => saveStepData('fund_position', { [section]: data })}
           />
         );
 
@@ -240,11 +268,12 @@ export default function MybondStepper() {
 
       case 'preliminary_bond_requirements':
         return (
-          <PreliminaryBondRequirements
-            currentBondRequirements={formData.preliminary_bond_requirements}
+          <PriliminaryAndCollateralView
+            currentPrliminaryRequirements={formData.preliminary_bond_requirements?.preliminaryData || null}
+            currentCollateral={formData.preliminary_bond_requirements?.collateralData || null}
             percent={(p) => updateStepPercent('preliminary_bond_requirements', p)}
             setActiveStepId={setActiveStepId}
-            saveStepData={(data) => saveStepData('preliminary_bond_requirements', data)}
+            saveStepData={(section, data) => saveStepData('preliminary_bond_requirements', { [section]: data })}
           />
         );
 
@@ -283,7 +312,7 @@ export default function MybondStepper() {
 
   return (
     <Box sx={{ p: 3 }}>
-      <DynamicStepper
+      <ProgressStepper
         steps={steps}
         activeStepId={activeStepId}
         stepsProgress={stepsProgress}

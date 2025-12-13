@@ -17,14 +17,104 @@ import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form'
 import axiosInstance from 'src/utils/axios';
 import * as Yup from 'yup';
 
-export default function CollateralAssets({ currentCollateralAssets, setPercent, setProgress }) {
+export default function CollateralAssets({
+  currentCollateralAssets,
+  setPercent,
+  setProgress,
+  saveStepData,
+}) {
   const { enqueueSnackbar } = useSnackbar();
   const { chargeTypes, chargeTypesLoading } = useGetChargeTypes();
   const { collateralTypes, collateralTypesLoading } = useGetCollateralTypes();
   const { ownershipTypes, ownershipTypesLoading } = useGetOwnershipTypes();
-  const [chargeTypesData, setChargeTypesData] = useState([]);
-  const [collateralTypesData, setCollateralTypesData] = useState([]);
-  const [ownershipTypesData, setOwnershipTypesData] = useState([]);
+  const [chargeTypesData, setChargeTypesData] = useState([
+    {
+      id: 'chg-001',
+      label: 'First Charge',
+      value: 'FIRST_CHARGE',
+      description: 'Primary charge created on the asset',
+      isActive: true,
+      isDeleted: false,
+    },
+    {
+      id: 'chg-002',
+      label: 'Second Charge',
+      value: 'SECOND_CHARGE',
+      description: 'Secondary/Residual charge on the asset',
+      isActive: true,
+      isDeleted: false,
+    },
+    {
+      id: 'chg-003',
+      label: 'Pari Passu Charge',
+      value: 'PARI_PASSU',
+      description: 'Charge shared equally among lenders',
+      isActive: true,
+      isDeleted: false,
+    },
+  ]);
+
+  const [collateralTypesData, setCollateralTypesData] = useState([
+    {
+      id: 'col-001',
+      label: 'Property',
+      value: 'PROPERTY',
+      description: 'Land, building, or immovable property',
+      isActive: true,
+      isDeleted: false,
+    },
+    {
+      id: 'col-002',
+      label: 'Fixed Deposit',
+      value: 'FD',
+      description: 'Fixed deposit pledged as collateral',
+      isActive: true,
+      isDeleted: false,
+    },
+    {
+      id: 'col-003',
+      label: 'Shares / Securities',
+      value: 'SHARES',
+      description: 'Shares, bonds, or market securities',
+      isActive: true,
+      isDeleted: false,
+    },
+    {
+      id: 'col-004',
+      label: 'Machinery',
+      value: 'MACHINERY',
+      description: 'Plant, machinery, and equipment',
+      isActive: true,
+      isDeleted: false,
+    },
+  ]);
+
+  const [ownershipTypesData, setOwnershipTypesData] = useState([
+    {
+      id: 'own-001',
+      label: 'Sole Ownership',
+      value: 'SOLE',
+      description: 'Owned by a single entity or individual',
+      isActive: true,
+      isDeleted: false,
+    },
+    {
+      id: 'own-002',
+      label: 'Joint Ownership',
+      value: 'JOINT',
+      description: 'Owned jointly by two or more parties',
+      isActive: true,
+      isDeleted: false,
+    },
+    {
+      id: 'own-003',
+      label: 'Company Owned',
+      value: 'COMPANY',
+      description: 'Owned by a corporate/legal entity',
+      isActive: true,
+      isDeleted: false,
+    },
+  ]);
 
   const newCollateralSchema = Yup.object().shape({
     collateralType: Yup.string().required('Collateral Type is required'),
@@ -33,7 +123,7 @@ export default function CollateralAssets({ currentCollateralAssets, setPercent, 
     estimatedValue: Yup.string().required('Estimated Value is required'),
     valuationDate: Yup.date().required('Valuation Date is required'),
     ownershipType: Yup.string().required('Ownership Type is required'),
-    securityDocument: Yup.object().required('Security Document is required'),
+    securityDocument: Yup.mixed().required('Security Document is required'),
     securityDocRef: Yup.string().required('Security Document Ref is required'),
     trustName: Yup.string().required('Trust Name is required'),
     remarks: Yup.string(),
@@ -43,11 +133,11 @@ export default function CollateralAssets({ currentCollateralAssets, setPercent, 
 
   const defaultValues = useMemo(
     () => ({
-      collateralType: currentCollateralAssets?.collateralTypeId || '',
-      chargeType: currentCollateralAssets?.chargeTypeId || '',
+      collateralType: currentCollateralAssets?.collateralType || '',
+      chargeType: currentCollateralAssets?.chargeType || '',
       description: currentCollateralAssets?.description || '',
       estimatedValue: currentCollateralAssets?.estimatedValue || '',
-      ownershipType: currentCollateralAssets?.ownershipTypeId || '',
+      ownershipType: currentCollateralAssets?.ownershipType || '',
       securityDocRef: currentCollateralAssets?.securityDocRef || '',
       trustName: currentCollateralAssets?.trustName || '',
       remarks: currentCollateralAssets?.remarks || '',
@@ -75,8 +165,32 @@ export default function CollateralAssets({ currentCollateralAssets, setPercent, 
 
   const values = watch();
 
-  const onSubmit = handleSubmit(async (data) => {
-    console.log('data', data);
+  const onSubmit = handleSubmit((data) => {
+    const payload = {
+      collateralType: data.collateralType,
+      chargeType: data.chargeType,
+      description: data.description,
+      estimatedValue: data.estimatedValue,
+      valuationDate: data.valuationDate,
+      ownershipType: data.ownershipType,
+      securityDocRef: data.securityDocRef,
+      trustName: data.trustName,
+      remarks: data.remarks,
+      securityDocument: data.securityDocument,
+      assetCoverCertificate: data.assetCoverCertificate,
+      valuationReport: data.valuationReport,
+    };
+
+    console.log('📌 Collateral Assets Saved:', payload);
+
+    // Call parent save handler
+    saveStepData?.(payload);
+
+    setProgress?.(true);
+
+    enqueueSnackbar('Collateral Assets saved (console only)', {
+      variant: 'success',
+    });
   });
 
   const handleCollateralFileDrop = async (fieldName, acceptedFiles) => {
@@ -102,6 +216,48 @@ export default function CollateralAssets({ currentCollateralAssets, setPercent, 
     setValue(fieldName, null, { shouldValidate: true });
   };
 
+  const calculatePercent = () => {
+    let completed = 0;
+
+    if (values.collateralType) completed++;
+    if (values.chargeType) completed++;
+    if (values.description) completed++;
+    if (values.estimatedValue) completed++;
+    if (values.ownershipType) completed++;
+    if (values.securityDocRef) completed++;
+    if (values.trustName) completed++;
+    if (values.valuationDate) completed++;
+
+    // Optional fields — count them only if needed:
+    if (values.securityDocument) completed++;
+    if (values.assetCoverCertificate) completed++;
+    if (values.valuationReport) completed++;
+
+    // Decide how many are required (you choose)
+    const TOTAL = 11; // if only first 8 are required
+
+    const percentVal = (completed / TOTAL) * 50;
+
+    setPercent?.(percentVal);
+  };
+
+  useEffect(() => {
+    calculatePercent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    values.collateralType,
+    values.chargeType,
+    values.description,
+    values.estimatedValue,
+    values.ownershipType,
+    values.securityDocRef,
+    values.trustName,
+    values.valuationDate,
+    values.securityDocument,
+    values.assetCoverCertificate,
+    values.valuationReport,
+  ]);
+
   useEffect(() => {
     if (currentCollateralAssets) {
       reset(defaultValues);
@@ -109,19 +265,19 @@ export default function CollateralAssets({ currentCollateralAssets, setPercent, 
   }, [currentCollateralAssets, reset, defaultValues]);
 
   useEffect(() => {
-    if (chargeTypes && !chargeTypesLoading) {
+    if (chargeTypes?.length > 0 && !chargeTypesLoading) {
       setChargeTypesData(chargeTypes);
     }
   }, [chargeTypes, chargeTypesLoading]);
 
   useEffect(() => {
-    if (collateralTypes && !collateralTypesLoading) {
+    if (collateralTypes?.length > 0 && !collateralTypesLoading) {
       setCollateralTypesData(collateralTypes);
     }
   }, [collateralTypes, collateralTypesLoading]);
 
   useEffect(() => {
-    if (ownershipTypes && !ownershipTypesLoading) {
+    if (ownershipTypes?.length > 0 && !ownershipTypesLoading) {
       setOwnershipTypesData(ownershipTypes);
     }
   }, [ownershipTypes, ownershipTypesLoading]);
@@ -188,7 +344,7 @@ export default function CollateralAssets({ currentCollateralAssets, setPercent, 
                   </Typography>
                 </Grid>
                 <Grid item xs={8} md={9}>
-                  <RHFSelect disabled name="chargeType" label="Charge Type" defaultValue="">
+                  <RHFSelect name="chargeType" label="Charge Type" defaultValue="">
                     {chargeTypesData.length > 0 ? (
                       chargeTypesData.map((type) => (
                         <MenuItem key={type.id} value={type.id}>
@@ -214,7 +370,7 @@ export default function CollateralAssets({ currentCollateralAssets, setPercent, 
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={12}>
-                  <RHFTextField multiline name="assetDescription" fullWidth />
+                  <RHFTextField multiline name="description" fullWidth />
                 </Grid>
               </Grid>
             </Grid>
@@ -345,26 +501,26 @@ export default function CollateralAssets({ currentCollateralAssets, setPercent, 
                 name="securityDocument"
                 label="Upload security document"
                 icon="mdi:file-document-outline"
-                onDrop={(files) => handleCollateralFileDrop('securityDocument', files)}
-                onDelete={() => handleRemoveCollateralFile('securityDocument')}
+                // onDrop={(files) => handleCollateralFileDrop('securityDocument', files)}
+                // onDelete={() => handleRemoveCollateralFile('securityDocument')}
               />
-              <YupErrorMessage name="valuationReport" />
+              <YupErrorMessage name="securityDocument" />
               <Typography sx={{ py: '20px' }}>Asset Cover Certificate</Typography>
               <RHFFileUploadBox
                 name="assetCoverCertificate"
                 label="Upload Asset cover certificate"
                 icon="mdi:file-document-outline"
-                onDrop={(files) => handleCollateralFileDrop('assetCoverCertificate', files)}
-                onDelete={() => handleRemoveCollateralFile('assetCoverCertificate')}
+                // onDrop={(files) => handleCollateralFileDrop('assetCoverCertificate', files)}
+                // onDelete={() => handleRemoveCollateralFile('assetCoverCertificate')}
               />
-              <YupErrorMessage name="creditRatingLetter" />
+              <YupErrorMessage name="assetCoverCertificate" />
               <Typography sx={{ py: '20px' }}>Valuation Report</Typography>
               <RHFFileUploadBox
                 name="valuationReport"
                 label="Upload Valuation Report"
                 icon="mdi:file-document-outline"
-                onDrop={(files) => handleCollateralFileDrop('valuationReport', files)}
-                onDelete={() => handleRemoveCollateralFile('valuationReport')}
+                // onDrop={(files) => handleCollateralFileDrop('valuationReport', files)}
+                // onDelete={() => handleRemoveCollateralFile('valuationReport')}
               />
               <YupErrorMessage name="valuationReport" />
             </Grid>

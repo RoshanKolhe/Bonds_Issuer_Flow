@@ -143,9 +143,14 @@ export default function LaunchIssue({
                   sx={{
                     minHeight: 36,
                     height: 36,
+                    p: 0,
+                    m: 0,
                     borderBottom: 'none',
+
                     '& .MuiTabs-flexContainer': {
-                      gap: 0.5, // Small gap between tabs
+                      gap: 0, // REMOVE ALL GAP
+                      p: 0,
+                      m: 0,
                       border: 'none',
                     },
                   }}
@@ -157,30 +162,23 @@ export default function LaunchIssue({
                       value={option.toLowerCase()}
                       disableRipple
                       sx={{
-                        minWidth: 'auto',
+                        minWidth: 80,
                         minHeight: 36,
                         height: 36,
-                        px: 2.5,
-                        py: 0,
-                        margin: 0,
+                        p: 0,
+                        m: 0,
                         fontSize: '13px',
                         border: '1px solid #ccc',
                         borderRadius: '10px',
                         textTransform: 'none',
 
-                        // Override internal MUI button base styles
-                        '& .MuiButtonBase-root': {
-                          margin: 0,
-                          padding: 0,
-                        },
-                        '& .MuiTab-root': {
-                          margin: 0,
-                        },
-
                         '&.Mui-selected': {
                           backgroundColor: '#2E6CF6',
                           color: '#fff',
                           borderColor: '#2E6CF6',
+                        },
+                        '&&': {
+                          marginRight: '10px !important',
                         },
                       }}
                     />

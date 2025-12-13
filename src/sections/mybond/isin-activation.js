@@ -19,6 +19,8 @@ import FormProvider, { RHFTextField, RHFUploadRectangle } from 'src/components/h
 import { LoadingButton } from '@mui/lab';
 import { DatePicker } from '@mui/x-date-pickers';
 import { enqueueSnackbar } from 'notistack';
+import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
+import YupErrorMessage from 'src/components/error-field/yup-error-messages';
 
 export default function IsinActivation({ currentIsin, saveStepData, setActiveStepId, percent }) {
   const IsinSchema = Yup.object().shape({
@@ -205,15 +207,22 @@ export default function IsinActivation({ currentIsin, saveStepData, setActiveSte
               />
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={12}>
               <Typography sx={{ pb: 2 }}>Upload ISIN Confirmation Letter*</Typography>
-              <RHFUploadRectangle
+              {/* <RHFUploadRectangle
                 name="isinLetter"
                 multiple={false}
                 helperText="Upload ISIN Confirmation Letter*"
                 onDrop={(files) => handleFileDrop('isinLetter', files)}
                 onDelete={() => handleFileRemove('isinLetter')}
+              /> */}
+              <RHFFileUploadBox
+                name="isinLetter"
+                label="Upload ISIN Confirmation Letter*"
+                icon="mdi:file-document-outline"
+                maxSizeMB={5}
               />
+              <YupErrorMessage name="isinLetter" />
             </Grid>
             <Grid item xs={12}>
               <Typography variant="h6" sx={{ color: '#1976d2', fontWeight: 600 }}>
@@ -261,15 +270,22 @@ export default function IsinActivation({ currentIsin, saveStepData, setActiveSte
                 fullWidth
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={12}>
               <Typography sx={{ pb: 2 }}>Upload Credit Confirmation Proof*</Typography>
-              <RHFUploadRectangle
+              {/* <RHFUploadRectangle
                 name="creditProof"
                 multiple={false}
                 helperText="Upload Credit Confirmation Proof*"
                 onDrop={(files) => handleFileDrop('creditProof', files)}
                 onDelete={() => handleFileRemove('creditProof')}
+              /> */}
+              <RHFFileUploadBox
+                name="creditProof"
+                label="Upload Credit Confirmation Proof*"
+                icon="mdi:file-document-outline"
+                maxSizeMB={5}
               />
+              <YupErrorMessage name="creditProof" />
             </Grid>
             <Grid item xs={12}>
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>

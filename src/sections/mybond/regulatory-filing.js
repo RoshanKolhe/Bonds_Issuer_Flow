@@ -179,7 +179,7 @@ export default function RegulatoryFiling({
     };
     // ---------------------------------------------------------------
 
-    saveStepData('regulatory_filing', {
+    saveStepData({
       pas4: payload.pas4 || {},
       memorandum: payload.memorandum || {},
       sebiApprovals: payload.sebiApprovals || {},
@@ -382,16 +382,13 @@ export default function RegulatoryFiling({
                   sx={{
                     height: 48,
                     border: 'none !important', // remove outer group border
-                    '& .MuiToggleButtonGroup-grouped': {
-                      border: '1px solid #ccc !important', // restore border for buttons
-                      borderRadius: 0,
-                      '&:not(:last-of-type)': {
-                        borderRight: 'none !important', // remove double border overlap
-                      },
-                      '&.Mui-selected': {
-                        backgroundColor: '#2E6CF6',
-                        color: '#fff',
-                      },
+                    '&& .MuiToggleButton-root': {
+                      border: '1px solid #000000ff !important',
+                    },
+                    '&& .MuiToggleButton-root.Mui-selected': {
+                      border: '1px solid #1976d2 !important',
+                      backgroundColor: '#1976d2',
+                      color: '#fff',
                     },
                   }}
                 >
@@ -471,16 +468,13 @@ export default function RegulatoryFiling({
                   sx={{
                     height: 48,
                     border: 'none !important', // remove outer group border
-                    '& .MuiToggleButtonGroup-grouped': {
-                      border: '1px solid #ccc !important', // restore border for buttons
-                      borderRadius: 0,
-                      '&:not(:last-of-type)': {
-                        borderRight: 'none !important', // remove double border overlap
-                      },
-                      '&.Mui-selected': {
-                        backgroundColor: '#2E6CF6',
-                        color: '#fff',
-                      },
+                    '&& .MuiToggleButton-root': {
+                      border: '1px solid #000000ff !important',
+                    },
+                    '&& .MuiToggleButton-root.Mui-selected': {
+                      border: '1px solid #1976d2 !important',
+                      backgroundColor: '#1976d2',
+                      color: '#fff',
                     },
                   }}
                 >
@@ -560,16 +554,13 @@ export default function RegulatoryFiling({
                   sx={{
                     height: 48,
                     border: 'none !important', // remove outer group border
-                    '& .MuiToggleButtonGroup-grouped': {
-                      border: '1px solid #ccc !important', // restore border for buttons
-                      borderRadius: 0,
-                      '&:not(:last-of-type)': {
-                        borderRight: 'none !important', // remove double border overlap
-                      },
-                      '&.Mui-selected': {
-                        backgroundColor: '#2E6CF6',
-                        color: '#fff',
-                      },
+                    '&& .MuiToggleButton-root': {
+                      border: '1px solid #000000ff !important',
+                    },
+                    '&& .MuiToggleButton-root.Mui-selected': {
+                      border: '1px solid #1976d2 !important',
+                      backgroundColor: '#1976d2',
+                      color: '#fff',
                     },
                   }}
                 >
