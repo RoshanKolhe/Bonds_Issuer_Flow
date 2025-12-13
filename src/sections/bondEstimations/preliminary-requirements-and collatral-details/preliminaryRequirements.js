@@ -1,15 +1,18 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
 import { Box, Card, Grid, Icon, MenuItem, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
+import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useParams } from 'react-router';
 import { useGetInvestorCategories } from 'src/api/investorCategories';
 import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
+import axiosInstance from 'src/utils/axios';
 import * as Yup from 'yup';
 
 export default function PreliminaryRequirements({ currentPriliminaryRequirements, setPercent, setProgress }) {
+    const { enqueueSnackbar } = useSnackbar();
     const params = useParams();
     const { applicationId } = params;
     const { investorCtegories, investorCtegoriesLoading } = useGetInvestorCategories();
@@ -40,9 +43,14 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
             .required('ROI is required'),
     });
 
-    const defaultValues = useMemo(() => {
-
-    }, []);
+    const defaultValues = useMemo(() => ({
+        issueAmount: currentPriliminaryRequirements?.issueAmount || '',
+        security: currentPriliminaryRequirements?.security || true,
+        tenure: currentPriliminaryRequirements?.tenure || '',
+        preferedInvestorCategory: currentPriliminaryRequirements?.investorCategoryId || '',
+        preferedPaymentCycle: currentPriliminaryRequirements?.preferedPaymentCycle || 0,
+        roi: currentPriliminaryRequirements?.roi || ''
+    }), [currentPriliminaryRequirements]);
 
     const methods = useForm({
         resolver: yupResolver(newPreliminaryRequirementsSchema),
@@ -57,9 +65,48 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
         formState: { isSubmitting }
     } = methods;
 
-    const onSubmit = handleSubmit(async (data) => {
+    const values = watch();
 
+    const onSubmit = handleSubmit(async (data) => {
+        try {
+            const payload = {
+                issueAmount: data.issueAmount,
+                security: data.security,
+                tenure: data.tenure,
+                investorCategoryId: data.preferedInvestorCategory,
+                preferedPaymentCycle: data.preferedPaymentCycle,
+                roi: data.roi
+            };
+            const response = await axiosInstance.patch(`/bond-estimations/priliminary-requirements/${applicationId}`, payload);
+            if (response.data.success) {
+                setProgress(true);
+                enqueueSnackbar('Priliminary requirements saved', { variant: 'success' });
+            }
+        } catch (error) {
+            console.error('Error while filling priliminary requirements :', error);
+        }
     });
+
+    const calculatePercent = () => {
+        let completed = 0;
+
+        if (values.issueAmount) completed++;
+        if (values.security) completed++;
+        if (values.preferedInvestorCategory) completed++;
+        if (values.tenure) completed++;
+        if (values.preferedPaymentCycle) completed++;
+        if (values.roi) completed++;
+
+
+        const percentVal = (completed / 6) * 50; // 50% weight for this section
+
+        setPercent?.(percentVal);
+    };
+
+    useEffect(() => {
+        calculatePercent();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [values.issueAmount, values.preferedInvestorCategory, values.preferedPaymentCycle, values.security, values.tenure, values.roi]);
 
     useEffect(() => {
         if (currentPriliminaryRequirements) {
@@ -230,7 +277,7 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
                             xs={12}
                             md={6}
                             sx={{
-                                display: 'flex',
+                                display: { xs: 'none', lg: 'flex' },
                                 justifyContent: 'center',
                                 alignItems: 'center',
                             }}
@@ -250,7 +297,7 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
                             gap: 2,
                         }}
                     >
-                        <LoadingButton type="submit" variant="contained" sx={{ color: '#fff' }}>
+                        <LoadingButton type="submit" loading={isSubmitting} variant="contained" sx={{ color: '#fff' }}>
                             Save
                         </LoadingButton>
                     </Box>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import FundAndCreditForm from './fund-position-and-credit-rating/fundAndCreditForm';
 import { useGetBondEstimation } from 'src/api/bondEstimations';
 import { useParams } from 'src/routes/hook';
@@ -7,8 +7,10 @@ import NotFoundPage from 'src/pages/404';
 import AuditedFinancialDocument from './audited-financial/audited-financial-document';
 import MainFile from './borrowing-and-capital-details/main';
 import FinancialDetails from './financial-ratios/financial-details';
-import PreliminaryBondRequirements from './preliminary-bond-requirements';
 import ProgressStepper from 'src/components/progress-stepper/ProgressStepper';
+import { AnimatePresence } from 'framer-motion';
+import { m } from 'framer-motion';
+import PriliminaryAndCollateralView from './preliminary-requirements-and collatral-details/priliminaryAndCollateralView';
 
 export default function Stepper() {
   const params = useParams()
@@ -115,10 +117,11 @@ export default function Stepper() {
 
       case 'preliminary_bond_requirements':
         return (
-          <PreliminaryBondRequirements
+          <PriliminaryAndCollateralView
             percent={(p) => updateStepPercent('preliminary_bond_requirements', p)}
-            // setActiveStepId={() => setActiveStepId('preliminary_bond_requirements')}
-            currentPrliminaryRequirements={estimationData ? estimationData?.estimationPriliminaryRequirements : null}
+            setActiveStepId={() => setActiveStepId('preliminary_bond_requirements')}
+            currentPrliminaryRequirements={estimationData ? estimationData?.estimationPriliminaryBondRequirements : null}
+            currentCollateral={estimationData ? estimationData?.currentCollateralAssets : null}
           />
         );
 
@@ -171,7 +174,18 @@ export default function Stepper() {
         onStepClick={handleStepClick}
       />
 
-      <Stack sx={{ mt: 3 }}>{renderForm()}</Stack>
+      <Stack sx={{ mt: 3 }}>
+        <AnimatePresence mode="wait">
+          <m.div
+            key={activeStepId}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+          >
+            {renderForm()}
+          </m.div>
+        </AnimatePresence>
+      </Stack>
     </Box>
   );
 }
