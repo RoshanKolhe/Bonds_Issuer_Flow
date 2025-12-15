@@ -98,7 +98,7 @@ export default function AuthClassicLayout({ children, image, title }) {
         {title || 'Hi, Welcome back'}
       </Typography> */}
       <Typography variant="h3" sx={{ display: 'flex', justifyContent: 'start' }}>
-        Welcome in To Issure Portal
+        Welcome in To Issuer Portal
       </Typography>
 
       <Box

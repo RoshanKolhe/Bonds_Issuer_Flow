@@ -94,7 +94,7 @@ export default function JwtLoginView() {
       {!!errorMsg && <Alert severity="error">{errorMsg}</Alert>}
 
       <Typography variant="h4" sx={{ display: 'flex', justifyContent: 'start' }}>
-        Sign in To Issure Portal
+        Sign in To Issuer Portal
       </Typography>
       <Typography variant="body1" sx={{ textAlign: 'start' }}>
         Log in securely to manage your account, protect your personal information, and stay safe
