@@ -41,41 +41,18 @@ export default function RegulatoryFiling({
     fileNamePas4: Yup.string().required('File Name is required'),
     referenceNoPas4: Yup.string().required('Reference No is required'),
     approvalNoPas4: Yup.string().required('Approval Number is required'),
-    pas4: Yup.mixed()
-      .required('Upload is required')
-      .test('fileSize', 'Max size is 5MB', (value) => {
-        if (!value || typeof value === 'string') return true;
-        return value.size <= 5 * 1024 * 1024;
-      })
-      .test('fileType', 'Only PDF allowed', (value) => {
-        if (!value || typeof value === 'string') return true;
-        return value.type === 'application/pdf';
-      }),
+    pas4: Yup.mixed().required('Upload is required'),
 
     // Memorandum
     filingDateMemorandum: Yup.string().required('Filing Date is required'),
     fileNameMemorandum: Yup.string().required('File Name is required'),
     referenceNoMemorandum: Yup.string().required('Reference No is required'),
-    informationMemorandum: Yup.mixed()
-      .required('Upload is required')
-      .test('fileSize', 'Max size is 5MB', (value) => {
-        if (!value || typeof value === 'string') return true;
-        return value.size <= 5 * 1024 * 1024;
-      })
-      .test('fileType', 'Only PDF allowed', (value) => {
-        if (!value || typeof value === 'string') return true;
-        return value.type === 'application/pdf';
-      }),
+    informationMemorandum: Yup.mixed().required('Upload is required'),
 
     // SEBI/NHB/RBI Approvals
     sebiApprovalNo: Yup.string().required('Approval number is required'),
     sebiDate: Yup.date().nullable().required('Date is required'),
-    sebi: Yup.mixed()
-      .required('Upload required')
-      .test('fileSize', 'Max size is 5MB', (value) => {
-        if (!value || typeof value === 'string') return true;
-        return value.size <= 5 * 1024 * 1024;
-      }),
+    sebi: Yup.mixed().required('Upload required'),
 
     // In-principle listing
     principleApprovalNo: Yup.string().required('Approval number is required'),

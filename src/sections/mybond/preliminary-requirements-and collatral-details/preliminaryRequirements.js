@@ -64,7 +64,7 @@ export default function PreliminaryRequirements({
       security: currentPriliminaryRequirements?.security || true,
       tenure: currentPriliminaryRequirements?.tenure || '',
       preferedInvestorCategory: currentPriliminaryRequirements?.investorCategoryId || '',
-      preferedPaymentCycle: (currentPriliminaryRequirements.preferedPaymentCycle !== null && currentPriliminaryRequirements.preferedPaymentCycle !== undefined) ? currentPriliminaryRequirements?.preferedPaymentCycle : 0,
+      preferedPaymentCycle: (currentPriliminaryRequirements?.preferedPaymentCycle !== null && currentPriliminaryRequirements?.preferedPaymentCycle !== undefined) ? currentPriliminaryRequirements?.preferedPaymentCycle : 0,
       roi: currentPriliminaryRequirements?.roi || '',
     }),
     [currentPriliminaryRequirements]

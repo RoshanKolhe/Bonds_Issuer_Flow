@@ -11,6 +11,8 @@ import AuditedFinancialDocument from './audited-financial/audited-financial-docu
 import FundAndCreditForm from './fund-position-and-credit-rating/fundAndCreditForm';
 import ProgressStepper from 'src/components/progress-stepper/ProgressStepper';
 import PriliminaryAndCollateralView from './preliminary-requirements-and collatral-details/priliminaryAndCollateralView';
+import ExecuteDocument from './execute-documents';
+import IsinActivationMain from './isin-activation/isin-activation-main';
 
 // // -------------------- Dynamic Stepper ------------------------
 // function DynamicStepper({ steps, activeStepId, stepsProgress, onStepClick }) {
@@ -88,13 +90,14 @@ export default function MybondStepper() {
   const [activeStepId, setActiveStepId] = useState('my_bond_new_issue');
   const [formData, setFormData] = useState({
     my_bond_new_issue: {},
-    fund_position: {},
+    execute_document: {},
     audited_financial: {},
     borrowing_details: {},
     financial_details: {},
     preliminary_bond_requirements: {},
     regulatory_filing: {},
     isin_activation: {},
+    fund_position: {},
     launch_issue: {},
   });
 
@@ -104,6 +107,7 @@ export default function MybondStepper() {
       number: 1,
       lines: ['New Issue', 'Setup'],
     },
+
     {
       id: 'fund_position',
       number: 2,
@@ -140,8 +144,13 @@ export default function MybondStepper() {
       lines: ['ISIN', 'Activation'],
     },
     {
-      id: 'launch_issue',
+      id: 'execute_document',
       number: 9,
+      lines: ['Execute', 'Document'],
+    },
+    {
+      id: 'launch_issue',
+      number: 10,
       lines: ['Launch', 'Issue'],
     },
   ];
@@ -155,6 +164,7 @@ export default function MybondStepper() {
     preliminary_bond_requirements: { percent: 0 },
     regulatory_filing: { percent: 0 },
     isin_activation: { percent: 0 },
+    execute_document: { percent: 0 },
     launch_issue: { percent: 0 },
   });
 
@@ -269,11 +279,15 @@ export default function MybondStepper() {
       case 'preliminary_bond_requirements':
         return (
           <PriliminaryAndCollateralView
-            currentPrliminaryRequirements={formData.preliminary_bond_requirements?.preliminaryData || null}
+            currentPrliminaryRequirements={
+              formData.preliminary_bond_requirements?.preliminaryData || null
+            }
             currentCollateral={formData.preliminary_bond_requirements?.collateralData || null}
             percent={(p) => updateStepPercent('preliminary_bond_requirements', p)}
             setActiveStepId={setActiveStepId}
-            saveStepData={(section, data) => saveStepData('preliminary_bond_requirements', { [section]: data })}
+            saveStepData={(section, data) =>
+              saveStepData('preliminary_bond_requirements', { [section]: data })
+            }
           />
         );
 
@@ -288,11 +302,23 @@ export default function MybondStepper() {
         );
       case 'isin_activation':
         return (
-          <IsinActivation
-            currentIsin={formData.isin_activation}
+          <IsinActivationMain
+            currentIsin={formData.isin_activation?.isin_activation || {}}
+            currentDemat={formData.isin_activation?.demat_credit_details || {}}
+            currentTrusteeApproval={formData.isin_activation?.trustee_sebi_approval || {}}
             percent={(p) => updateStepPercent('isin_activation', p)}
             setActiveStepId={setActiveStepId}
-            saveStepData={saveStepData}
+            saveStepData={(section, data) => saveStepData('isin_activation', { [section]: data })}
+          />
+        );
+
+      case 'execute_document':
+        return (
+          <ExecuteDocument
+            currentExecuteDocument={formData.execute_document}
+            percent={(p) => updateStepPercent('execute_document', p)}
+            setActiveStepId={setActiveStepId}
+            saveStepData={(data) => saveStepData('execute_document', data)}
           />
         );
       case 'launch_issue':

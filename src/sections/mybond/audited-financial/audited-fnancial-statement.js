@@ -107,6 +107,13 @@ export default function AuditedFinancialStatement({
     );
   };
 
+  const toValidDate = (value) => {
+    if (!value) return null;
+
+    const date = value instanceof Date ? value : new Date(value);
+    return isNaN(date.getTime()) ? null : date;
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'Uploaded':
@@ -301,7 +308,7 @@ export default function AuditedFinancialStatement({
                 <Box>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <DatePicker
-                      value={doc.reportDate ?  new Date(doc.reportDate) : null}
+                      value={doc.reportDate ? new Date(doc.reportDate) : null}
                       onChange={(newValue) => handleDateChange(newValue, doc.id)}
                       renderInput={({ inputRef, inputProps, InputProps }) => (
                         <Box
@@ -455,7 +462,7 @@ export default function AuditedFinancialStatement({
                   <Typography variant="subtitle2">Report Date:</Typography>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <DatePicker
-                      value={doc.reportDate}
+                      value={toValidDate(doc.reportDate)}
                       onChange={(newValue) => handleDateChange(newValue, doc.id)}
                       renderInput={({ inputRef, inputProps, InputProps }) => (
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -546,7 +553,7 @@ export default function AuditedFinancialStatement({
             display: 'flex',
             justifyContent: 'flex-end',
             gap: 2,
-            width: '100%'
+            width: '100%',
           }}
         >
           <Button

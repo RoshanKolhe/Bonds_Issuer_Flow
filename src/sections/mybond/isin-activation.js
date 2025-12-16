@@ -127,7 +127,7 @@ export default function IsinActivation({ currentIsin, saveStepData, setActiveSte
   const onSubmit = (data) => {
     console.log('ISIN DATA:', data);
     saveStepData('isin_activation', { ...data });
-    setActiveStepId('launch_issue');
+    setActiveStepId('execute_document');
     enqueueSnackbar('Created Successfully!', { variant: 'success' });
   };
 
@@ -199,11 +199,37 @@ export default function IsinActivation({ currentIsin, saveStepData, setActiveSte
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <RHFTextField
+              {/* <RHFTextField
                 name="activationDate"
                 label="Activation Date*"
                 placeholder="16 Nov 2025"
                 fullWidth
+              /> */}
+              <Controller
+                name="activationDate"
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <DatePicker
+                    {...field}
+                    label="Activation Date*"
+                    value={
+                      field.value
+                        ? field.value instanceof Date
+                          ? field.value
+                          : new Date(field.value)
+                        : null
+                    }
+                    onChange={(newValue) => field.onChange(newValue)}
+                    format="dd/MM/yyyy"
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!error,
+                        helperText: error?.message,
+                      },
+                    }}
+                  />
+                )}
               />
             </Grid>
 
