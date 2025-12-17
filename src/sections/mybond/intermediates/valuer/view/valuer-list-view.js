@@ -16,14 +16,15 @@ import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import { useSettingsContext } from 'src/components/settings';
 import { TableHeadCustom } from 'src/components/table';
 
-import { LEAD_MANAGERS } from '../../intermediates-dummy-date';
-import LeadManagerTableToolbar from '../lead-manager-table-toolbar';
-import LeadManagerTableRow from '../lead-manager-table-row';
+import { VALUERS } from '../../intermediates-dummy-date';
+import ValuerTableToolbar from '../valuer-table-toolbar';
+import ValuerTableRow from '../valuer-table-row';
 import { useRouter } from 'src/routes/hook';
+
 // ------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'legalEntityName', label: 'Lead Manager' },
+  { id: 'legalEntityName', label: 'Valuer' },
   { id: 'experience', label: 'Experience' },
   { id: 'regulatory', label: 'Regulatory' },
   { id: 'fees', label: 'Fees' },
@@ -33,14 +34,14 @@ const TABLE_HEAD = [
 
 // ------------------------------------------------------
 
-export default function LeadManagerListView() {
-  const router = useRouter();
+export default function ValuerListView() {
   const settings = useSettingsContext();
+  const router = useRouter();
   const [tab, setTab] = useState('debenture_trustee');
   const [filterName, setFilterName] = useState('');
   const [selected, setSelected] = useState([]);
 
-  const filteredData = LEAD_MANAGERS.filter((item) =>
+  const filteredData = VALUERS.filter((item) =>
     item.legalEntityName.toLowerCase().includes(filterName.toLowerCase())
   );
 
@@ -58,17 +59,17 @@ export default function LeadManagerListView() {
   };
 
   const handleCompare = () => {
-    router.push(`/dashboard/mybond/compare?type=lead-manager&ids=${selected.join(',')}`);
+    router.push(`/dashboard/mybond/compare?type=valuer&ids=${selected.join(',')}`);
   };
 
   const isSendDisabled = selected.length === 0;
 
   const handleView = (id) => {
-    console.log('View Lead Manager:', id);
+    console.log('View Valuer:', id);
   };
 
   const handleSendRequest = (id) => {
-    console.log('Send Request to Lead Manager:', id);
+    console.log('Send Request to Valuer:', id);
   };
 
   return (
@@ -93,7 +94,7 @@ export default function LeadManagerListView() {
       </Stack>
       <Card>
         {/* Search */}
-        <LeadManagerTableToolbar filterName={filterName} onFilterName={setFilterName} />
+        <ValuerTableToolbar filterName={filterName} onFilterName={setFilterName} />
 
         {/* Table */}
         <TableContainer>
@@ -109,7 +110,7 @@ export default function LeadManagerListView() {
 
               <TableBody>
                 {filteredData.map((row) => (
-                  <LeadManagerTableRow
+                  <ValuerTableRow
                     key={row.id}
                     row={row}
                     selected={selected.includes(row.id)}

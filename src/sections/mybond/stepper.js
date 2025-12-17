@@ -13,7 +13,7 @@ import ProgressStepper from 'src/components/progress-stepper/ProgressStepper';
 import PriliminaryAndCollateralView from './preliminary-requirements-and collatral-details/priliminaryAndCollateralView';
 import ExecuteDocument from './execute-documents';
 import IsinActivationMain from './isin-activation/isin-activation-main';
-import IntermediariesView from './trustee/view/trustee-list-view';
+import IntermediariesView from './intermediates/intermediates-view/intermediate-view';
 
 // // -------------------- Dynamic Stepper ------------------------
 // function DynamicStepper({ steps, activeStepId, stepsProgress, onStepClick }) {
