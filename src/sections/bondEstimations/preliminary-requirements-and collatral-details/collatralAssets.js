@@ -11,10 +11,7 @@ import {
   useGetCollateralTypes,
   useGetOwnershipTypes,
 } from 'src/api/fieldOptions';
-import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
-import YupErrorMessage from 'src/components/error-field/yup-error-messages';
-import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
-import axiosInstance from 'src/utils/axios';
+import FormProvider, { RHFCustomFileUploadBox, RHFSelect, RHFTextField } from 'src/components/hook-form';
 import * as Yup from 'yup';
 
 export default function CollateralAssets({ currentCollateralAssets, setPercent, setProgress }) {
@@ -38,7 +35,7 @@ export default function CollateralAssets({ currentCollateralAssets, setPercent, 
     trustName: Yup.string().required('Trust Name is required'),
     remarks: Yup.string(),
     assetCoverCertificate: Yup.mixed().required('Asset Cover Certificate is required'),
-    valuationReport: Yup.mixed().required('Valuation Report is required'),
+    valuationReport: Yup.array().of(Yup.mixed().required('Valuation Report is required'))
   });
 
   const defaultValues = useMemo(
@@ -54,7 +51,7 @@ export default function CollateralAssets({ currentCollateralAssets, setPercent, 
       valuationDate: currentCollateralAssets?.valuationDate || new Date(),
       securityDocument: currentCollateralAssets?.securityDocument || null,
       assetCoverCertificate: currentCollateralAssets?.assetCoverCertificate || null,
-      valuationReport: currentCollateralAssets?.valuationReport || null,
+      valuationReport: currentCollateralAssets?.valuationReport || [],
     }),
     [currentCollateralAssets]
   );
@@ -79,28 +76,6 @@ export default function CollateralAssets({ currentCollateralAssets, setPercent, 
     console.log('data', data);
   });
 
-  const handleCollateralFileDrop = async (fieldName, acceptedFiles) => {
-    try {
-      if (!acceptedFiles) return;
-
-      enqueueSnackbar('Uploading File...', { variant: 'info' });
-
-      const uploadFormData = new FormData();
-      uploadFormData.append('file', acceptedFiles);
-
-      const uploadRes = await axiosInstance.post('/files', uploadFormData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-
-      setValue(fieldName, uploadRes?.data?.files[0], { shouldValidate: true });
-    } catch (err) {
-      enqueueSnackbar('File upload failed', { variant: 'error' });
-    }
-  };
-
-  const handleRemoveCollateralFile = (fieldName) => {
-    setValue(fieldName, null, { shouldValidate: true });
-  };
 
   useEffect(() => {
     if (currentCollateralAssets) {
@@ -125,6 +100,9 @@ export default function CollateralAssets({ currentCollateralAssets, setPercent, 
       setOwnershipTypesData(ownershipTypes);
     }
   }, [ownershipTypes, ownershipTypesLoading]);
+
+
+  console.log('values', values);
 
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
@@ -341,32 +319,39 @@ export default function CollateralAssets({ currentCollateralAssets, setPercent, 
             </Grid>
             <Grid item xs={12} md={12}>
               <Typography sx={{ py: '20px' }}>Security Document</Typography>
-              <RHFFileUploadBox
+              <RHFCustomFileUploadBox
                 name="securityDocument"
                 label="Upload security document"
                 icon="mdi:file-document-outline"
-                onDrop={(files) => handleCollateralFileDrop('securityDocument', files)}
-                onDelete={() => handleRemoveCollateralFile('securityDocument')}
+                accept={{
+                  'application/pdf': ['.pdf'],
+                  'application/msword': ['.doc'],
+                  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+                }}
               />
-              <YupErrorMessage name="valuationReport" />
               <Typography sx={{ py: '20px' }}>Asset Cover Certificate</Typography>
-              <RHFFileUploadBox
+              <RHFCustomFileUploadBox
                 name="assetCoverCertificate"
                 label="Upload Asset cover certificate"
                 icon="mdi:file-document-outline"
-                onDrop={(files) => handleCollateralFileDrop('assetCoverCertificate', files)}
-                onDelete={() => handleRemoveCollateralFile('assetCoverCertificate')}
+                accept={{
+                  'application/pdf': ['.pdf'],
+                  'application/msword': ['.doc'],
+                  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+                }}
               />
-              <YupErrorMessage name="creditRatingLetter" />
               <Typography sx={{ py: '20px' }}>Valuation Report</Typography>
-              <RHFFileUploadBox
+              <RHFCustomFileUploadBox
                 name="valuationReport"
                 label="Upload Valuation Report"
                 icon="mdi:file-document-outline"
-                onDrop={(files) => handleCollateralFileDrop('valuationReport', files)}
-                onDelete={() => handleRemoveCollateralFile('valuationReport')}
+                multiple
+                accept={{
+                  'application/pdf': ['.pdf'],
+                  'application/msword': ['.doc'],
+                  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+                }}
               />
-              <YupErrorMessage name="valuationReport" />
             </Grid>
           </Grid>
           <Box
