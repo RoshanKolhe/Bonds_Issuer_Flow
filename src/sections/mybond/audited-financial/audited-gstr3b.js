@@ -105,6 +105,13 @@ export default function AuditedGST3B({ setData, currentAuditedGST3B, setPercent,
     }
   };
 
+  const toValidDate = (value) => {
+    if (!value) return null;
+
+    const date = value instanceof Date ? value : new Date(value);
+    return isNaN(date.getTime()) ? null : date;
+  };
+
   const [documents, setDocuments] = useState([]);
 
   const handleDateChange = (date, id) => {
@@ -335,7 +342,7 @@ export default function AuditedGST3B({ setData, currentAuditedGST3B, setPercent,
                 <Box>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <DatePicker
-                      value={doc.reportDate}
+                      value={toValidDate(doc.reportDate)}
                       onChange={(newValue) => handleDateChange(newValue, doc.id)}
                       renderInput={({ inputRef, inputProps, InputProps }) => (
                         <Box
@@ -489,7 +496,7 @@ export default function AuditedGST3B({ setData, currentAuditedGST3B, setPercent,
                   <Typography variant="subtitle2">Report Date:</Typography>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <DatePicker
-                      value={doc.reportDate}
+                      value={toValidDate(doc.reportDate)}
                       onChange={(newValue) => handleDateChange(newValue, doc.id)}
                       renderInput={({ inputRef, inputProps, InputProps }) => (
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
