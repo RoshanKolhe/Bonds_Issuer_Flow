@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Box, Card, Stack, Typography } from '@mui/material';
 
-import MyBondNewIssue from './mybond-new-issue';
 import MainFile from './borrowing/main';
 import FinancialDetails from './financial-details';
 import LaunchIssue from './launch-issue';
@@ -14,6 +13,7 @@ import PriliminaryAndCollateralView from './preliminary-requirements-and collatr
 import ExecuteDocument from './execute-documents';
 import IsinActivationMain from './isin-activation/isin-activation-main';
 import IntermediariesView from './intermediates/intermediates-view/intermediate-view';
+import MyBondNewIssue from './my-new-issue/my-bond-new-issue';
 
 // // -------------------- Dynamic Stepper ------------------------
 // function DynamicStepper({ steps, activeStepId, stepsProgress, onStepClick }) {
@@ -230,7 +230,8 @@ export default function MybondStepper() {
       case 'my_bond_new_issue':
         return (
           <MyBondNewIssue
-            currentIssue={formData.my_bond_new_issue}
+            currentIssueDetail={formData.my_bond_new_issue?.issueDetails || null}
+            currentIssueDocument={formData.my_bond_new_issue?.documentData || null}
             percent={(p) => updateStepPercent('my_bond_new_issue', p)}
             setActiveStepId={setActiveStepId}
             saveStepData={(data) => saveStepData('my_bond_new_issue', data)}
