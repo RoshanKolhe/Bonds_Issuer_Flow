@@ -13,6 +13,7 @@ import ProgressStepper from 'src/components/progress-stepper/ProgressStepper';
 import PriliminaryAndCollateralView from './preliminary-requirements-and collatral-details/priliminaryAndCollateralView';
 import ExecuteDocument from './execute-documents';
 import IsinActivationMain from './isin-activation/isin-activation-main';
+import IntermediariesView from './trustee/view/trustee-list-view';
 
 // // -------------------- Dynamic Stepper ------------------------
 // function DynamicStepper({ steps, activeStepId, stepsProgress, onStepClick }) {
@@ -90,6 +91,7 @@ export default function MybondStepper() {
   const [activeStepId, setActiveStepId] = useState('my_bond_new_issue');
   const [formData, setFormData] = useState({
     my_bond_new_issue: {},
+    trustee_selection: {},
     execute_document: {},
     audited_financial: {},
     borrowing_details: {},
@@ -107,56 +109,61 @@ export default function MybondStepper() {
       number: 1,
       lines: ['New Issue', 'Setup'],
     },
-
+    {
+      id: 'trustee_selection',
+      number: 2,
+      lines: ['Trustee', 'Selection'],
+    },
     {
       id: 'fund_position',
-      number: 2,
+      number: 3,
       lines: ['Fund', 'Position'],
     },
     {
       id: 'audited_financial',
-      number: 3,
+      number: 4,
       lines: ['Audited', 'Financials'],
     },
     {
       id: 'borrowing_details',
-      number: 4,
+      number: 5,
       lines: ['Borrowing', 'Details'],
     },
     {
       id: 'financial_details',
-      number: 5,
+      number: 6,
       lines: ['Financial', 'Details'],
     },
     {
       id: 'preliminary_bond_requirements',
-      number: 6,
+      number: 7,
       lines: ['Preliminary', 'Requirements'],
     },
     {
       id: 'regulatory_filing',
-      number: 7,
+      number: 8,
       lines: ['Regulatory', 'Filing'],
     },
     {
       id: 'isin_activation',
-      number: 8,
+      number: 9,
       lines: ['ISIN', 'Activation'],
     },
     {
       id: 'execute_document',
-      number: 9,
+      number: 10,
       lines: ['Execute', 'Document'],
     },
     {
       id: 'launch_issue',
-      number: 10,
+      number: 11,
       lines: ['Launch', 'Issue'],
     },
   ];
 
   const [stepsProgress, setStepsProgress] = useState({
     my_bond_new_issue: { percent: 0 },
+    trustee_selection: { percent: 0 },
     fund_position: { percent: 0 },
     audited_financial: { percent: 0 },
     borrowing_details: { percent: 0 },
@@ -227,6 +234,16 @@ export default function MybondStepper() {
             percent={(p) => updateStepPercent('my_bond_new_issue', p)}
             setActiveStepId={setActiveStepId}
             saveStepData={(data) => saveStepData('my_bond_new_issue', data)}
+          />
+        );
+      
+      case 'trustee_selection':
+        return (
+          <IntermediariesView
+            currentIssue={formData.my_bond_new_issue}
+            percent={(p) => updateStepPercent('trustee_selection', p)}
+            setActiveStepId={setActiveStepId}
+            saveStepData={(data) => saveStepData('trustee_selection', data)}
           />
         );
 

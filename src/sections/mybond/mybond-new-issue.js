@@ -162,7 +162,7 @@ export default function MyBondNewIssue({ currentIssue, saveStepData, setActiveSt
       // }
 
       saveStepData(formData);
-      setActiveStepId('fund_position');
+      setActiveStepId('trustee_selection');
       enqueueSnackbar(currentIssue ? 'Updated Successfully!' : 'Created Successfully!');
     } catch (err) {
       console.error(err);

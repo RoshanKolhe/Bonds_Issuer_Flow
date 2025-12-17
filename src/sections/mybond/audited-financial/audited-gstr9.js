@@ -110,6 +110,13 @@ export default function AuditedGSTR9({ currentAuditedGSTR9, setData, setPercent,
     }
   };
 
+  const toValidDate = (value) => {
+    if (!value) return null;
+
+    const date = value instanceof Date ? value : new Date(value);
+    return isNaN(date.getTime()) ? null : date;
+  };
+
   const calculateCompletion = () => {
     let score = 0;
 
@@ -293,7 +300,7 @@ export default function AuditedGSTR9({ currentAuditedGSTR9, setData, setPercent,
                 <Box>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <DatePicker
-                      value={doc.reportDate}
+                      value={toValidDate(doc.reportDate)}
                       onChange={(newValue) => handleDateChange(newValue, doc.id)}
                       renderInput={({ inputRef, inputProps, InputProps }) => (
                         <Box
@@ -447,7 +454,7 @@ export default function AuditedGSTR9({ currentAuditedGSTR9, setData, setPercent,
                   <Typography variant="subtitle2">Report Date:</Typography>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <DatePicker
-                      value={doc.reportDate}
+                      value={toValidDate(doc.reportDate)}
                       onChange={(newValue) => handleDateChange(newValue, doc.id)}
                       renderInput={({ inputRef, inputProps, InputProps }) => (
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
