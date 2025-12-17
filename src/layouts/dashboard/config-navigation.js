@@ -97,7 +97,7 @@ export function useNavData() {
             icon: ICONS.company,
             children: [
               { title: t('Bond Estimation'), path: paths.dashboard.issureservices.roi },
-              // { title: t('Document Drafting'), path: paths.dashboard.documentDrafting.documentDrafting },
+              { title: t('Document Drafting'), path: paths.dashboard.documentDrafting.list },
             ],
           },
 

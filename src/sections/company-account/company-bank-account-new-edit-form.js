@@ -11,7 +11,7 @@ import Paper from '@mui/material/Paper';
 // components
 import { RouterLink } from 'src/routes/components';
 import { paths } from 'src/routes/paths';
-import FormProvider, { RHFTextField, RHFSelect } from 'src/components/hook-form';
+import FormProvider, { RHFTextField, RHFSelect, RHFCustomFileUploadBox } from 'src/components/hook-form';
 import { useForm, useWatch } from 'react-hook-form';
 
 // sections
@@ -254,15 +254,26 @@ export default function BankNewForm({ bankDetails, refreshBankDetail }) {
 
           {/* ---------------- ADDRESS PROOF UPLOAD ---------------- */}
           {isEdit &&
-            <RHFFileUploadBox
+            // <RHFFileUploadBox
+            //   name="addressProof"
+            //   label={`Upload ${documentType === 'cheque' ? 'Cheque' : 'Bank Statement'}`}
+            //   icon="mdi:file-document-outline"
+            //   color="#1e88e5"
+            //   acceptedTypes="pdf,xls,docx,jpeg"
+            //   maxSizeMB={10}
+            //   existing={existingProof}
+            //   onDrop={(files) => handleDrop(files)}
+            // />  
+
+            <RHFCustomFileUploadBox
               name="addressProof"
               label={`Upload ${documentType === 'cheque' ? 'Cheque' : 'Bank Statement'}`}
               icon="mdi:file-document-outline"
-              color="#1e88e5"
-              acceptedTypes="pdf,xls,docx,jpeg"
-              maxSizeMB={10}
-              existing={existingProof}
-              onDrop={(files) => handleDrop(files)}
+            // accept={{
+            //   'application/pdf': ['.pdf'],
+            //   'application/msword': ['.doc'],
+            //   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+            // }}
             />
           }
           {!isEdit &&

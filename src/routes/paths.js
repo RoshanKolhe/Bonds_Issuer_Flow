@@ -155,7 +155,8 @@ export const paths = {
     documentDrafting: {
       root: `${ROOTS.DASHBOARD}/documentDrafting`,
       documentDrafting: `${ROOTS.DASHBOARD}/documentDrafting/document-drafting`,
-
+      list: `${ROOTS.DASHBOARD}/documentDrafting/list`,
+      view: (id) => `${ROOTS.DASHBOARD}/documentDrafting/${id}`,
     },
     mybond: {
       root: `${ROOTS.DASHBOARD}/mybond`,
@@ -171,7 +172,7 @@ export const paths = {
       edit: (id) => `${ROOTS.DASHBOARD}/signatories/${id}/edit`,
       details: (id) => `${ROOTS.DASHBOARD}/signatories/${id}`,
     },
-     bankDetails: {
+    bankDetails: {
       details: (id) => `${ROOTS.DASHBOARD}/bankDetails/${id}`,
     },
     //   invoice: {

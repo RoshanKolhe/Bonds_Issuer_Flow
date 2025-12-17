@@ -56,6 +56,8 @@ const MyBondNewIssuePage = lazy(() => import('src/pages/dashboard/mybond/bond-is
 const ReactFlowPage = lazy(() => import('src/pages/dashboard/react-flow/board'));
 // DOCUMENT DRAFTING
 const DocumentDraftingFormPage = lazy(() => import('src/pages/dashboard/document-drafting/document-drafting-forms'))
+const DocumentDraftingListPage = lazy(()=> import('src/pages/dashboard/document-drafting/list'));
+const DocumentDraftingViewPage = lazy(()=> import('src/pages/dashboard/document-drafting/view'));
 // SCHEDULER
 const SchedulerNewPage = lazy(() => import('src/pages/dashboard/scheduler/new'));
 const SchedulerListPage = lazy(() => import('src/pages/dashboard/scheduler/list'));
@@ -217,6 +219,8 @@ export const dashboardRoutes = [
         children: [
           { element: <DocumentDraftingFormPage />, index: true },
           { path: 'document-drafting', element: <DocumentDraftingFormPage /> },
+          {path: 'list', element:<DocumentDraftingListPage/>},
+          {path: ':id', element:<DocumentDraftingViewPage/>}
         ],
       },
       {

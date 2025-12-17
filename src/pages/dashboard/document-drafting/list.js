@@ -1,22 +1,18 @@
 import { Helmet } from 'react-helmet-async';
 // sections
-
-import TrusteeSelection from 'src/sections/trustee/view/trustee-list-view';
-import TrusteeDetailsView from 'src/sections/trustee/trustee-details';
-import CompareTrusteeView from 'src/sections/trustee/compare-trustee';
+import { DocumentListView } from 'src/sections/document/view';
 
 // ----------------------------------------------------------------------
 
-export default function TrusteeListPage() {
+export default function DocumentDraftingListPage() {
   return (
     <>
       <Helmet>
-        <title> Dashboard: Trustee List</title>
+        <title> Dashboard: Document Drafting List</title>
       </Helmet>
 
-      <TrusteeSelection />
-      {/* <TrusteeDetailsView/> */}
-      {/* <CompareTrusteeView/> */}
+      <DocumentListView />
+
     </>
   );
 }

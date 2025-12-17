@@ -62,7 +62,11 @@ export const endpoints = {
     filterList: (filter) => `/schedulers?filter=${filter}`,
     details: (id) => `/schedulers/${id}`,
   },
-
+  documentType: {
+    list: '/document-types',
+    filterList: (filter) => `/document-types?filter=${filter}`,
+    details: (id) => `/document-types/${id}`,
+  },
   companyInfo: {
     list: '/api/kyc/issuer_kyc/company-info/',
     filterList: (filter) => `/api/kyc/issuer_kyc/company-info/?filter=${filter}`,
@@ -97,7 +101,7 @@ export const endpoints = {
   investorCategories: {
     list: '/investor-categories',
     filterList: (filter) => `/investor-categories?filter=${filter}`,
-  }, 
+  },
   fieldOptions: {
     chargeTypes: '',
     ownershipTypes: '',
