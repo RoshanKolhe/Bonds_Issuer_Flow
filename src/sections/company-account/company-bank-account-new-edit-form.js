@@ -67,7 +67,7 @@ export default function BankNewForm({ bankDetails, refreshBankDetail }) {
     resolver: yupResolver(NewSchema),
     reValidateMode: 'onChange',
     defaultValues: {
-      documentType: '0',
+      documentType: 0,
       bankName: '',
       branchName: '',
       accountNumber: '',
@@ -266,8 +266,9 @@ export default function BankNewForm({ bankDetails, refreshBankDetail }) {
             // />  
 
             <RHFCustomFileUploadBox
+              key={documentType}
               name="addressProof"
-              label={`Upload ${documentType === 'cheque' ? 'Cheque' : 'Bank Statement'}`}
+              label={`Upload ${documentType === 0 ? 'Cheque' : 'Bank Statement'}`}
               icon="mdi:file-document-outline"
             // accept={{
             //   'application/pdf': ['.pdf'],
