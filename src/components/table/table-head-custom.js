@@ -32,19 +32,20 @@ export default function TableHeadCustom({
   onSort,
   onSelectAllRows,
   sx,
+  isCheckedBoxVisible,
 }) {
   return (
     <TableHead sx={sx}>
       <TableRow>
-        {/* {onSelectAllRows && (
-          // <TableCell padding="checkbox">
-          //   <Checkbox
-          //     indeterminate={!!numSelected && numSelected < rowCount}
-          //     checked={!!rowCount && numSelected === rowCount}
-          //     onChange={(event) => onSelectAllRows(event.target.checked)}
-          //   />
-          // </TableCell>
-        )} */}
+        {(onSelectAllRows && isCheckedBoxVisible) && (
+          <TableCell padding="checkbox">
+            <Checkbox
+              indeterminate={!!numSelected && numSelected < rowCount}
+              checked={!!rowCount && numSelected === rowCount}
+              onChange={(event) => onSelectAllRows(event.target.checked)}
+            />
+          </TableCell>
+        )}
 
         {headLabel.map((headCell) => (
           <TableCell
@@ -86,5 +87,6 @@ TableHeadCustom.propTypes = {
   rowCount: PropTypes.number,
   numSelected: PropTypes.number,
   onSelectAllRows: PropTypes.func,
+  isCheckedBoxVisible: PropTypes.bool,
   order: PropTypes.oneOf(['asc', 'desc']),
 };

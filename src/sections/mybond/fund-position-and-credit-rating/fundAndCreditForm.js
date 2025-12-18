@@ -4,11 +4,13 @@ import FundPosition from './fundPosition';
 import { useEffect, useState } from 'react';
 import { Box, Button } from '@mui/material';
 import { useSnackbar } from 'notistack';
+import CapitalDetails from './capital-details';
 
 export default function FundAndCreditForm({
   saveStepData,
   currentFundPosition,
-  currentCreditRatings,
+  // currentCreditRatings,
+  currentCapitalDetails,
   percent,
   setActiveStepId,
 }) {
@@ -45,11 +47,11 @@ export default function FundAndCreditForm({
         setProgress={setfundpositionCompleted}
         saveStepData={(data) => saveStepData('fundData', data)}
       />
-      <CreditRating
-        currentCreditRatings={currentCreditRatings}
+      <CapitalDetails
+        currentCapitalDetails={currentCapitalDetails}
         setPercent={setCreditRatingPercent}
         setProgress={setcreditRatingCompleted}
-        saveStepData={(data) => saveStepData('creditRatingData', data)}
+        saveStepData={(data) => saveStepData('capitalDetails', data)}
       />
       <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
         <Button type="button" variant="contained" onClick={() => handleNextClick()}>

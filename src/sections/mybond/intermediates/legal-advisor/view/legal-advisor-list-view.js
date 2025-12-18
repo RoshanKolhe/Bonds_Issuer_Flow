@@ -16,14 +16,15 @@ import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import { useSettingsContext } from 'src/components/settings';
 import { TableHeadCustom } from 'src/components/table';
 
-import { LEAD_MANAGERS } from '../../intermediates-dummy-date';
-import LeadManagerTableToolbar from '../lead-manager-table-toolbar';
-import LeadManagerTableRow from '../lead-manager-table-row';
+import { LEGAL_ADVISORS } from '../../intermediates-dummy-date';
+import LegalAdvisorTableToolbar from '../legal-advisor-table-toolbar';
+import LegalAdvisorTableRow from '../legal-advisor-table-row';
 import { useRouter } from 'src/routes/hook';
+
 // ------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'legalEntityName', label: 'Lead Manager' },
+  { id: 'legalEntityName', label: 'Legal Advisor' },
   { id: 'experience', label: 'Experience' },
   { id: 'regulatory', label: 'Regulatory' },
   { id: 'fees', label: 'Fees' },
@@ -33,14 +34,14 @@ const TABLE_HEAD = [
 
 // ------------------------------------------------------
 
-export default function LeadManagerListView() {
-  const router = useRouter();
+export default function LegalAdvisorListView() {
   const settings = useSettingsContext();
+  const router = useRouter();
   const [tab, setTab] = useState('debenture_trustee');
   const [filterName, setFilterName] = useState('');
   const [selected, setSelected] = useState([]);
 
-  const filteredData = LEAD_MANAGERS.filter((item) =>
+  const filteredData = LEGAL_ADVISORS.filter((item) =>
     item.legalEntityName.toLowerCase().includes(filterName.toLowerCase())
   );
 
@@ -58,17 +59,17 @@ export default function LeadManagerListView() {
   };
 
   const handleCompare = () => {
-    router.push(`/dashboard/mybond/compare?type=lead-manager&ids=${selected.join(',')}`);
+    router.push(`/dashboard/mybond/compare?type=legal&ids=${selected.join(',')}`);
   };
 
   const isSendDisabled = selected.length === 0;
 
   const handleView = (id) => {
-    console.log('View Lead Manager:', id);
+    console.log('View Legal Advisor:', id);
   };
 
   const handleSendRequest = (id) => {
-    console.log('Send Request to Lead Manager:', id);
+    console.log('Send Request to Legal Advisor:', id);
   };
 
   return (
@@ -93,7 +94,7 @@ export default function LeadManagerListView() {
       </Stack>
       <Card>
         {/* Search */}
-        <LeadManagerTableToolbar filterName={filterName} onFilterName={setFilterName} />
+        <LegalAdvisorTableToolbar filterName={filterName} onFilterName={setFilterName} />
 
         {/* Table */}
         <TableContainer>
@@ -109,7 +110,7 @@ export default function LeadManagerListView() {
 
               <TableBody>
                 {filteredData.map((row) => (
-                  <LeadManagerTableRow
+                  <LegalAdvisorTableRow
                     key={row.id}
                     row={row}
                     selected={selected.includes(row.id)}

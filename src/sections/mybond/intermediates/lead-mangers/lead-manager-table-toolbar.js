@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { Stack, TextField, InputAdornment } from '@mui/material';
 import Iconify from 'src/components/iconify';
 
-export default function DebentureTrusteeTableToolbar({ filterName, onFilterName }) {
+export default function LeadManagerTableToolbar({ filterName, onFilterName }) {
   return (
     <Stack
       spacing={2}
@@ -14,7 +14,7 @@ export default function DebentureTrusteeTableToolbar({ filterName, onFilterName 
         fullWidth
         value={filterName}
         onChange={(e) => onFilterName(e.target.value)}
-        placeholder="Search Debenture Trustee..."
+        placeholder="Search Lead Manager..."
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -27,7 +27,7 @@ export default function DebentureTrusteeTableToolbar({ filterName, onFilterName 
   );
 }
 
-DebentureTrusteeTableToolbar.propTypes = {
+LeadManagerTableToolbar.propTypes = {
   filterName: PropTypes.string,
   onFilterName: PropTypes.func,
 };

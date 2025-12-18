@@ -1,29 +1,19 @@
 import { useState } from 'react';
-import {
-  Card,
-  Container,
-  Table,
-  TableBody,
-  TableContainer,
-  Tabs,
-  Tab,
-  Stack,
-  Button,
-} from '@mui/material';
+import { Button, Card, Container, Stack, Table, TableBody, TableContainer } from '@mui/material';
 
 import Scrollbar from 'src/components/scrollbar';
-import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import { useSettingsContext } from 'src/components/settings';
 import { TableHeadCustom } from 'src/components/table';
 
-import { LEAD_MANAGERS } from '../../intermediates-dummy-date';
-import LeadManagerTableToolbar from '../lead-manager-table-toolbar';
-import LeadManagerTableRow from '../lead-manager-table-row';
+import { RTAS } from '../../intermediates-dummy-date';
+import RtaTableToolbar from '../rta-table-toolbar';
+import RtaTableRow from '../rta-table-row';
 import { useRouter } from 'src/routes/hook';
+
 // ------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'legalEntityName', label: 'Lead Manager' },
+  { id: 'legalEntityName', label: 'Rta' },
   { id: 'experience', label: 'Experience' },
   { id: 'regulatory', label: 'Regulatory' },
   { id: 'fees', label: 'Fees' },
@@ -33,14 +23,13 @@ const TABLE_HEAD = [
 
 // ------------------------------------------------------
 
-export default function LeadManagerListView() {
-  const router = useRouter();
+export default function RtaListView() {
   const settings = useSettingsContext();
-  const [tab, setTab] = useState('debenture_trustee');
+  const router = useRouter();
   const [filterName, setFilterName] = useState('');
   const [selected, setSelected] = useState([]);
 
-  const filteredData = LEAD_MANAGERS.filter((item) =>
+  const filteredData = RTAS.filter((item) =>
     item.legalEntityName.toLowerCase().includes(filterName.toLowerCase())
   );
 
@@ -58,17 +47,17 @@ export default function LeadManagerListView() {
   };
 
   const handleCompare = () => {
-    router.push(`/dashboard/mybond/compare?type=lead-manager&ids=${selected.join(',')}`);
+    router.push(`/dashboard/mybond/compare?type=rta&ids=${selected.join(',')}`);
   };
 
   const isSendDisabled = selected.length === 0;
 
   const handleView = (id) => {
-    console.log('View Lead Manager:', id);
+    console.log('View Rta:', id);
   };
 
   const handleSendRequest = (id) => {
-    console.log('Send Request to Lead Manager:', id);
+    console.log('Send Request to Rta:', id);
   };
 
   return (
@@ -93,7 +82,7 @@ export default function LeadManagerListView() {
       </Stack>
       <Card>
         {/* Search */}
-        <LeadManagerTableToolbar filterName={filterName} onFilterName={setFilterName} />
+        <RtaTableToolbar filterName={filterName} onFilterName={setFilterName} />
 
         {/* Table */}
         <TableContainer>
@@ -109,7 +98,7 @@ export default function LeadManagerListView() {
 
               <TableBody>
                 {filteredData.map((row) => (
-                  <LeadManagerTableRow
+                  <RtaTableRow
                     key={row.id}
                     row={row}
                     selected={selected.includes(row.id)}
