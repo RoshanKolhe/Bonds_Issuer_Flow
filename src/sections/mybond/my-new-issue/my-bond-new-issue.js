@@ -32,7 +32,7 @@ export default function MyBondNewIssue({
       return;
     }
 
-    setActiveStepId('trustee_selection');
+    setActiveStepId('fund_position');
   };
 
   // ---------- PERCENT ----------
