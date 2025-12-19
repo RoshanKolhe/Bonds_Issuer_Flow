@@ -81,7 +81,7 @@ export default function AllIntermediariesView({ setActiveStepId }) {
 
     // ✅ All appointed → go next
     enqueueSnackbar('All intermediaries appointed', { variant: 'success' });
-    setActiveStepId('credit_rating');
+    setActiveStepId('fund_position');
   };
   return (
     <>
