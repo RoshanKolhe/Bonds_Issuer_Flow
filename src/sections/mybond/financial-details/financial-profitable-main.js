@@ -34,7 +34,7 @@ export default function FinancialProfitableMainFile({
       return;
     }
 
-    setActiveStepId('trustee_selection');
+    setActiveStepId('intermediaries');
   };
 
   return (

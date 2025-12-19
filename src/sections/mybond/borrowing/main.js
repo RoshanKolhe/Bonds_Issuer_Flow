@@ -48,6 +48,18 @@ export default function MainFile({ currentDetails, saveStepData, setActiveStepId
     }
   };
 
+  const handleSkipClick = () => {
+    enqueueSnackbar('Borrowing skipped', { variant: 'info' });
+
+    // mark step as fully completed
+    if (typeof percent === 'function') {
+      percent(100);
+    }
+
+    // move to next step
+    setActiveStepId('collateral_assets');
+  };
+
   useEffect(() => {
     if (!currentDetails) return;
 
@@ -107,13 +119,9 @@ export default function MainFile({ currentDetails, saveStepData, setActiveStepId
             gap: 2,
           }}
         >
-          {/* <Button
-            variant="outlined"
-            sx={{ color: '#000000' }}
-            onClick={() => setActiveStep(1)}
-          >
-            Cancel
-          </Button> */}
+          <Button variant="outlined" color="secondary" onClick={handleSkipClick}>
+            Skip
+          </Button>
 
           <LoadingButton
             variant="contained"
