@@ -19,6 +19,7 @@ import FormProvider, {
 } from 'src/components/hook-form';
 import axiosInstance from 'src/utils/axios';
 import * as Yup from 'yup';
+import ApprovalCard from '../approval-card';
 
 export default function CollateralAssets({
   currentCollateral,
@@ -31,6 +32,7 @@ export default function CollateralAssets({
   const { collateralTypes, collateralTypesLoading } = useGetCollateralTypes();
   const { ownershipTypes, ownershipTypesLoading } = useGetOwnershipTypes();
   const [isStepComplete, setIsStepComplete] = useState(false);
+  const [showApprovalCard, setShowApprovalCard] = useState(false);
   const [chargeTypesData, setChargeTypesData] = useState([
     {
       id: 'chg-001',
@@ -193,6 +195,7 @@ export default function CollateralAssets({
     enqueueSnackbar('Collateral Assets saved (console only)', {
       variant: 'success',
     });
+    setShowApprovalCard(true);
   });
 
   const handleNextClick = () => {
@@ -552,6 +555,15 @@ export default function CollateralAssets({
             </LoadingButton>
           </Box>
         </Card>
+        {showApprovalCard && (
+          <ApprovalCard
+            name="Sunny"
+            reg="HJK459632478"
+            intermediaryType="Valuator Name"
+            intermediaryRegName="Valuator Register No"
+          />
+        )}
+
         <Grid item xs={12}>
           <Box
             sx={{
@@ -561,7 +573,7 @@ export default function CollateralAssets({
               gap: 2,
             }}
           >
-            <LoadingButton variant="contained" onClick={handleNextClick} >
+            <LoadingButton variant="contained" onClick={handleNextClick}>
               Next
             </LoadingButton>
           </Box>

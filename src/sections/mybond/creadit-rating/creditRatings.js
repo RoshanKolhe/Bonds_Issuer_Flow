@@ -438,9 +438,10 @@ import { Box, Grid, Typography, Card, Radio, FormControlLabel } from '@mui/mater
 import { DatePicker } from '@mui/x-date-pickers';
 import { LoadingButton } from '@mui/lab';
 import { useSnackbar } from 'src/components/snackbar';
-import FormProvider, { RHFAutocomplete } from 'src/components/hook-form';
+import FormProvider, { RHFAutocomplete, RHFCustomFileUploadBox } from 'src/components/hook-form';
 import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
 import { useGetCreditRatingAgencies, useGetCreditRatings } from 'src/api/creditRatingsAndAgencies';
+import YupErrorMessage from 'src/components/error-field/yup-error-messages';
 
 const SELECTED_AGENCIES = [
   { id: '6c0561c2-a431-4d0c-ae26-ab484eed4335', name: 'Acuite Ratings & Research' },
@@ -596,12 +597,18 @@ export default function CreditRating({ saveStepData, setPercent, setProgress }) 
                   )}
                 />
 
-                {/* Letter */}
-                <RHFFileUploadBox
-                  name={`ratings.${index}.creditRatingLetter`}
-                  label="Upload Credit Rating Letter"
-                  maxSizeMB={2}
-                />
+                <Grid item xs={12}>
+                  <RHFCustomFileUploadBox
+                    name={`ratings.${index}.creditRatingLetter`}
+                    label="Upload Credit Rating Letter"
+                    accept={{
+                      'application/pdf': ['.pdf'],
+                      'image/png': ['.png'],
+                      'image/jpeg': ['.jpg', '.jpeg'],
+                    }}
+                  />
+                  <YupErrorMessage name="mgtFilling14" />
+                </Grid>
               </Card>
             </Grid>
           ))}
