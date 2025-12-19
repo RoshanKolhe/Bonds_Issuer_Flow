@@ -1,190 +1,147 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import {
   Grid,
   Typography,
   Button,
   Box,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  IconButton,
   Card,
-  Chip,
+  Checkbox,
+  Tooltip,
+  Avatar,
+  Alert,
 } from '@mui/material';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
-
-import Iconify from 'src/components/iconify';
-import FormProvider, { RHFAutocomplete } from 'src/components/hook-form';
-import { useGetCreditRatingAgencies } from 'src/api/creditRatingsAndAgencies';
 import { useSnackbar } from 'notistack';
+import Iconify from 'src/components/iconify';
+import { useGetCreditRatingAgencies } from 'src/api/creditRatingsAndAgencies';
 
 export default function CreditRatingAgency() {
   const { enqueueSnackbar } = useSnackbar();
 
   const { creditRatingAgencies = [], creditRatingAgenciesLoading } = useGetCreditRatingAgencies();
 
-  const [agencyList, setAgencyList] = useState([]);
+  const [selectedAgencyIds, setSelectedAgencyIds] = useState([]);
+  const [showError, setShowError] = useState(false);
 
-  const Schema = Yup.object().shape({
-    agencies: Yup.array(),
-  });
-
-  const defaultValues = useMemo(
-    () => ({
-      agencies: [],
-    }),
-    []
-  );
-
-  const methods = useForm({
-    resolver: yupResolver(Schema),
-    defaultValues,
-  });
-
-  const { watch, setValue, handleSubmit } = methods;
-
-  const selectedAgencies = watch('agencies');
-
-  // ---------------- Add Multiple Agencies ----------------
-  const handleAddAgencies = () => {
-    if (!selectedAgencies?.length) return;
-
-    setAgencyList((prev) => {
-      const existingIds = prev.map((a) => a.id);
-      const newOnes = selectedAgencies.filter((a) => !existingIds.includes(a.id));
-      return [...prev, ...newOnes];
-    });
-
-    // clear selection
-    setValue('agencies', []);
-  };
-
-  // ---------------- Remove ----------------
-  const handleRemove = (id) => {
-    setAgencyList((prev) => prev.filter((a) => a.id !== id));
+  const handleToggle = (id) => {
+    setShowError(false);
+    setSelectedAgencyIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
   };
 
   const onSubmit = () => {
-    if (!agencyList.length) {
-      enqueueSnackbar('Please add at least one credit rating agency', {
+    if (!selectedAgencyIds.length) {
+      setShowError(true);
+      enqueueSnackbar('Please select at least one credit rating agency', {
         variant: 'error',
       });
       return;
     }
 
-    console.log('✅ Selected Credit Rating Agencies:', agencyList);
+    const selectedAgencies = creditRatingAgencies.filter((agency) =>
+      selectedAgencyIds.includes(agency.id)
+    );
+
+    console.log('✅ Selected Credit Rating Agencies:', selectedAgencies);
 
     enqueueSnackbar('Credit Rating Agencies saved successfully', {
       variant: 'success',
     });
   };
+  const fileUrl =
+    'https://images.unsplash.com/photo-1575936123452-b67c3203c357?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
   return (
-    <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-      <Card sx={{ p: 2, mb: '50px' }}>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <Typography
-              variant="h6"
-              fontWeight={700}
-              sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-            >
-              <Iconify icon="solar:chart-bold" width={22} />
-              Credit Rating Agency
-            </Typography>
-          </Grid>
+    <Card sx={{ p: 3, mb: 6 }}>
+      <Typography
+        variant="h6"
+        fontWeight={700}
+        sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}
+      >
+        <Iconify icon="solar:chart-bold" width={22} />
+        Credit Rating Agencies
+      </Typography>
 
-          {/* Multi Select Autocomplete */}
-          <Grid item xs={12}>
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-              <Box sx={{ flexGrow: 1 }}>
-                <RHFAutocomplete
-                  name="agencies"
-                  label="Select Credit Rating Agencies"
-                  multiple
-                  options={creditRatingAgencies}
-                  loading={creditRatingAgenciesLoading}
-                  getOptionLabel={(option) => option?.name || ''}
-                  isOptionEqualToValue={(option, value) => option.id === value.id}
-                  renderOption={(props, option) => (
-                    <li {...props} key={option.id}>
-                      <Iconify icon="solar:chart-bold" width={18} style={{ marginRight: 8 }} />
-                      {option.name}
-                    </li>
-                  )}
-                  renderTags={(selected, getTagProps) =>
-                    selected.map((option, index) => (
-                      <Chip
-                        {...getTagProps({ index })}
-                        key={option.id}
-                        label={option.name}
-                        size="small"
-                        color="info"
-                        variant="soft"
-                      />
-                    ))
-                  }
-                />
-              </Box>
+      {showError && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          You must select at least one credit rating agency
+        </Alert>
+      )}
 
-              <Button
-                variant="contained"
-                onClick={handleAddAgencies}
-                startIcon={<Iconify icon="solar:add-circle-bold" />}
+      <Grid container spacing={3}>
+        {creditRatingAgencies.map((agency) => {
+          const checked = selectedAgencyIds.includes(agency.id);
+
+          return (
+            <Grid item xs={12} md={6} lg={4} key={agency.id}>
+              <Card
                 sx={{
-                  px: 3,
-                  height: 40, // 🔥 same visual size as Save
-                  fontWeight: 600,
-                  whiteSpace: 'nowrap',
+                  p: 2.5,
+                  height: '100%',
+                  position: 'relative',
+                  border: checked ? '2px solid #1877F2' : '1px solid #e0e0e0',
+                  transition: '0.2s',
                 }}
               >
-                Add
-              </Button>
-            </Box>
-          </Grid>
-          {/* Table */}
-          {agencyList.length > 0 && (
-            <Grid item xs={12}>
-              <Card sx={{ mt: 2 }}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Agency Name</TableCell>
-                      <TableCell align="right">Action</TableCell>
-                    </TableRow>
-                  </TableHead>
+                <Checkbox
+                  checked={checked}
+                  onChange={() => handleToggle(agency.id)}
+                  sx={{ position: 'absolute', top: 8, right: 8 }}
+                />
+                <Box
+                  sx={{
+                    width: '100%',
+                    height: 60,
+                    mb: 1.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src={agency.logoId?.fileUrl || fileUrl}
+                    alt={agency.name}
+                    sx={{
+                      maxHeight: 50,
+                      objectFit: 'contain',
+                    }}
+                  />
+                </Box>
 
-                  <TableBody>
-                    {agencyList.map((agency) => (
-                      <TableRow key={agency.id}>
-                        <TableCell>{agency.name}</TableCell>
-                        <TableCell align="right">
-                          <IconButton color="error" onClick={() => handleRemove(agency.id)}>
-                            <Iconify icon="solar:trash-bin-trash-bold" />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                {/* Name */}
+                <Typography fontWeight={600} variant="subtitle1">
+                  {agency.name}
+                </Typography>
+
+                {/* Description */}
+                <Tooltip title={agency.description || ''} arrow>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{
+                      mt: 0.5,
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {agency.description || 'No description available'}
+                  </Typography>
+                </Tooltip>
               </Card>
             </Grid>
-          )}
+          );
+        })}
+      </Grid>
 
-          {/* Save */}
-          <Grid item xs={12}>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-              <Button type="submit" variant="contained">
-                Save
-              </Button>
-            </Box>
-          </Grid>
-        </Grid>
-      </Card>
-    </FormProvider>
+      {/* Save */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
+        <Button variant="contained" onClick={onSubmit}>
+          Save
+        </Button>
+      </Box>
+    </Card>
   );
 }
