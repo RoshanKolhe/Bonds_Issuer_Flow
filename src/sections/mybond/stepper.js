@@ -43,34 +43,34 @@ export default function MybondStepper() {
       lines: ['New Issue', 'Setup'],
     },
     {
-      id: 'fund_position',
+      id: 'intermediaries',
       number: 2,
+      lines: ['Intermediaries'],
+    },
+    {
+      id: 'fund_position',
+      number: 3,
       lines: ['Fund', 'Position'],
     },
     {
       id: 'audited_financial',
-      number: 3,
+      number: 4,
       lines: ['Audited', 'Financials'],
     },
     {
       id: 'borrowing_details',
-      number: 4,
+      number: 5,
       lines: ['Borrowing', 'Details'],
     },
     {
       id: 'collateral_assets',
-      number: 5,
+      number: 6,
       lines: ['Collateral', 'Assets'],
     },
     {
       id: 'financial_details',
-      number: 6,
-      lines: ['Financial', 'Details'],
-    },
-    {
-      id: 'intermediaries',
       number: 7,
-      lines: ['Intermediaries'],
+      lines: ['Financial', 'Details'],
     },
     {
       id: 'credit_rating',
@@ -183,6 +183,16 @@ export default function MybondStepper() {
           />
         );
 
+      case 'intermediaries':
+        return (
+          <IntermediariesView
+            currentIssue={formData.my_bond_new_issue}
+            percent={(p) => updateStepPercent('intermediaries', p)}
+            setActiveStepId={setActiveStepId}
+            saveStepData={(data) => saveStepData('intermediaries', data)}
+          />
+        );
+
       case 'fund_position':
         return (
           <FundAndCreditForm
@@ -241,15 +251,6 @@ export default function MybondStepper() {
           />
         );
 
-      case 'intermediaries':
-        return (
-          <IntermediariesView
-            currentIssue={formData.my_bond_new_issue}
-            percent={(p) => updateStepPercent('intermediaries', p)}
-            setActiveStepId={setActiveStepId}
-            saveStepData={(data) => saveStepData('intermediaries', data)}
-          />
-        );
       case 'credit_rating':
         return (
           <CreditRating

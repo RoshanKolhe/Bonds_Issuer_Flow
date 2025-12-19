@@ -32,7 +32,7 @@ export default function MyBondNewIssue({
       return;
     }
 
-    setActiveStepId('fund_position');
+    setActiveStepId('intermediaries');
   };
 
   // ---------- PERCENT ----------
