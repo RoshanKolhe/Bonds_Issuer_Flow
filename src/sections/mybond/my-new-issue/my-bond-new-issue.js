@@ -21,19 +21,29 @@ export default function MyBondNewIssue({
   const [docsCompleted, setDocsCompleted] = useState(false);
 
   // ---------- NEXT ----------
-  const handleNextClick = () => {
-    if (!detailsCompleted) {
-      enqueueSnackbar('Please complete issue details section');
-      return;
-    }
+ const handleNextClick = () => {
 
-    if (!docsCompleted) {
-      enqueueSnackbar('Please upload all required documents');
-      return;
-    }
+  if (!detailsCompleted && !docsCompleted) {
+    enqueueSnackbar('Please complete Issue Details and upload required Documents', {
+      variant: 'error',
+    });
+    return;
+  }
+  if (!detailsCompleted) {
+    enqueueSnackbar('Please complete the Issue Details section', {
+      variant: 'error',
+    });
+    return;
+  }
+  if (!docsCompleted) {
+    enqueueSnackbar('Please upload all required Documents', {
+      variant: 'error',
+    });
+    return;
+  }
 
-    setActiveStepId('fund_position');
-  };
+  setActiveStepId('fund_position');
+};
 
   // ---------- PERCENT ----------
   useEffect(() => {
