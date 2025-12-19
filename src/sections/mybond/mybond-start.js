@@ -5,6 +5,7 @@ import Iconify from 'src/components/iconify';
 import MybondStepper from './stepper';
 import { paths } from 'src/routes/paths';
 import { useNavigate } from 'react-router';
+import axiosInstance from 'src/utils/axios';
 
 const features = [
   { icon: 'mdi:file-document-edit-outline', text: 'Easy Compliance' },
@@ -13,9 +14,25 @@ const features = [
   { icon: 'mdi:cash-check', text: 'Lowest Cost Funding' },
 ];
 
-export default function MyBondStar() {
+export default function MyBondStart() {
   const navigate = useNavigate();
   const [showStepper, setShowStepper] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleStart = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axiosInstance.post('/bonds-pre-issue/new-application');
+      if (response.data.success) {
+        navigate(paths.dashboard.mybond.bondIssue(response.data?.application?.id));
+      }
+    } catch (error) {
+      console.error('error while starting bond estimation :', error);
+
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <Card sx={{ borderRadius: 3, overflow: 'hidden', py: 5 }}>
@@ -56,6 +73,7 @@ export default function MyBondStar() {
               </Stack>
 
               <Button
+                loading={isLoading}
                 variant="contained"
                 size="large"
                 sx={{
@@ -65,7 +83,7 @@ export default function MyBondStar() {
                   py: 1.5,
                   mb: 2,
                 }}
-                onClick={() => navigate(paths.dashboard.mybond.bondIssue)}
+                onClick={handleStart}
               >
                 Start Issuing Bonds
               </Button>

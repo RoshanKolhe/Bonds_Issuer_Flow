@@ -162,7 +162,7 @@ export const paths = {
       root: `${ROOTS.DASHBOARD}/mybond`,
       list: `${ROOTS.DASHBOARD}/mybond/list`,
       create: `${ROOTS.DASHBOARD}/mybond/create`,
-      bondIssue: `${ROOTS.DASHBOARD}/mybond/bond-issue`,
+      bondIssue: (applicationId) => `${ROOTS.DASHBOARD}/issureservices/fund-position-form/${applicationId}`,
       investor: `${ROOTS.DASHBOARD}/mybond/investor`,
       compare: `${ROOTS.DASHBOARD}/mybond/compare`
     },

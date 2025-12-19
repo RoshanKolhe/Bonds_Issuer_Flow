@@ -172,7 +172,7 @@ export const dashboardRoutes = [
           { element: <MyBondCreatePage />, index: true },
           { path: 'list', element: <ROIGuidancePage /> },
           { path: 'create', element: <MyBondCreatePage /> },
-          { path: 'bond-issue', element: <MyBondNewIssuePage /> },
+          { path: 'bond-issue/:applicationId', element: <MyBondNewIssuePage /> },
           { path: 'investor', element: <AfterCompleteRoiStagePage /> },
           { path: ':id', element: <IntermediateComparePage /> },
         ],

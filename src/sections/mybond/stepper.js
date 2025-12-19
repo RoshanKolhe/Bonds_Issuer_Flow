@@ -16,7 +16,7 @@ import IntermediariesView from './intermediates/intermediates-view/intermediate-
 import MyBondNewIssue from './my-new-issue/my-bond-new-issue';
 import CollateralAssets from './collateral-assets/collatralAssets';
 import FinancialProfitableMainFile from './financial-details/financial-profitable-main';
-import CreditRating from './creadit-rating/creditRatings';
+// import CreditRating from './creadit-rating/creditRatings';
 
 export default function MybondStepper() {
   const [activeStepId, setActiveStepId] = useState('my_bond_new_issue');
@@ -250,15 +250,15 @@ export default function MybondStepper() {
             saveStepData={(data) => saveStepData('intermediaries', data)}
           />
         );
-      case 'credit_rating':
-        return (
-          <CreditRating
-            currentIssue={formData.my_bond_new_issue}
-            percent={(p) => updateStepPercent('credit_rating', p)}
-            setActiveStepId={setActiveStepId}
-            saveStepData={(data) => saveStepData('credit_rating', data)}
-          />
-        );
+      // case 'credit_rating':
+      //   return (
+      //     <CreditRating
+      //       currentIssue={formData.my_bond_new_issue}
+      //       percent={(p) => updateStepPercent('credit_rating', p)}
+      //       setActiveStepId={setActiveStepId}
+      //       saveStepData={(data) => saveStepData('credit_rating', data)}
+      //     />
+      //   );
 
       // case 'preliminary_bond_requirements':
       //   return (

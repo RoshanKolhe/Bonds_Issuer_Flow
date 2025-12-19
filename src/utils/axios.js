@@ -87,6 +87,11 @@ export const endpoints = {
     filterList: (filter) => `/bond-estimations?filter=${filter}`,
     details: (applicationId) => `/bond-estimations/${applicationId}`
   },
+    bondApplications: {
+    list: '/bond-applications',
+    filterList: (filter) => `/bond-applications?filter=${filter}`,
+    details: (applicationId) => `/bond-applications/${applicationId}`
+  },
   creditRatingAgencies: {
     list: '/credit-rating-agencies',
   },
