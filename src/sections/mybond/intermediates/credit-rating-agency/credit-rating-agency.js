@@ -100,7 +100,7 @@ export default function CreditRatingAgency() {
                 >
                   <Box
                     component="img"
-                    src={agency.logoId?.fileUrl || fileUrl}
+                    src={agency.logo?.fileUrl || fileUrl}
                     alt={agency.name}
                     sx={{
                       maxHeight: 50,
