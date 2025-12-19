@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Box, Card, Stack, Typography } from '@mui/material';
 
 import MainFile from './borrowing/main';
-import FinancialDetails from './financial-details';
+import FinancialDetails from './financial-details/financial-details';
 import LaunchIssue from './launch-issue';
 import IsinActivation from './isin-activation';
 import RegulatoryFiling from './regulatory-filing';
@@ -14,21 +14,26 @@ import ExecuteDocument from './execute-documents';
 import IsinActivationMain from './isin-activation/isin-activation-main';
 import IntermediariesView from './intermediates/intermediates-view/intermediate-view';
 import MyBondNewIssue from './my-new-issue/my-bond-new-issue';
+import CollateralAssets from './collateral-assets/collatralAssets';
+import FinancialProfitableMainFile from './financial-details/financial-profitable-main';
+import CreditRating from './creadit-rating/creditRatings';
 
 export default function MybondStepper() {
   const [activeStepId, setActiveStepId] = useState('my_bond_new_issue');
   const [formData, setFormData] = useState({
     my_bond_new_issue: {},
     fund_position: {},
-    trustee_selection: {},
+    intermediaries: {},
     execute_document: {},
     audited_financial: {},
     borrowing_details: {},
     financial_details: {},
-    preliminary_bond_requirements: {},
+    // preliminary_bond_requirements: {},
+    collateral_assets: {},
     regulatory_filing: {},
     isin_activation: {},
     launch_issue: {},
+    credit_rating: {},
   });
 
   const steps = [
@@ -43,20 +48,19 @@ export default function MybondStepper() {
       lines: ['Fund', 'Position'],
     },
     {
-      id: 'trustee_selection',
-      number: 3,
-      lines: ['Trustee', 'Selection'],
-    },
-
-    {
       id: 'audited_financial',
-      number: 4,
+      number: 3,
       lines: ['Audited', 'Financials'],
     },
     {
       id: 'borrowing_details',
-      number: 5,
+      number: 4,
       lines: ['Borrowing', 'Details'],
+    },
+    {
+      id: 'collateral_assets',
+      number: 5,
+      lines: ['Collateral', 'Assets'],
     },
     {
       id: 'financial_details',
@@ -64,28 +68,38 @@ export default function MybondStepper() {
       lines: ['Financial', 'Details'],
     },
     {
-      id: 'preliminary_bond_requirements',
+      id: 'intermediaries',
       number: 7,
-      lines: ['Preliminary', 'Requirements'],
+      lines: ['Intermediaries'],
     },
     {
-      id: 'regulatory_filing',
+      id: 'credit_rating',
       number: 8,
+      lines: ['Credit Rating'],
+    },
+    // {
+    //   id: 'preliminary_bond_requirements',
+    //   number: 7,
+    //   lines: ['Preliminary', 'Requirements'],
+    // },
+    {
+      id: 'regulatory_filing',
+      number: 9,
       lines: ['Regulatory', 'Filing'],
     },
     {
       id: 'isin_activation',
-      number: 9,
+      number: 10,
       lines: ['ISIN', 'Activation'],
     },
     {
       id: 'execute_document',
-      number: 10,
+      number: 11,
       lines: ['Execute', 'Document'],
     },
     {
       id: 'launch_issue',
-      number: 11,
+      number: 12,
       lines: ['Launch', 'Issue'],
     },
   ];
@@ -93,15 +107,17 @@ export default function MybondStepper() {
   const [stepsProgress, setStepsProgress] = useState({
     my_bond_new_issue: { percent: 0 },
     fund_position: { percent: 0 },
-    trustee_selection: { percent: 0 },
+    intermediaries: { percent: 0 },
     audited_financial: { percent: 0 },
     borrowing_details: { percent: 0 },
     financial_details: { percent: 0 },
-    preliminary_bond_requirements: { percent: 0 },
+    // preliminary_bond_requirements: { percent: 0 },
+    collateral_assets: { percent: 0 },
     regulatory_filing: { percent: 0 },
     isin_activation: { percent: 0 },
     execute_document: { percent: 0 },
     launch_issue: { percent: 0 },
+    credit_rating: { percent: 0 },
   });
 
   useEffect(() => {
@@ -184,16 +200,6 @@ export default function MybondStepper() {
           />
         );
 
-      case 'trustee_selection':
-        return (
-          <IntermediariesView
-            currentIssue={formData.my_bond_new_issue}
-            percent={(p) => updateStepPercent('trustee_selection', p)}
-            setActiveStepId={setActiveStepId}
-            saveStepData={(data) => saveStepData('trustee_selection', data)}
-          />
-        );
-
       case 'audited_financial':
         return (
           <AuditedFinancialDocument
@@ -214,30 +220,60 @@ export default function MybondStepper() {
           />
         );
 
-      case 'financial_details':
+      case 'collateral_assets':
         return (
-          <FinancialDetails
-            currentFinancial={formData.financial_details}
-            percent={(p) => updateStepPercent('financial_details', p)}
+          <CollateralAssets
+            currentCollateral={formData.collateral_assets?.collateralData || null}
+            percent={(p) => updateStepPercent('collateral_assets', p)}
             setActiveStepId={setActiveStepId}
-            saveStepData={(data) => saveStepData('financial_details', data)}
+            saveStepData={(data) => saveStepData('collateral_assets', data)}
           />
         );
 
-      case 'preliminary_bond_requirements':
+      case 'financial_details':
         return (
-          <PriliminaryAndCollateralView
-            currentPrliminaryRequirements={
-              formData.preliminary_bond_requirements?.preliminaryData || null
-            }
-            currentCollateral={formData.preliminary_bond_requirements?.collateralData || null}
-            percent={(p) => updateStepPercent('preliminary_bond_requirements', p)}
+          <FinancialProfitableMainFile
+            currentFinancial={formData.financial_details?.financialStatements || null}
+            currentProfitability={formData.financial_details?.profitabilityStatements || null}
+            percent={(p) => updateStepPercent('financial_details', p)}
             setActiveStepId={setActiveStepId}
-            saveStepData={(section, data) =>
-              saveStepData('preliminary_bond_requirements', { [section]: data })
-            }
+            saveStepData={(section, data) => saveStepData('financial_details', { [section]: data })}
           />
         );
+
+      case 'intermediaries':
+        return (
+          <IntermediariesView
+            currentIssue={formData.my_bond_new_issue}
+            percent={(p) => updateStepPercent('intermediaries', p)}
+            setActiveStepId={setActiveStepId}
+            saveStepData={(data) => saveStepData('intermediaries', data)}
+          />
+        );
+      case 'credit_rating':
+        return (
+          <CreditRating
+            currentIssue={formData.my_bond_new_issue}
+            percent={(p) => updateStepPercent('credit_rating', p)}
+            setActiveStepId={setActiveStepId}
+            saveStepData={(data) => saveStepData('credit_rating', data)}
+          />
+        );
+
+      // case 'preliminary_bond_requirements':
+      //   return (
+      //     <PriliminaryAndCollateralView
+      //       currentPrliminaryRequirements={
+      //         formData.preliminary_bond_requirements?.preliminaryData || null
+      //       }
+      //       currentCollateral={formData.preliminary_bond_requirements?.collateralData || null}
+      //       percent={(p) => updateStepPercent('preliminary_bond_requirements', p)}
+      //       setActiveStepId={setActiveStepId}
+      //       saveStepData={(section, data) =>
+      //         saveStepData('preliminary_bond_requirements', { [section]: data })
+      //       }
+      //     />
+      //   );
 
       case 'regulatory_filing':
         return (

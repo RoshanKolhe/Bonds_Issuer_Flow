@@ -14,12 +14,19 @@ import RtaListView from '../registrar-and-transfer-agents/view/rta-list-view';
 import LeadManagerListView from '../lead-mangers/view/lead-manager-list-view';
 import LegalAdvisorListView from '../legal-advisor/view/legal-advisor-list-view';
 import ValuerListView from '../valuer/view/valuer-list-view';
+import AllIntermediariesView from '../all-intermediaries/all-intermediaries';
+import CreditRatingAgency from '../credit-rating-agency/credit-rating-agency';
 
 // tabs pages
 
 // ----------------------------------------------------------------------
 
 const TABS = [
+  {
+    value: 'all',
+    label: 'All',
+    icon: <Iconify icon="solar:layers-bold" width={22} />,
+  },
   {
     value: 'debenture_trustee',
     label: 'Debenture Trustee',
@@ -54,7 +61,7 @@ const TABS = [
 
 // ----------------------------------------------------------------------
 
-export default function IntermediariesView() {
+export default function IntermediariesView({ setActiveStepId }) {
   const settings = useSettingsContext();
   const [currentTab, setCurrentTab] = useState('debenture_trustee');
 
@@ -73,11 +80,7 @@ export default function IntermediariesView() {
         sx={{ mb: { xs: 3, md: 5 } }}
       /> */}
 
-      <Tabs
-        value={currentTab}
-        onChange={handleChangeTab}
-        sx={{ mb: { xs: 3, md: 5 } }}
-      >
+      <Tabs value={currentTab} onChange={handleChangeTab} sx={{ mb: { xs: 3, md: 5 } }}>
         {TABS.map((tab) => (
           <Tab
             key={tab.value}
@@ -88,13 +91,13 @@ export default function IntermediariesView() {
           />
         ))}
       </Tabs>
-
+      {currentTab === 'all' && <AllIntermediariesView setActiveStepId={setActiveStepId} />}
       {currentTab === 'debenture_trustee' && <DebentureTrusteeListView />}
       {currentTab === 'rta' && <RtaListView />}
       {currentTab === 'lead_manager' && <LeadManagerListView />}
       {currentTab === 'legal_advisor' && <LegalAdvisorListView />}
       {currentTab === 'valuer' && <ValuerListView />}
-      {/* {currentTab === 'credit_rating' && <CreditRatingSelection />} */}
+      {currentTab === 'credit_rating' && <CreditRatingAgency />}
     </Container>
   );
 }

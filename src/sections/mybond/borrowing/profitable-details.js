@@ -58,7 +58,7 @@ export default function ProfitabilityDetails({ currentProfitable, onSave, setCur
   const onSubmit = (data) => {
     console.log('✅ Full Form Data:', data);
     onSave(data);
-    setCurrentFormCount(3);
+    setCurrentFormCount(2);
   };
 
   return (

@@ -19,11 +19,11 @@ export default function MainFile({ currentDetails, saveStepData, setActiveStepId
   const getPercent = (count) => {
     switch (count) {
       case 1:
-        return 35;
-      case 2:
-        return 70;
-      case 3:
         return 100;
+      // case 2:
+      //   return 70;
+      // case 2:
+      //   return 100;
       default:
         return 0;
     }
@@ -38,14 +38,26 @@ export default function MainFile({ currentDetails, saveStepData, setActiveStepId
   }, [currentFormCount]);
 
   const handleNextClick = async () => {
-    if (currentFormCount === 3) {
+    if (currentFormCount === 1) {
       enqueueSnackbar('Step completed!', { variant: 'success' });
       saveStepData(payloadData);
-      setActiveStepId('financial_details');
+      setActiveStepId('collateral_assets');
     } else {
       enqueueSnackbar('Please complete the form', { variant: 'error' });
       return;
     }
+  };
+
+  const handleSkipClick = () => {
+    enqueueSnackbar('Borrowing skipped', { variant: 'info' });
+
+    // mark step as fully completed
+    if (typeof percent === 'function') {
+      percent(100);
+    }
+
+    // move to next step
+    setActiveStepId('collateral_assets');
   };
 
   useEffect(() => {
@@ -56,18 +68,18 @@ export default function MainFile({ currentDetails, saveStepData, setActiveStepId
     if (currentDetails.borrowings && Object.keys(currentDetails.borrowings).length > 0) {
       count += 1;
     }
-    if (currentDetails.capitalDetails && Object.keys(currentDetails.capitalDetails).length > 0) {
-      count += 1;
-    }
-    if (currentDetails.profitDetails && Object.keys(currentDetails.profitDetails).length > 0) {
-      count += 1;
-    }
+    // if (currentDetails.capitalDetails && Object.keys(currentDetails.capitalDetails).length > 0) {
+    //   count += 1;
+    // }
+    // if (currentDetails.profitDetails && Object.keys(currentDetails.profitDetails).length > 0) {
+    //   count += 1;
+    // }
 
     setCurrentFormCount(count);
 
     setpayloadData({
       borrowings: currentDetails.borrowings || null,
-      capitalDetails: currentDetails.capitalDetails || null,
+      // capitalDetails: currentDetails.capitalDetails || null,
       profitDetails: currentDetails.profitDetails || null,
     });
   }, [currentDetails]);
@@ -82,21 +94,21 @@ export default function MainFile({ currentDetails, saveStepData, setActiveStepId
         />
       </Grid>
 
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <CapitalDetails
           currentCapitals={currentDetails?.capitalDetails}
           onSave={(data) => setpayloadData((prev) => ({ ...prev, capitalDetails: data }))}
           setCurrentFormCount={setCurrentFormCount}
         />
-      </Grid>
+      </Grid> */}
 
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <ProfitabilityDetails
           currentProfitable={currentDetails?.profitDetails}
           onSave={(data) => setpayloadData((prev) => ({ ...prev, profitDetails: data }))}
           setCurrentFormCount={setCurrentFormCount}
         />
-      </Grid>
+      </Grid> */}
 
       <Grid item xs={12}>
         <Box
@@ -107,13 +119,9 @@ export default function MainFile({ currentDetails, saveStepData, setActiveStepId
             gap: 2,
           }}
         >
-          {/* <Button
-            variant="outlined"
-            sx={{ color: '#000000' }}
-            onClick={() => setActiveStep(1)}
-          >
-            Cancel
-          </Button> */}
+          <Button variant="outlined" color="secondary" onClick={handleSkipClick}>
+            Skip
+          </Button>
 
           <LoadingButton
             variant="contained"
