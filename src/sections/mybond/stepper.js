@@ -16,7 +16,7 @@ import IntermediariesView from './intermediates/intermediates-view/intermediate-
 import MyBondNewIssue from './my-new-issue/my-bond-new-issue';
 import CollateralAssets from './collateral-assets/collatralAssets';
 import FinancialProfitableMainFile from './financial-details/financial-profitable-main';
-// import CreditRating from './creadit-rating/creditRatings';
+import CreditRating from './creadit-rating/creditRatings';
 
 export default function MybondStepper() {
   const [activeStepId, setActiveStepId] = useState('my_bond_new_issue');
