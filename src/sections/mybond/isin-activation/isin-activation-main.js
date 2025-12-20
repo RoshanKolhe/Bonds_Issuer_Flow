@@ -31,15 +31,15 @@ export default function IsinActivationMain({
       return;
     }
 
-    if (!dematCompleted) {
-      enqueueSnackbar('Please complete Demat Credit Details section', { variant: 'error' });
-      return;
-    }
+    // if (!dematCompleted) {
+    //   enqueueSnackbar('Please complete Demat Credit Details section', { variant: 'error' });
+    //   return;
+    // }
 
-    if (!trusteeCompleted) {
-      enqueueSnackbar('Please complete Trustee Approval section', { variant: 'error' });
-      return;
-    }
+    // if (!trusteeCompleted) {
+    //   enqueueSnackbar('Please complete Trustee Approval section', { variant: 'error' });
+    //   return;
+    // }
 
     setActiveStepId('execute_document');
   };
@@ -47,7 +47,9 @@ export default function IsinActivationMain({
   /* ---------------- STEP PERCENT ---------------- */
 
   useEffect(() => {
-    const totalPercent = isinPercent * 0.35 + dematPercent * 0.35 + trusteePercent * 0.3;
+    const totalPercent = isinPercent 
+    // * 0.35 + dematPercent * 0.35 + trusteePercent * 0.3
+    ;
 
     percent?.(Math.round(totalPercent));
   }, [isinPercent, dematPercent, trusteePercent, percent]);
@@ -55,12 +57,12 @@ export default function IsinActivationMain({
   return (
     <Stack direction="column" spacing={3}>
       {/* ---------------- TRUSTEE APPROVAL ---------------- */}
-      <TrusteeProceedForApproval
+      {/* <TrusteeProceedForApproval
         currentTrusteeApproval={currentTrusteeApproval}
         saveStepData={(data) => saveStepData('trustee_sebi_approval', data)}
         setPercent={setTrusteePercent}
         setProgress={setTrusteeCompleted}
-      />
+      /> */}
       {/* ---------------- ISIN ACTIVATION ---------------- */}
       <IsinActivationFinalization
         currentIsin={currentIsin}
@@ -70,12 +72,12 @@ export default function IsinActivationMain({
       />
 
       {/* ---------------- DEMAT CREDIT DETAILS ---------------- */}
-      <DematCreditDetails
+      {/* <DematCreditDetails
         currentDemat={currentDemat}
         saveStepData={(data) => saveStepData('demat_credit_details', data)}
         setPercent={setDematPercent}
         setProgress={setDematCompleted}
-      />
+      /> */}
 
       {/* ---------------- NEXT BUTTON ---------------- */}
       <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>

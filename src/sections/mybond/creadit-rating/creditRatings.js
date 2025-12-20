@@ -438,16 +438,17 @@ import { Box, Grid, Typography, Card, Radio, FormControlLabel } from '@mui/mater
 import { DatePicker } from '@mui/x-date-pickers';
 import { LoadingButton } from '@mui/lab';
 import { useSnackbar } from 'src/components/snackbar';
-import FormProvider, { RHFAutocomplete } from 'src/components/hook-form';
+import FormProvider, { RHFAutocomplete, RHFCustomFileUploadBox } from 'src/components/hook-form';
 import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
 import { useGetCreditRatingAgencies, useGetCreditRatings } from 'src/api/creditRatingsAndAgencies';
+import YupErrorMessage from 'src/components/error-field/yup-error-messages';
 
 const SELECTED_AGENCIES = [
   { id: '6c0561c2-a431-4d0c-ae26-ab484eed4335', name: 'Acuite Ratings & Research' },
   { id: 'a9aaab26-3d2b-4917-a3aa-21a02ce996fb', name: 'India Ratings & Research' },
 ];
 
-export default function CreditRating({ saveStepData, setPercent, setProgress }) {
+export default function CreditRating({ saveStepData, setPercent, setProgress, setActiveStepId }) {
   const { enqueueSnackbar } = useSnackbar();
   const { creditRatings = [] } = useGetCreditRatings();
   const { creditRatingAgencies } = useGetCreditRatingAgencies();
@@ -501,6 +502,25 @@ export default function CreditRating({ saveStepData, setPercent, setProgress }) 
   });
 
   const values = watch('ratings');
+
+  const isCreditRatingComplete = values?.length
+    ? values.every((r) => r.rating && r.validFrom && r.creditRatingLetter)
+    : false;
+
+  const handleNextClick = () => {
+    if (!isCreditRatingComplete) {
+      enqueueSnackbar('Please complete all Credit Rating details', {
+        variant: 'warning',
+      });
+      return;
+    }
+
+    // mark step complete
+    setProgress?.(true);
+
+    // move to next step
+    setActiveStepId?.('regulatory_filing');
+  };
 
   const { reset } = methods;
 
@@ -596,12 +616,18 @@ export default function CreditRating({ saveStepData, setPercent, setProgress }) 
                   )}
                 />
 
-                {/* Letter */}
-                <RHFFileUploadBox
-                  name={`ratings.${index}.creditRatingLetter`}
-                  label="Upload Credit Rating Letter"
-                  maxSizeMB={2}
-                />
+                <Grid item xs={12}>
+                  <RHFCustomFileUploadBox
+                    name={`ratings.${index}.creditRatingLetter`}
+                    label="Upload Credit Rating Letter"
+                    accept={{
+                      'application/pdf': ['.pdf'],
+                      'image/png': ['.png'],
+                      'image/jpeg': ['.jpg', '.jpeg'],
+                    }}
+                  />
+                  <YupErrorMessage name="mgtFilling14" />
+                </Grid>
               </Card>
             </Grid>
           ))}
@@ -613,6 +639,21 @@ export default function CreditRating({ saveStepData, setPercent, setProgress }) 
           </LoadingButton>
         </Box>
       </Card>
+      <Grid item xs={12}>
+        <Box
+          sx={{
+            mt: 3,
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: 2,
+            m: 2,
+          }}
+        >
+          <LoadingButton type="button" variant="contained" onClick={handleNextClick}>
+            Next
+          </LoadingButton>
+        </Box>
+      </Grid>
     </FormProvider>
   );
 }

@@ -19,8 +19,7 @@ import {
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 
-import FormProvider, { RHFTextField } from 'src/components/hook-form';
-import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
+import FormProvider, { RHFCustomFileUploadBox, RHFTextField } from 'src/components/hook-form';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
 import { DatePicker } from '@mui/x-date-pickers';
 import { enqueueSnackbar } from 'notistack';
@@ -108,6 +107,7 @@ export default function RegulatoryFiling({
 
   const {
     handleSubmit,
+    isSubmitting,
     setValue,
     control,
     formState: { errors },
@@ -267,23 +267,22 @@ export default function RegulatoryFiling({
             </Grid>
 
             <Grid item xs={12} md={3}>
-              <RHFTextField name="fileNamePas4" label="File Name" fullWidth />
-            </Grid>
-
-            <Grid item xs={12} md={3}>
               <RHFTextField name="referenceNoPas4" label="Reference No" fullWidth />
             </Grid>
 
             <Grid item xs={12} md={3}>
               <RHFTextField name="approvalNoPas4" label="Approval Number" fullWidth />
             </Grid>
-
             <Grid item xs={12}>
-              <RHFFileUploadBox
+              <RHFCustomFileUploadBox
                 name="pas4"
-                label="Upload Filing Document"
+                label="PAS-4"
                 icon="mdi:file-document-outline"
-                maxSizeMB={5}
+                accept={{
+                  'application/pdf': ['.pdf'],
+                  'image/png': ['.png'],
+                  'image/jpeg': ['.jpg', '.jpeg'],
+                }}
               />
               <YupErrorMessage name="pas4" />
             </Grid>
@@ -302,17 +301,21 @@ export default function RegulatoryFiling({
               <RHFTextField name="referenceNoMemorandum" label="Reference No" fullWidth />
             </Grid>
             <Grid item xs={12}>
-              <RHFFileUploadBox
+              <RHFCustomFileUploadBox
                 name="informationMemorandum"
                 label="Prospectus/Information Memorandum"
                 icon="mdi:file-document-outline"
-                maxSizeMB={5}
+                accept={{
+                  'application/pdf': ['.pdf'],
+                  'image/png': ['.png'],
+                  'image/jpeg': ['.jpg', '.jpeg'],
+                }}
               />
               <YupErrorMessage name="informationMemorandum" />
             </Grid>
           </Grid>
           <Typography variant="h5" sx={{ mb: 3, fontWeight: 600, mt: 5 }}>
-            SEBI/ NHB/RBI Approvals:
+            Term Sheet:
           </Typography>
           <Grid container spacing={3}>
             <Grid item xs={12} md={3}>
@@ -386,104 +389,21 @@ export default function RegulatoryFiling({
                 </ToggleButtonGroup>
               </Stack>
             </Grid>
-
             <Grid item xs={12}>
-              <RHFFileUploadBox
+              <RHFCustomFileUploadBox
                 name="sebi"
-                label="Prospectus/Information Memorandum"
+                label="Term Sheet"
                 icon="mdi:file-document-outline"
-                maxSizeMB={5}
+                accept={{
+                  'application/pdf': ['.pdf'],
+                  'image/png': ['.png'],
+                  'image/jpeg': ['.jpg', '.jpeg'],
+                }}
               />
               <YupErrorMessage name="sebi" />
             </Grid>
           </Grid>
-          <Typography variant="h5" sx={{ mb: 3, fontWeight: 600, mt: 5 }}>
-            In-Principle Listing Approvals
-          </Typography>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={3}>
-              <RHFTextField name="principleApprovalNo" label="Approval number" fullWidth />
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <Controller
-                name="principleDate"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <DatePicker
-                    {...field}
-                    label="Principle Date"
-                    value={
-                      field.value
-                        ? field.value instanceof Date
-                          ? field.value
-                          : new Date(field.value)
-                        : null
-                    }
-                    onChange={(newValue) => field.onChange(newValue)}
-                    format="dd/MM/yyyy"
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        error: !!error,
-                        helperText: error?.message,
-                      },
-                    }}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Stack direction="row" alignItems="center" spacing={2}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, lineHeight: '48px' }}>
-                  Authority:
-                </Typography>
-
-                <ToggleButtonGroup
-                  value={inPrincipleAuthority}
-                  exclusive
-                  onChange={(e, val) => val && setInPrincipleAuthority(val)}
-                  sx={{
-                    height: 48,
-                    border: 'none !important', // remove outer group border
-                    '&& .MuiToggleButton-root': {
-                      border: '1px solid #000000ff !important',
-                    },
-                    '&& .MuiToggleButton-root.Mui-selected': {
-                      border: '1px solid #1976d2 !important',
-                      backgroundColor: '#1976d2',
-                      color: '#fff',
-                    },
-                  }}
-                >
-                  {['SEBI', 'NBH', 'RBI'].map((option) => (
-                    <ToggleButton
-                      key={option}
-                      value={option.toLowerCase()}
-                      sx={{
-                        minWidth: 90,
-                        height: 48,
-                        fontSize: '16px',
-                        px: 2,
-                      }}
-                    >
-                      {option}
-                    </ToggleButton>
-                  ))}
-                </ToggleButtonGroup>
-              </Stack>
-            </Grid>
-
-            <Grid item xs={12}>
-              <RHFFileUploadBox
-                name="principle"
-                label="In-Principle Listing Approvals"
-                icon="mdi:file-document-outline"
-                maxSizeMB={5}
-              />
-              <YupErrorMessage name="principle" />
-            </Grid>
-          </Grid>
-          <Typography variant="h5" sx={{ mb: 3, fontWeight: 600, mt: 5 }}>
+          {/* <Typography variant="h5" sx={{ mb: 3, fontWeight: 600, mt: 5 }}>
             Registrar of Companies (ROC)
           </Typography>
           <Grid container spacing={3}>
@@ -568,7 +488,108 @@ export default function RegulatoryFiling({
               />
               <YupErrorMessage name="roc" />
             </Grid>
+          </Grid> */}
+          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+            <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+              Save
+            </LoadingButton>
+          </Box>
+        </Card>
+        <Card sx={{ p: 3, mt: 3 }}>
+          <Typography variant="h5" sx={{ mb: 3, fontWeight: 600, mt: 5 }}>
+            In-Principle Listing Approvals
+          </Typography>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={3}>
+              <RHFTextField name="principleApprovalNo" label="Approval number" fullWidth />
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Controller
+                name="principleDate"
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <DatePicker
+                    {...field}
+                    label="Principle Date"
+                    value={
+                      field.value
+                        ? field.value instanceof Date
+                          ? field.value
+                          : new Date(field.value)
+                        : null
+                    }
+                    onChange={(newValue) => field.onChange(newValue)}
+                    format="dd/MM/yyyy"
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!error,
+                        helperText: error?.message,
+                      },
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600, lineHeight: '48px' }}>
+                  Authority:
+                </Typography>
+
+                <ToggleButtonGroup
+                  value={inPrincipleAuthority}
+                  exclusive
+                  onChange={(e, val) => val && setInPrincipleAuthority(val)}
+                  sx={{
+                    height: 48,
+                    border: 'none !important', // remove outer group border
+                    '&& .MuiToggleButton-root': {
+                      border: '1px solid #000000ff !important',
+                    },
+                    '&& .MuiToggleButton-root.Mui-selected': {
+                      border: '1px solid #1976d2 !important',
+                      backgroundColor: '#1976d2',
+                      color: '#fff',
+                    },
+                  }}
+                >
+                  {['SEBI', 'NBH', 'RBI'].map((option) => (
+                    <ToggleButton
+                      key={option}
+                      value={option.toLowerCase()}
+                      sx={{
+                        minWidth: 90,
+                        height: 48,
+                        fontSize: '16px',
+                        px: 2,
+                      }}
+                    >
+                      {option}
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
+              </Stack>
+            </Grid>
+            <Grid item xs={12}>
+              <RHFCustomFileUploadBox
+                name="principle"
+                label="In-Principle Listing Approvals"
+                icon="mdi:file-document-outline"
+                accept={{
+                  'application/pdf': ['.pdf'],
+                  'image/png': ['.png'],
+                  'image/jpeg': ['.jpg', '.jpeg'],
+                }}
+              />
+              <YupErrorMessage name="principle" />
+            </Grid>
           </Grid>
+          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+            <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+              Save
+            </LoadingButton>
+          </Box>
         </Card>
         <Grid item xs={12}>
           <Box

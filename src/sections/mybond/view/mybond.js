@@ -8,7 +8,6 @@ import MyBondStart from '../mybond-start';
 import MyBondStar from '../mybond-start';
 import PreliminaryBondRequirements from '../preliminary-bond-requirements';
 import RegulatoryFiling from '../regulatory-filing';
-import BondsApplicationListView from './bond-application-list-view';
 // ----------------------------------------------------------------------
 
 export default function MyBondCreate() {

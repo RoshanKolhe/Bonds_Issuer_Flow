@@ -6,8 +6,7 @@ import { Card, Grid, Typography, Box } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { enqueueSnackbar } from 'notistack';
 
-import FormProvider, { RHFTextField } from 'src/components/hook-form';
-import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
+import FormProvider, { RHFCustomFileUploadBox, RHFTextField } from 'src/components/hook-form';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
 
 export default function TrusteeProceedForApproval({
@@ -34,27 +33,23 @@ export default function TrusteeProceedForApproval({
   });
 
   const { handleSubmit, watch, reset } = methods;
+  const watched = watch(['acknowledementNumber', 'trusteeApprovalDocument']);
 
-  /* ---------------- PERCENT CALCULATION ---------------- */
   useEffect(() => {
     let completed = 0;
-
-    if (methods.getValues('acknowledementNumber')) completed++;
-    if (methods.getValues('trusteeApprovalDocument')) completed++;
+    if (watched[0]) completed++;
+    if (watched[1]) completed++;
 
     const pct = Math.round((completed / 2) * 100);
-
     setPercent?.(pct);
     setProgress?.(pct === 100);
-  }, [watch()]);
+  }, [watched, setPercent, setProgress]);
 
-  /* ---------------- PREFILL DATA ---------------- */
   useEffect(() => {
-    if (currentTrusteeApproval) {
+    if (currentTrusteeApproval && Object.keys(currentTrusteeApproval).length > 0) {
       reset({ ...defaultValues, ...currentTrusteeApproval });
     }
   }, [currentTrusteeApproval, reset]);
-
   /* ---------------- SUBMIT ---------------- */
   const onSubmit = (data) => {
     saveStepData?.(data);
@@ -81,13 +76,16 @@ export default function TrusteeProceedForApproval({
               fullWidth
             />
           </Grid>
-
           <Grid item xs={12}>
-            <RHFFileUploadBox
+            <RHFCustomFileUploadBox
               name="trusteeApprovalDocument"
               label="Upload Trustee Approval Document*"
               icon="mdi:file-document-outline"
-              maxSizeMB={5}
+              accept={{
+                'application/pdf': ['.pdf'],
+                'image/png': ['.png'],
+                'image/jpeg': ['.jpg', '.jpeg'],
+              }}
             />
             <YupErrorMessage name="trusteeApprovalDocument" />
           </Grid>
