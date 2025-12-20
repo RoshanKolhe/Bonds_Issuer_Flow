@@ -17,6 +17,9 @@ import { useSnackbar } from 'notistack';
 import { LoadingButton } from '@mui/lab';
 import { useGetInvestorCategories } from 'src/api/investorCategories';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
+import { useGetRedemptionTypes } from 'src/api/redemptionTypes';
+import axiosInstance from 'src/utils/axios';
+import { useParams } from 'src/routes/hook';
 
 export default function IssueDetailsCard({
   currentIssueDetail,
@@ -27,10 +30,24 @@ export default function IssueDetailsCard({
   const { enqueueSnackbar } = useSnackbar();
   const { investorCtegories, investorCtegoriesLoading } = useGetInvestorCategories();
   const [investorCategoriesData, setInvestorCategoriesData] = useState([]);
+
+  const [redemptionType, setRedemptionType] = useState();
+  const { redemptionTypes, redemptionTypesLoading } = useGetRedemptionTypes();
+
+  const param = useParams();
+
+  const { applicationId } = param;
+
+
+  useEffect(() => {
+    if (redemptionTypes && !redemptionTypesLoading) {
+      setRedemptionType(redemptionTypes)
+    }
+  }, [redemptionTypes, redemptionTypesLoading])
   const paymentCycleOptions = [
-    { label: 'Monthly', value: 0 },
-    { label: 'Quaterly', value: 1 },
-    { label: 'Anually', value: 2 },
+    { label: 'Monthly', value: 'monthly' },
+    { label: 'Quaterly', value: 'quarterly' },
+    { label: 'Anually', value: 'annually' },
   ];
   const Schema = Yup.object().shape({
     issueType: Yup.string().required('Required'),
@@ -60,7 +77,7 @@ export default function IssueDetailsCard({
       redemptionType: currentIssueDetail?.redemptionType || '',
       minimumPurchaseUnit: currentIssueDetail?.minimumPurchaseUnit || '',
       totalUnit: currentIssueDetail?.totalUnit || '',
-      preferedPaymentCycle: currentIssueDetail?.preferedInvestorCategory ?? 0,
+      preferedPaymentCycle: currentIssueDetail?.preferedInvestorCategory || '',
     }),
     [currentIssueDetail]
   );
@@ -142,25 +159,45 @@ export default function IssueDetailsCard({
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      //   const payload = {
-      //     issueType: formData.issueType,
-      //     securityType: formData.securityType,
-      //     issueSize: formData.issueSize,
-      //     tenureYears: formData.tenureYears,
-      //     couponRate: formData.couponRate,
-      //     minimumInvestmentPrice: formData.minimumInvestmentPrice,
-      //     redemptionType: formData.redemptionType,
-      //     minimumPurchaseUnit: formData.minimumPurchaseUnit,
-      //     totalUnit: formData.totalUnit,
-      //   };
-      saveStepData(data);
-      setProgress(true);
-      enqueueSnackbar('Issue details saved', { variant: 'success' });
-    } catch (err) {
-      console.error(err);
-      enqueueSnackbar('Failed to save issue details', { variant: 'error' });
+      const payload = {
+        placementType: data.issueType, // public / private
+
+        isEbpIssue: false, // or true based on business logic
+
+        tenure: Number(data.tenureYears),
+
+        interestPaymentFrequency: data.preferedPaymentCycle, // 0/1/2
+
+        minimumInvestment: Number(data.minimumInvestmentPrice),
+
+        minimumUnitsToPurchase: Number(data.minimumPurchaseUnit),
+
+        totalUnits: Number(data.totalUnit),
+
+        issueSize: Number(data.issueSize),
+
+        couponRate: Number(data.couponRate),
+
+        securityType: data.securityType ? 'secured' : 'unsecured',
+      };
+
+      const response = await axiosInstance.patch(
+        `/bonds-pre-issue/update-issue-details/${applicationId}`,
+        payload
+      );
+
+      if (response.data.success) {
+        setProgress(true);
+        enqueueSnackbar('Issue details saved successfully', { variant: 'success' });
+      }
+    } catch (error) {
+      const message =
+        error?.response?.data?.error?.message || 'Failed to save issue details';
+      enqueueSnackbar(message, { variant: 'error' });
+      console.error(error);
     }
   });
+
 
   useEffect(() => {
     if (issueType === 'public') {
@@ -259,9 +296,15 @@ export default function IssueDetailsCard({
               </Typography>
               <RHFSelect name="redemptionType">
                 <MenuItem value="">Select Redemption</MenuItem>
-                <MenuItem value="bullet">Bullet</MenuItem>
-                <MenuItem value="amortizing">Amortizing</MenuItem>
-                <MenuItem value="callable">Callable</MenuItem>
+                {redemptionType?.length > 0 ? (
+                  redemptionType.map((red) => (
+                    <MenuItem key={red.id} value={red.id}>
+                      {red.label}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled>No categories</MenuItem>
+                )}
               </RHFSelect>
             </Grid>
 

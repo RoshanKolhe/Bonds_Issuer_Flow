@@ -16,14 +16,14 @@ export function useGetBondApplications(filter) {
 
     const memoizedValue = useMemo(
         () => ({
-            bondApplications: data?.data || [],
+            bondApplications: data?.applications || [],
             count: data?.count || 0,
             bondApplicationsLoading: isLoading,
             bondApplicationsError: error,
             bondApplicationsValidating: isValidating,
-            bondApplicationsEmpty: !isLoading && !data?.data.length,
+            bondApplicationsEmpty: !isLoading && !data?.applications?.length,
         }),
-        [data, error, isLoading, isValidating]
+        [data?.applications, error, isLoading, isValidating]
     );
 
   

@@ -17,8 +17,19 @@ import MyBondNewIssue from './my-new-issue/my-bond-new-issue';
 import CollateralAssets from './collateral-assets/collatralAssets';
 import FinancialProfitableMainFile from './financial-details/financial-profitable-main';
 import CreditRating from './creadit-rating/creditRatings';
+import { useParams } from 'src/routes/hook';
+import { useGetBondApplication } from 'src/api/bondApplications';
 
 export default function MybondStepper() {
+  const params = useParams()
+  const { applicationId } = params;
+
+  const [applicationData, setApplicationData] = useState(null);
+  const { bondApplication, bondApplicationLoading } = useGetBondApplication(applicationId);
+  const [dataInitialized, setDataInitialized] = useState(false);
+
+
+
   const [activeStepId, setActiveStepId] = useState('my_bond_new_issue');
   const [formData, setFormData] = useState({
     my_bond_new_issue: {},
@@ -170,6 +181,48 @@ export default function MybondStepper() {
     setActiveStepId(stepId);
   };
 
+
+    // useEffect(() => {
+    //   if (bondEstimation && !bondEstimationLoading && !dataInitialized) {
+  
+    //     setEstimationData(bondEstimation);
+    //     let currentStep = 'fund_position_and_credit_ratings';
+  
+    //     if (
+    //       bondEstimation.currentProgress.includes('fund_position') &&
+    //       bondEstimation.currentProgress.includes('credit_ratings')
+    //     ) {
+    //       updateStepPercent('fund_position_and_credit_ratings', 100);
+    //       currentStep = 'borrowing_details';
+    //     }
+  
+    //     if (
+    //       bondEstimation.currentProgress.includes('profitability_details') &&
+    //       bondEstimation.currentProgress.includes('capital_details') &&
+    //       bondEstimation.currentProgress.includes('borrowing_details')
+    //     ) {
+    //       updateStepPercent('audited_financial', 100);
+    //       updateStepPercent('borrowing_details', 100);
+    //       currentStep = 'financial_details';
+    //     }
+  
+    //     if (bondEstimation.currentProgress.includes('financial_details')) {
+    //       updateStepPercent('financial_details', 100);
+    //       currentStep = 'preliminary_bond_requirements';
+    //     }
+  
+    //     setActiveStepId(currentStep);
+  
+    //     setDataInitialized(true);
+    //   }
+    // }, [bondEstimation, bondEstimationLoading, dataInitialized]);
+
+
+    useEffect(()=>{
+  if(bondApplication && !bondApplicationLoading){
+    setApplicationData(bondApplication)
+  }
+}, [bondApplication , bondApplicationLoading])
   const renderForm = () => {
     switch (activeStepId) {
       case 'my_bond_new_issue':

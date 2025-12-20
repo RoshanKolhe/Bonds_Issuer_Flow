@@ -87,7 +87,7 @@ export const endpoints = {
     filterList: (filter) => `/bond-estimations?filter=${filter}`,
     details: (applicationId) => `/bond-estimations/${applicationId}`
   },
-    bondApplications: {
+  bondApplications: {
     list: '/bond-applications',
     filterList: (filter) => `/bond-applications?filter=${filter}`,
     details: (applicationId) => `/bond-applications/${applicationId}`
@@ -102,6 +102,11 @@ export const endpoints = {
     list: '/company-profiles/bank-details',
     filterList: (filter) => `/company-profiles/bank-details?filter=${filter}`,
     details: (accountId) => `/company-profiles/bank-details/${accountId}`,
+  },
+  redemptionTypes: {
+    list: '/redemption-types',
+    filterList: (filter) => `/redemption-types?filter=${filter}`,
+    details: (accountId) => `/redemption-types/${accountId}`,
   },
   investorCategories: {
     list: '/investor-categories',

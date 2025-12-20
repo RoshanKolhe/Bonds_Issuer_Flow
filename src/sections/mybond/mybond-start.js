@@ -23,11 +23,13 @@ export default function MyBondStart() {
     try {
       setIsLoading(true);
       const response = await axiosInstance.post('/bonds-pre-issue/new-application');
+
+
       if (response.data.success) {
         navigate(paths.dashboard.mybond.bondIssue(response.data?.application?.id));
       }
     } catch (error) {
-      console.error('error while starting bond estimation :', error);
+      console.error('error while starting bond application :', error);
 
     } finally {
       setIsLoading(false);

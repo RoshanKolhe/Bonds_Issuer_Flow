@@ -23,23 +23,17 @@ import { paths } from 'src/routes/paths';
 // ----------------------------------------------------------------------
 
 export default function BondApplicationsTableRow({ row, selected, onViewRow, onSelectRow, onDeleteRow }) {
-  const { id, currentProgress, createdAt } = row;
+  const { id, currentStatus, createdAt } = row;
   const navigate = useNavigate();
   const confirm = useBoolean();
   const popover = usePopover();
 
-  const getStatus = () => {
-    if(currentProgress?.includes('initialize')){
-      return 'In Process';
-    }
-  }
-
   const getColor = () => {
-    if(currentProgress?.includes('initialize')){
+    if (currentStatus?.code) {
       return 'warning';
     }
-  }
-
+    return 'default';
+  };
   return (
     <>
       <TableRow hover selected={selected}>
@@ -52,7 +46,7 @@ export default function BondApplicationsTableRow({ row, selected, onViewRow, onS
             variant="soft"
             color={getColor()}
           >
-            {getStatus()}
+            {currentStatus?.label}
           </Label>
         </TableCell>
 
