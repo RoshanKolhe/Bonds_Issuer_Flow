@@ -2,12 +2,11 @@ import React, { useEffect } from 'react';
 import * as Yup from 'yup';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Card, Grid, Typography, Tabs, Tab, Box } from '@mui/material';
+import { Card, Grid, Typography, Box } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { LoadingButton } from '@mui/lab';
 
-import FormProvider, { RHFTextField } from 'src/components/hook-form';
-import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
+import FormProvider, { RHFCustomFileUploadBox, RHFTextField } from 'src/components/hook-form';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
 import { enqueueSnackbar } from 'notistack';
 
@@ -43,24 +42,28 @@ export default function IsinActivationFinalization({
 
   const { handleSubmit, control, watch, reset, setValue } = methods;
 
-  /* ---------------- PERCENT ---------------- */
+  const watched = watch(['ISIN', 'activationDate', 'isinLetter']);
+
   useEffect(() => {
     let completed = 0;
-
-    if (methods.getValues('ISIN')) completed++;
-    if (methods.getValues('activationDate')) completed++;
-    if (methods.getValues('isinLetter')) completed++;
+    if (watched[0]) completed++;
+    if (watched[1]) completed++;
+    if (watched[2]) completed++;
 
     const pct = Math.round((completed / 3) * 100);
-
     setPercent?.(pct);
     setProgress?.(pct === 100);
-  }, [watch()]);
+  }, [watched, setPercent, setProgress]);
 
-  /* ---------------- PREFILL ---------------- */
   useEffect(() => {
-    if (currentIsin) reset({ ...defaultValues, ...currentIsin });
-  }, [currentIsin]);
+    if (currentIsin && Object.keys(currentIsin).length > 0) {
+      reset({
+        ...defaultValues,
+        ...currentIsin,
+        activationDate: currentIsin.activationDate ? new Date(currentIsin.activationDate) : null,
+      });
+    }
+  }, [currentIsin, reset]);
 
   /* ---------------- SUBMIT ---------------- */
   const onSubmit = (data) => {
@@ -105,13 +108,16 @@ export default function IsinActivationFinalization({
               )}
             />
           </Grid>
-
           <Grid item xs={12}>
-            <RHFFileUploadBox
+            <RHFCustomFileUploadBox
               name="isinLetter"
               label="Upload ISIN Confirmation Letter*"
               icon="mdi:file-document-outline"
-              maxSizeMB={5}
+              accept={{
+                'application/pdf': ['.pdf'],
+                'image/png': ['.png'],
+                'image/jpeg': ['.jpg', '.jpeg'],
+              }}
             />
             <YupErrorMessage name="isinLetter" />
           </Grid>

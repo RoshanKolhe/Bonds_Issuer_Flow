@@ -5,7 +5,7 @@ import MainFile from './borrowing/main';
 import FinancialDetails from './financial-details/financial-details';
 import LaunchIssue from './launch-issue';
 import IsinActivation from './isin-activation';
-import RegulatoryFiling from './regulatory-filing';
+import RegulatoryFiling from './regulatory-filing/regulatory-filing';
 import AuditedFinancialDocument from './audited-financial/audited-financial-document';
 import FundAndCreditForm from './fund-position-and-credit-rating/fundAndCreditForm';
 import ProgressStepper from 'src/components/progress-stepper/ProgressStepper';

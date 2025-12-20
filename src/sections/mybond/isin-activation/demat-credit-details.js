@@ -6,8 +6,7 @@ import { Card, Grid, Typography, Box } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { LoadingButton } from '@mui/lab';
 
-import FormProvider, { RHFTextField } from 'src/components/hook-form';
-import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
+import FormProvider, { RHFCustomFileUploadBox, RHFTextField } from 'src/components/hook-form';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
 import { enqueueSnackbar } from 'notistack';
 
@@ -20,7 +19,7 @@ export default function DematCreditDetails({
   setProgress,
 }) {
   const DematSchema = Yup.object().shape({
-    creditConfirmationDate: Yup.date().required('Credit date is required'),
+    creditConfirmationDate: Yup.date().nullable().required('Credit date is required'),
     creditProof: Yup.mixed().required('Credit proof is required'),
     remark: Yup.string().nullable(),
   });
@@ -38,23 +37,29 @@ export default function DematCreditDetails({
 
   const { handleSubmit, control, watch, reset } = methods;
 
-  /* ---------------- PERCENT ---------------- */
+  const watched = watch(['creditConfirmationDate', 'creditProof']);
+
   useEffect(() => {
     let completed = 0;
-
-    if (methods.getValues('creditConfirmationDate')) completed++;
-    if (methods.getValues('creditProof')) completed++;
+    if (watched[0]) completed++;
+    if (watched[1]) completed++;
 
     const pct = Math.round((completed / 2) * 100);
-
     setPercent?.(pct);
     setProgress?.(pct === 100);
-  }, [watch()]);
+  }, [watched, setPercent, setProgress]);
 
-  /* ---------------- PREFILL ---------------- */
   useEffect(() => {
-    if (currentDemat) reset({ ...defaultValues, ...currentDemat });
-  }, [currentDemat]);
+    if (currentDemat && Object.keys(currentDemat).length > 0) {
+      reset({
+        ...defaultValues,
+        ...currentDemat,
+        creditConfirmationDate: currentDemat.creditConfirmationDate
+          ? new Date(currentDemat.creditConfirmationDate)
+          : null,
+      });
+    }
+  }, [currentDemat, reset]);
 
   /* ---------------- SUBMIT ---------------- */
   const onSubmit = (data) => {
@@ -99,13 +104,16 @@ export default function DematCreditDetails({
           <Grid item xs={12} md={6}>
             <RHFTextField name="remark" label="Remark" fullWidth />
           </Grid>
-
           <Grid item xs={12}>
-            <RHFFileUploadBox
+            <RHFCustomFileUploadBox
               name="creditProof"
               label="Upload Credit Confirmation Proof*"
               icon="mdi:file-document-outline"
-              maxSizeMB={5}
+              accept={{
+                'application/pdf': ['.pdf'],
+                'image/png': ['.png'],
+                'image/jpeg': ['.jpg', '.jpeg'],
+              }}
             />
             <YupErrorMessage name="creditProof" />
           </Grid>

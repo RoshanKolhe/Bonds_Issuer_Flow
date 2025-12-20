@@ -5,7 +5,7 @@ import LaunchIssue from '../launch-issue';
 import MyBondNewIssue from '../mybond-new-issue';
 import MyBondStar from '../mybond-start';
 import PreliminaryBondRequirements from '../preliminary-bond-requirements';
-import RegulatoryFiling from '../regulatory-filing';
+import RegulatoryFiling from '../regulatory-filing/regulatory-filing';
 // ----------------------------------------------------------------------
 
 export default function MyBondCreate() {
