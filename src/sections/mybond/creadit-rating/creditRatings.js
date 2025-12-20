@@ -448,7 +448,7 @@ const SELECTED_AGENCIES = [
   { id: 'a9aaab26-3d2b-4917-a3aa-21a02ce996fb', name: 'India Ratings & Research' },
 ];
 
-export default function CreditRating({ saveStepData, setPercent, setProgress }) {
+export default function CreditRating({ saveStepData, setPercent, setProgress, setActiveStepId }) {
   const { enqueueSnackbar } = useSnackbar();
   const { creditRatings = [] } = useGetCreditRatings();
   const { creditRatingAgencies } = useGetCreditRatingAgencies();
@@ -502,6 +502,25 @@ export default function CreditRating({ saveStepData, setPercent, setProgress }) 
   });
 
   const values = watch('ratings');
+
+  const isCreditRatingComplete = values?.length
+    ? values.every((r) => r.rating && r.validFrom && r.creditRatingLetter)
+    : false;
+
+  const handleNextClick = () => {
+    if (!isCreditRatingComplete) {
+      enqueueSnackbar('Please complete all Credit Rating details', {
+        variant: 'warning',
+      });
+      return;
+    }
+
+    // mark step complete
+    setProgress?.(true);
+
+    // move to next step
+    setActiveStepId?.('regulatory_filing');
+  };
 
   const { reset } = methods;
 
@@ -620,6 +639,21 @@ export default function CreditRating({ saveStepData, setPercent, setProgress }) 
           </LoadingButton>
         </Box>
       </Card>
+      <Grid item xs={12}>
+        <Box
+          sx={{
+            mt: 3,
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: 2,
+            m: 2,
+          }}
+        >
+          <LoadingButton type="button" variant="contained" onClick={handleNextClick}>
+            Next
+          </LoadingButton>
+        </Box>
+      </Grid>
     </FormProvider>
   );
 }

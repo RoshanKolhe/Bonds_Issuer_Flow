@@ -10,7 +10,7 @@ import AuditedFinancialDocument from './audited-financial/audited-financial-docu
 import FundAndCreditForm from './fund-position-and-credit-rating/fundAndCreditForm';
 import ProgressStepper from 'src/components/progress-stepper/ProgressStepper';
 import PriliminaryAndCollateralView from './preliminary-requirements-and collatral-details/priliminaryAndCollateralView';
-import ExecuteDocument from './execute-documents';
+import ExecuteDocument from './execute-documents/execute-documents';
 import IsinActivationMain from './isin-activation/isin-activation-main';
 import IntermediariesView from './intermediates/intermediates-view/intermediate-view';
 import MyBondNewIssue from './my-new-issue/my-bond-new-issue';

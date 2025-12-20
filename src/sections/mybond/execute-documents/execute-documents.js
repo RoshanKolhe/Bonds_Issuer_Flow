@@ -2,7 +2,7 @@ import { Box, Card, Grid, Typography } from '@mui/material';
 import * as Yup from 'yup';
 import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
-import FormProvider from 'src/components/hook-form';
+import FormProvider, { RHFCustomFileUploadBox } from 'src/components/hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import { LoadingButton } from '@mui/lab';
@@ -92,33 +92,45 @@ export default function ExecuteDocument({
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <RHFFileUploadBox
+            <RHFCustomFileUploadBox
               name="debentureTrusteeDeed"
-              label="Upload ISIN Confirmation Letter*"
+              label="Upload Debenture Trustee Deed*"
               icon="mdi:file-document-outline"
-              maxSizeMB={5}
+              accept={{
+                'application/pdf': ['.pdf'],
+                'image/png': ['.png'],
+                'image/jpeg': ['.jpg', '.jpeg'],
+              }}
             />
             <YupErrorMessage name="debentureTrusteeDeed" />
           </Grid>
 
           {/* Security Document */}
           <Grid item xs={12}>
-            <RHFFileUploadBox
+            <RHFCustomFileUploadBox
               name="securityDocumt"
-              label="Upload ISIN Confirmation Letter*"
+              label="Upload Security Document*"
               icon="mdi:file-document-outline"
-              maxSizeMB={5}
+              accept={{
+                'application/pdf': ['.pdf'],
+                'image/png': ['.png'],
+                'image/jpeg': ['.jpg', '.jpeg'],
+              }}
             />
             <YupErrorMessage name="securityDocumt" />
           </Grid>
 
           {/* Escrow Agreement */}
           <Grid item xs={12}>
-            <RHFFileUploadBox
+            <RHFCustomFileUploadBox
               name="escrowAgremment"
-              label="Upload ISIN Confirmation Letter*"
+              label="Upload Escrow Agreement*"
               icon="mdi:file-document-outline"
-              maxSizeMB={5}
+              accept={{
+                'application/pdf': ['.pdf'],
+                'image/png': ['.png'],
+                'image/jpeg': ['.jpg', '.jpeg'],
+              }}
             />
             <YupErrorMessage name="escrowAgremment" />
           </Grid>
@@ -134,7 +146,12 @@ export default function ExecuteDocument({
             m: 2,
           }}
         >
-          <LoadingButton type="submit" variant="contained" loading={isSubmitting} sx={{ color: '#fff' }}>
+          <LoadingButton
+            type="submit"
+            variant="contained"
+            loading={isSubmitting}
+            sx={{ color: '#fff' }}
+          >
             Next
           </LoadingButton>
         </Box>

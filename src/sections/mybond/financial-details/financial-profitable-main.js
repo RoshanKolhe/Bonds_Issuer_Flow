@@ -34,7 +34,7 @@ export default function FinancialProfitableMainFile({
       return;
     }
 
-    setActiveStepId('intermediaries');
+    setActiveStepId('credit_rating');
   };
 
   return (
