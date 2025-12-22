@@ -8,16 +8,47 @@ import MyBondStart from '../mybond-start';
 import MyBondStar from '../mybond-start';
 import PreliminaryBondRequirements from '../preliminary-bond-requirements';
 import BondsApplicationListView from './bond-application-list-view';
+import { useTable } from 'src/components/table';
+import { buildFilter } from 'src/utils/filters';
+import { useState } from 'react';
+
+const defaultFilters = {
+  name: '',
+  email: '',
+  role: [],
+  status: 'all',
+};
 
 export default function MyBondCreate() {
 
-  const {bondApplications , count , bondApplicationsLoading}= useGetBondApplications();
+  const table = useTable();
+  const [filters, setFilters] = useState(defaultFilters);
+
+  // 🔑 BUILD FILTER HERE (correct place)
+  const filter = buildFilter({
+    page: table.page,
+    rowsPerPage: table.rowsPerPage,
+    order: table.order,
+    orderBy: table.orderBy,
+
+    validSortFields: ['id'],
+
+    searchTextValue: filters.name?.trim() || undefined,
+  })
+
+  const filterList = encodeURIComponent(JSON.stringify(filter));
+
+  const { bondApplications, bondApplicationsLoading, count } = useGetBondApplications(filterList);
+
   return (
     <>
       {/* <MyBondStart /> */}
 
       {
-        (bondApplications.length === 0 && !bondApplicationsLoading) ? <MyBondStart /> : <BondsApplicationListView bondsApplication={bondApplications} bondApplicationsLoading={bondApplicationsLoading} count={count} />
+        (bondApplications.length === 0 && !bondApplicationsLoading) ? <MyBondStart /> : <BondsApplicationListView bondsApplication={bondApplications} bondApplicationsLoading={bondApplicationsLoading} count={count}
+                    table={table}
+                    filters={filters}
+                    setFilters={setFilters} />
       }
     </>
   );

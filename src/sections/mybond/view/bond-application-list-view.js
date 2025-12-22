@@ -76,8 +76,11 @@ const defaultFilters = {
 
 // ----------------------------------------------------------------------
 
-export default function BondsApplicationListView({ bondsApplication, bondsApplicationLoading, count }) {
-  const table = useTable();
+export default function BondsApplicationListView({ bondsApplication, bondsApplicationLoading, count,
+  table,
+  filters,
+  setFilters, }) {
+
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const settings = useSettingsContext();
@@ -88,24 +91,22 @@ export default function BondsApplicationListView({ bondsApplication, bondsApplic
 
   const [tableData, setTableData] = useState(mockJob);
 
-  const [filters, setFilters] = useState(defaultFilters);
+  // const dataFiltered = applyFilter({
+  //   inputData: tableData,
+  //   comparator: getComparator(table.order, table.orderBy),
+  //   filters,
+  // });
 
-  const dataFiltered = applyFilter({
-    inputData: tableData,
-    comparator: getComparator(table.order, table.orderBy),
-    filters,
-  });
-
-  const dataInPage = dataFiltered.slice(
-    table.page * table.rowsPerPage,
-    table.page * table.rowsPerPage + table.rowsPerPage
-  );
+  // const dataInPage = dataFiltered.slice(
+  //   table.page * table.rowsPerPage,
+  //   table.page * table.rowsPerPage + table.rowsPerPage
+  // );
 
   const denseHeight = table.dense ? 52 : 72;
 
   const canReset = !isEqual(defaultFilters, filters);
 
-  const notFound = (!dataFiltered.length && canReset) || !dataFiltered.length;
+  const notFound = (!bondsApplication.length && canReset) || !bondsApplication.length;
 
   const handleFilters = useCallback(
     (name, value) => {
@@ -128,9 +129,9 @@ export default function BondsApplicationListView({ bondsApplication, bondsApplic
       const deleteRow = tableData.filter((row) => row.id !== id);
       setTableData(deleteRow);
 
-      table.onUpdatePageDeleteRow(dataInPage.length);
+      table.onUpdatePageDeleteRow(bondsApplication.length);
     },
-    [dataInPage.length, table, tableData]
+    [bondsApplication.length, table, tableData]
   );
 
   const handleDeleteRows = useCallback(() => {
@@ -139,10 +140,10 @@ export default function BondsApplicationListView({ bondsApplication, bondsApplic
 
     table.onUpdatePageDeleteRows({
       totalRows: tableData.length,
-      totalRowsInPage: dataInPage.length,
-      totalRowsFiltered: dataFiltered.length,
+      totalRowsInPage: bondsApplication.length,
+      totalRowsFiltered: bondsApplication.length,
     });
-  }, [dataFiltered.length, dataInPage.length, table, tableData]);
+  }, [bondsApplication.length, table, tableData]);
 
   // const handleEditRow = useCallback(
   //   (id) => {
@@ -209,7 +210,7 @@ export default function BondsApplicationListView({ bondsApplication, bondsApplic
         />
 
         <Card>
-          {/* <Tabs
+          <Tabs
             value={filters.status}
             onChange={handleFilterStatus}
             sx={{
@@ -245,26 +246,26 @@ export default function BondsApplicationListView({ bondsApplication, bondsApplic
                 }
               />
             ))}
-          </Tabs> */}
+          </Tabs>
 
-          {/* <BondApplicationsTableToolbar
+          <BondApplicationsTableToolbar
             filters={filters}
             onFilters={handleFilters}
             //
             roleOptions={_jobsOption}
-          /> */}
+          />
 
-          {/* {canReset && (
+          {canReset && (
             <BondApplicationsTableFiltersResult
               filters={filters}
               onFilters={handleFilters}
               //
               onResetFilters={handleResetFilters}
               //
-              results={dataFiltered.length}
+              results={bondsApplication.length}
               sx={{ p: 2.5, pt: 0 }}
             />
-          )} */}
+          )}
 
           <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
             {/* <TableSelectedAction
@@ -304,30 +305,22 @@ export default function BondsApplicationListView({ bondsApplication, bondsApplic
                 />
 
                 <TableBody>
-                  {dataFiltered.length > 0 ? (
-                    dataFiltered
-                      .slice(
-                        table.page * table.rowsPerPage,
-                        table.page * table.rowsPerPage + table.rowsPerPage
-                      )
-                      .map((row) => (
-                        <BondApplicationsTableRow
-                          key={row.id}
-                          row={row}
-                          selected={table.selected.includes(row.id)}
-                          onSelectRow={() => table.onSelectRow(row.id)}
-                          onViewRow={() => handleView(row._id.$oid)}
-                        // onDeleteRow={() => handleDeleteRow(row.id)}
-                        // onEditRow={() => handleEditRow(row.id)}
-                        />
-                      ))
-                  ) : (
-                    <TableRow>
-                      <TableCell align="center" colSpan={8}>
-                        No data found
-                      </TableCell>
-                    </TableRow>
-                  )}
+                  {bondsApplication.map((row) => (
+                    <BondApplicationsTableRow
+                      key={row.id}
+                      row={row}
+                      selected={table.selected.includes(row.id)}
+                      onSelectRow={() => table.onSelectRow(row.id)}
+                      onViewRow={() => handleView(row._id.$oid)}
+                    // onDeleteRow={() => handleDeleteRow(row.id)}
+                    // onEditRow={() => handleEditRow(row.id)}
+                    />
+                  ))}
+                  <TableEmptyRows
+                    height={denseHeight}
+                    emptyRows={emptyRows(table.page, table.rowsPerPage, tableData.length)}
+                  />
+                  <TableNoData notFound={notFound} />
                 </TableBody>
 
 
@@ -336,7 +329,7 @@ export default function BondsApplicationListView({ bondsApplication, bondsApplic
           </TableContainer>
 
           <TablePaginationCustom
-            count={dataFiltered.length}
+            count={count}
             page={table.page}
             rowsPerPage={table.rowsPerPage}
             onPageChange={table.onChangePage}
