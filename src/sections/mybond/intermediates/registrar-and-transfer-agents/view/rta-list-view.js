@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Card, Container, Stack, Table, TableBody, TableContainer } from '@mui/material';
+import { Button, Card, Container, Grid, Stack, Table, TableBody, TableContainer } from '@mui/material';
 
 import Scrollbar from 'src/components/scrollbar';
 import { useSettingsContext } from 'src/components/settings';
@@ -11,6 +11,7 @@ import RtaTableRow from '../rta-table-row';
 import { useParams, useRouter } from 'src/routes/hook';
 import axiosInstance from 'src/utils/axios';
 import { useSnackbar } from 'notistack';
+import RtaCardView from './rta-card-view';
 
 // ------------------------------------------------------
 
@@ -97,12 +98,27 @@ export default function RtaListView() {
           Send Request
         </Button>
       </Stack>
-      <Card>
+
         {/* Search */}
-        <RtaTableToolbar filterName={filterName} onFilterName={setFilterName} />
+        <Stack spacing={3}>
+          <RtaTableToolbar filterName={filterName} onFilterName={setFilterName} />
+
+          <Grid container spacing={3}>
+            {filteredData.map((row) => (
+              <RtaCardView
+                key={row.id}
+                row={row}
+                selected={selected.includes(row.id)}
+                onSelectRow={handleSelectRow}
+                onView={() => handleView(row.id)}
+                onSendRequest={() => handleSendRequest(row.id)}
+              />
+            ))}
+          </Grid>
+        </Stack>
 
         {/* Table */}
-        <TableContainer>
+        {/* <TableContainer>
           <Scrollbar>
             <Table sx={{ minWidth: 960 }}>
               <TableHeadCustom
@@ -127,8 +143,8 @@ export default function RtaListView() {
               </TableBody>
             </Table>
           </Scrollbar>
-        </TableContainer>
-      </Card>
+        </TableContainer> */}
+     
     </Container>
   );
 }

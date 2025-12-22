@@ -7,6 +7,7 @@ import {
   TableContainer,
   Button,
   Stack,
+  Grid,
 } from '@mui/material';
 
 import Scrollbar from 'src/components/scrollbar';
@@ -19,6 +20,7 @@ import DebentureTrusteeTableRow from '../debenture-trustee-table-row';
 import { useParams, useRouter } from 'src/routes/hook';
 import axiosInstance from 'src/utils/axios';
 import { useSnackbar } from 'notistack';
+import DebentureTrusteeCardView from './debenture-trustee-card';
 
 // ------------------------------------------------------
 
@@ -35,8 +37,8 @@ const TABLE_HEAD = [
 
 export default function DebentureTrusteeListView() {
   const params = useParams();
-  const {applicationId} = params;
-  const {enqueueSnackbar} = useSnackbar();
+  const { applicationId } = params;
+  const { enqueueSnackbar } = useSnackbar();
   const settings = useSettingsContext();
   const router = useRouter();
   const [filterName, setFilterName] = useState('');
@@ -70,17 +72,17 @@ export default function DebentureTrusteeListView() {
   };
 
   const handleSendRequest = async (id) => {
-    try{
+    try {
       const trusteeData = DEBENTURE_TRUSTEES.find((trustee) => trustee.id === id);
 
       const response = await axiosInstance.post(`/bonds-pre-issue/save-intermediaries/${applicationId}`, {
         debentureTrustee: trusteeData
       });
 
-      if(response.success){
+      if (response.success) {
         enqueueSnackbar('Request send successfully');
       }
-    }catch(error){
+    } catch (error) {
       console.error('error while sending request to debenture trustee :', error);
     }
   };
@@ -105,12 +107,13 @@ export default function DebentureTrusteeListView() {
           Send Request
         </Button>
       </Stack>
-      <Card>
-        {/* Search */}
-        <DebentureTrusteeTableToolbar filterName={filterName} onFilterName={setFilterName} />
+      {/* <Card> */}
+      {/* Search */}
+      <Stack spacing={3}>
+      <DebentureTrusteeTableToolbar filterName={filterName} onFilterName={setFilterName} />
 
-        {/* Table */}
-        <TableContainer>
+      {/* Table */}
+      {/* <TableContainer>
           <Scrollbar>
             <Table sx={{ minWidth: 960 }}>
               <TableHeadCustom
@@ -135,8 +138,22 @@ export default function DebentureTrusteeListView() {
               </TableBody>
             </Table>
           </Scrollbar>
-        </TableContainer>
-      </Card>
+        </TableContainer> */}
+      {/* </Card> */}
+
+      <Grid container spacing={3}>
+        {filteredData.map((row) => (
+          <DebentureTrusteeCardView
+            key={row.id}   
+            row={row}
+            selected={selected.includes(row.id)}
+            onSelectRow={handleSelectRow}
+            onView={() => handleView(row.id)}
+            onSendRequest={() => handleSendRequest(row.id)}
+          />
+        ))}
+      </Grid>
+      </Stack>
     </Container>
   );
 }

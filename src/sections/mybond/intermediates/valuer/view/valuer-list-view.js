@@ -9,6 +9,7 @@ import {
   Tab,
   Stack,
   Button,
+  Grid,
 } from '@mui/material';
 
 import Scrollbar from 'src/components/scrollbar';
@@ -22,6 +23,7 @@ import ValuerTableRow from '../valuer-table-row';
 import { useParams, useRouter } from 'src/routes/hook';
 import axiosInstance from 'src/utils/axios';
 import { useSnackbar } from 'notistack';
+import ValuerCardView from './valuer-card-view';
 
 // ------------------------------------------------------
 
@@ -109,12 +111,25 @@ export default function ValuerListView() {
           Send Request
         </Button>
       </Stack>
-      <Card>
         {/* Search */}
+        <Stack spacing={3}>
         <ValuerTableToolbar filterName={filterName} onFilterName={setFilterName} />
+          <Grid container spacing={2}>
+             {filteredData.map((row) => (
+                  <ValuerCardView
+                    key={row.id}
+                    row={row}
+                    selected={selected.includes(row.id)}
+                    onSelectRow={handleSelectRow}
+                    onView={() => handleView(row.id)}
+                    onSendRequest={() => handleSendRequest(row.id)}
+                  />
+                ))}
+          </Grid>
+        </Stack>
 
         {/* Table */}
-        <TableContainer>
+        {/* <TableContainer>
           <Scrollbar>
             <Table sx={{ minWidth: 960 }}>
               <TableHeadCustom
@@ -139,8 +154,8 @@ export default function ValuerListView() {
               </TableBody>
             </Table>
           </Scrollbar>
-        </TableContainer>
-      </Card>
+        </TableContainer> */}
+      
     </Container>
   );
 }

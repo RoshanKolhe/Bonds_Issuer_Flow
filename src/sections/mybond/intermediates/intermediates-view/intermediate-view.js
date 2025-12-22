@@ -37,16 +37,16 @@ const TABS = [
     label: 'RTA',
     icon: <Iconify icon="solar:document-text-bold" width={22} />,
   },
-  {
-    value: 'lead_manager',
-    label: 'Lead Manager',
-    icon: <Iconify icon="solar:user-star-bold" width={22} />,
-  },
-  {
-    value: 'legal_advisor',
-    label: 'Legal Advisor',
-    icon: <Iconify icon="solar:scale-bold" width={22} />,
-  },
+  // {
+  //   value: 'lead_manager',
+  //   label: 'Lead Manager',
+  //   icon: <Iconify icon="solar:user-star-bold" width={22} />,
+  // },
+  // {
+  //   value: 'legal_advisor',
+  //   label: 'Legal Advisor',
+  //   icon: <Iconify icon="solar:scale-bold" width={22} />,
+  // },
   {
     value: 'valuer',
     label: 'Valuer',

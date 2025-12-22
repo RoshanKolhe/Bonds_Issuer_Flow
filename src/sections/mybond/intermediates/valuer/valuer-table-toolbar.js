@@ -6,9 +6,6 @@ export default function ValuerTableToolbar({ filterName, onFilterName }) {
   return (
     <Stack
       spacing={2}
-      direction="row"
-      sx={{ p: 2.5 }}
-      alignItems="center"
     >
       <TextField
         fullWidth

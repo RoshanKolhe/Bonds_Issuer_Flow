@@ -1,14 +1,15 @@
 import PropTypes from 'prop-types';
-import { Stack, TextField, InputAdornment } from '@mui/material';
+import { Stack, TextField, InputAdornment, Grid } from '@mui/material';
 import Iconify from 'src/components/iconify';
 
 export default function DebentureTrusteeTableToolbar({ filterName, onFilterName }) {
   return (
+
     <Stack
       spacing={2}
-      direction="row"
-      sx={{ p: 2.5 }}
-      alignItems="center"
+      // direction="row"
+      // sx={{ p: 2.5 }}
+      // alignItems="center"
     >
       <TextField
         fullWidth
