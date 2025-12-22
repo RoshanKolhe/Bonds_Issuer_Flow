@@ -94,8 +94,8 @@ export default function IntermediariesView({ setActiveStepId }) {
       {currentTab === 'all' && <AllIntermediariesView setActiveStepId={setActiveStepId} />}
       {currentTab === 'debenture_trustee' && <DebentureTrusteeListView />}
       {currentTab === 'rta' && <RtaListView />}
-      {currentTab === 'lead_manager' && <LeadManagerListView />}
-      {currentTab === 'legal_advisor' && <LegalAdvisorListView />}
+      {/* {currentTab === 'lead_manager' && <LeadManagerListView />}
+      {currentTab === 'legal_advisor' && <LegalAdvisorListView />} */}
       {currentTab === 'valuer' && <ValuerListView />}
       {currentTab === 'credit_rating' && <CreditRatingAgency />}
     </Container>

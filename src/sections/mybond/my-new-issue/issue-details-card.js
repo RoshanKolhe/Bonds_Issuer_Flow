@@ -70,7 +70,7 @@ export default function IssueDetailsCard({
     totalUnit: issueDetailsData?.totalUnits ?? '',
     preferedPaymentCycle: issueDetailsData?.interestPaymentFrequency ?? 'monthly',
     redemptionType: issueDetailsData?.redemptionTypeId ?? '',
-    preferedInvestorCategory: issueDetailsData?.investorCategories[0].id ?? '',
+    preferedInvestorCategory: '',
   }), [issueDetailsData]);
 
 

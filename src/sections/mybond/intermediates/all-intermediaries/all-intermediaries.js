@@ -2,57 +2,9 @@ import { Grid, Typography, Box, Button } from '@mui/material';
 import Iconify from 'src/components/iconify';
 import IntermediarySection from './intermediary-section';
 import { useSnackbar } from 'notistack';
-
-const ALL_INTERMEDIARIES = {
-  debenture_trustee: [
-    {
-      id: 1,
-      name: 'IDBI Trusteeship Services Ltd',
-      registrationNo: 'SEBI/DT/001',
-      status: 'Appointed',
-    },
-  ],
-  rta: [
-    {
-      id: 1,
-      name: 'KFin Technologies Ltd',
-      registrationNo: 'SEBI/RTA/102',
-      status: 'Appointed',
-    },
-  ],
-  lead_manager: [
-    {
-      id: 1,
-      name: 'Axis Capital Ltd',
-      registrationNo: 'SEBI/MB/005',
-      status: 'Appointed',
-    },
-  ],
-  legal_advisor: [
-    {
-      id: 1,
-      name: 'Cyril Amarchand Mangaldas',
-      registrationNo: 'LAW/IND/001',
-      status: 'Appointed',
-    },
-  ],
-  valuer: [
-    {
-      id: 1,
-      name: 'RBSA Valuation Advisors LLP',
-      registrationNo: 'IBBI/RV/2018/103',
-      status: 'Appointed',
-    },
-  ],
-  credit_rating: [
-    {
-      id: 1,
-      name: 'CRISIL Ratings Ltd',
-      registrationNo: 'SEBI/CRA/001',
-      status: 'Appointed',
-    },
-  ],
-};
+import { useParams } from 'src/routes/hook';
+import { useGetBondApplicationStepData } from 'src/api/bondApplications';
+import { useEffect, useState } from 'react';
 
 const SectionTitle = ({ icon, title }) => (
   <Typography
@@ -67,10 +19,19 @@ const SectionTitle = ({ icon, title }) => (
 );
 
 export default function AllIntermediariesView({ setActiveStepId }) {
+  const param = useParams();
+  const { applicationId } = param;
   const { enqueueSnackbar } = useSnackbar();
+  const [appointedIntermediaries, setAppointedIntermediaries] = useState({
+    debenture_trustee: null,
+    rta: null,
+    valuer: null,
+    credit_rating: [],
+  });
+  const { stepData, stepDataLoading } = useGetBondApplicationStepData(applicationId, 'intermediary_appointments_pending');
 
   const handleNext = () => {
-    const allIntermediaries = Object.values(ALL_INTERMEDIARIES).flat();
+    const allIntermediaries = Object.values().flat();
 
     const hasPending = allIntermediaries.some((item) => item.status !== 'Appointed');
 
@@ -83,38 +44,70 @@ export default function AllIntermediariesView({ setActiveStepId }) {
     enqueueSnackbar('All intermediaries appointed', { variant: 'success' });
     setActiveStepId('fund_position');
   };
+
+  useEffect(() => {
+    if (stepData && !stepDataLoading) {
+      if (stepData.debentureTrustee) {
+        appointedIntermediaries.debenture_trustee = {
+          ...stepData.debentureTrustee,
+          status: 'Appointed'
+        }
+      };
+
+      if (stepData.creditRatingAgency.length) {
+        appointedIntermediaries.credit_rating = stepData.creditRatingAgency.map((agency) => ({
+          ...agency,
+          status: 'Appointed'
+        }))
+      };
+
+      if (stepData.registrarAndTransferAgent) {
+        appointedIntermediaries.rta = {
+          ...stepData.registrarAndTransferAgent,
+          status: 'Appointed'
+        }
+      };
+
+      if (stepData.valuer) {
+        appointedIntermediaries.valuer = {
+          ...stepData.valuer,
+          status: 'Appointed'
+        }
+      };
+    }
+  }, [stepData, stepDataLoading]);
   return (
     <>
       <Grid container spacing={4}>
         <Grid item xs={12}>
           <SectionTitle icon="solar:shield-check-bold" title="Debenture Trustee" />
 
-          <IntermediarySection data={ALL_INTERMEDIARIES.debenture_trustee} />
+          <IntermediarySection data={appointedIntermediaries.debenture_trustee} />
         </Grid>
 
         <Grid item xs={12}>
           <SectionTitle icon="solar:document-text-bold" title="Registrar & Transfer Agent (RTA)" />
-          <IntermediarySection data={ALL_INTERMEDIARIES.rta} />
+          <IntermediarySection data={appointedIntermediaries.rta} />
         </Grid>
 
-        <Grid item xs={12}>
+        {/* <Grid item xs={12}>
           <SectionTitle icon="solar:user-star-bold" title="Lead Manager" />
-          <IntermediarySection data={ALL_INTERMEDIARIES.lead_manager} />
+          <IntermediarySection data={appointedIntermediaries.lead_manager} />
         </Grid>
 
         <Grid item xs={12}>
           <SectionTitle icon="solar:scale-bold" title="Legal Advisor" />
-          <IntermediarySection data={ALL_INTERMEDIARIES.legal_advisor} />
-        </Grid>
+          <IntermediarySection data={appointedIntermediaries.legal_advisor} />
+        </Grid> */}
 
         <Grid item xs={12}>
           <SectionTitle icon="solar:calculator-bold" title="Valuer" />
-          <IntermediarySection data={ALL_INTERMEDIARIES.valuer} />
+          <IntermediarySection data={appointedIntermediaries.valuer} />
         </Grid>
 
         <Grid item xs={12}>
           <SectionTitle icon="solar:chart-bold" title="Credit Rating Agency" />
-          <IntermediarySection data={ALL_INTERMEDIARIES.credit_rating} />
+          <IntermediarySection data={appointedIntermediaries.credit_rating} />
         </Grid>
       </Grid>
       <Box

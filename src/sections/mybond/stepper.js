@@ -201,6 +201,14 @@ export default function MybondStepper() {
         currentStep = 'intermediaries';
       }
 
+      if (
+        completedStepCodes.includes('intermediary_appointments_pending') &&
+        completedStepCodes.includes('intermediary_appointments_success')
+      ) {
+        updateStepPercent('intermediaries', 100);
+        currentStep = 'fund_position';
+      }
+
       setActiveStepId(currentStep);
       setDataInitialized(true);
     }

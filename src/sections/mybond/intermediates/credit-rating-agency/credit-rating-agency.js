@@ -13,10 +13,13 @@ import {
 import { useSnackbar } from 'notistack';
 import Iconify from 'src/components/iconify';
 import { useGetCreditRatingAgencies } from 'src/api/creditRatingsAndAgencies';
+import axiosInstance from 'src/utils/axios';
+import { useParams } from 'react-router';
 
 export default function CreditRatingAgency() {
   const { enqueueSnackbar } = useSnackbar();
-
+  const params = useParams();
+  const { applicationId } = params;
   const { creditRatingAgencies = [], creditRatingAgenciesLoading } = useGetCreditRatingAgencies();
 
   const [selectedAgencyIds, setSelectedAgencyIds] = useState([]);
@@ -29,7 +32,7 @@ export default function CreditRatingAgency() {
     );
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!selectedAgencyIds.length) {
       setShowError(true);
       enqueueSnackbar('Please select at least one credit rating agency', {
@@ -42,11 +45,14 @@ export default function CreditRatingAgency() {
       selectedAgencyIds.includes(agency.id)
     );
 
-    console.log('✅ Selected Credit Rating Agencies:', selectedAgencies);
 
-    enqueueSnackbar('Credit Rating Agencies saved successfully', {
-      variant: 'success',
+    const response = await axiosInstance.post(`/bonds-pre-issue/save-intermediaries/${applicationId}`, {
+      creditRatingAgency: selectedAgencies
     });
+
+    if (response.success) {
+      enqueueSnackbar('Request send successfully');
+    }
   };
   const fileUrl =
     'https://images.unsplash.com/photo-1575936123452-b67c3203c357?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
