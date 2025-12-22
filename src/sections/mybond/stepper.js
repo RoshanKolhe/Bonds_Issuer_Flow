@@ -2,14 +2,10 @@ import { useState, useEffect } from 'react';
 import { Box, Card, Stack, Typography } from '@mui/material';
 
 import MainFile from './borrowing/main';
-import FinancialDetails from './financial-details/financial-details';
 import LaunchIssue from './launch-issue';
-import IsinActivation from './isin-activation';
-import RegulatoryFiling from './regulatory-filing/regulatory-filing';
 import AuditedFinancialDocument from './audited-financial/audited-financial-document';
 import FundAndCreditForm from './fund-position-and-credit-rating/fundAndCreditForm';
 import ProgressStepper from 'src/components/progress-stepper/ProgressStepper';
-import PriliminaryAndCollateralView from './preliminary-requirements-and collatral-details/priliminaryAndCollateralView';
 import ExecuteDocument from './execute-documents/execute-documents';
 import IsinActivationMain from './isin-activation/isin-activation-main';
 import IntermediariesView from './intermediates/intermediates-view/intermediate-view';
@@ -17,6 +13,7 @@ import MyBondNewIssue from './my-new-issue/my-bond-new-issue';
 import CollateralAssets from './collateral-assets/collatralAssets';
 import FinancialProfitableMainFile from './financial-details/financial-profitable-main';
 import CreditRating from './creadit-rating/creditRatings';
+import RegulatoryFilingMain from './regulatory-filing/regulatory-filing-main';
 
 export default function MybondStepper() {
   const [activeStepId, setActiveStepId] = useState('my_bond_new_issue');
@@ -278,8 +275,12 @@ export default function MybondStepper() {
 
       case 'regulatory_filing':
         return (
-          <RegulatoryFiling
-            currentRegulatory={formData.regulatory_filing}
+          <RegulatoryFilingMain
+            currentPAS4Regulatory={formData.regulatory_filing?.pas4}
+            currentTermSheetRegulatory={formData.regulatory_filing?.sebiApprovals}
+            currentInformationMemorandumRegulatory={formData.regulatory_filing?.memorandum}
+            currentInPrincipleRegulatory={formData.regulatory_filing?.inPrinciple}
+            currentTrusteeDueDiligenceRegulatory={formData.regulatory_filing?.trusteeDueDiligence}
             percent={(p) => updateStepPercent('regulatory_filing', p)}
             setActiveStepId={setActiveStepId}
             saveStepData={(data) => saveStepData('regulatory_filing', data)}
