@@ -131,7 +131,7 @@ export default function IssueDocumentsCard({
       (doc) => values[doc.code]
     ).length;
 
-    const percent = Math.round((uploaded / normalizedDocuments.length) * 100);
+    const percent = Math.round((uploaded / normalizedDocuments.length) * 50);
     setPercent?.(percent);
   }, [values, normalizedDocuments, setPercent]);
 

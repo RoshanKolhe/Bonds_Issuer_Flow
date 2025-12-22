@@ -5,20 +5,24 @@ import { useSnackbar } from 'notistack';
 import { useParams } from 'src/routes/hook';
 import { useGetBondApplicationStepData } from 'src/api/bondApplications';
 import { useEffect, useState } from 'react';
+import DebentureTrusteeCard from './cards/debenturee-trustee-card';
+import RTACard from './cards/rta-card';
+import ValuerCard from './cards/valuer-card';
+import CreditRatingCard from './cards/creditrating-card';
 
-const SectionTitle = ({ icon, title }) => (
-  <Typography
-    variant="h6"
-    fontWeight={700}
-    mb={1}
-    sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-  >
-    <Iconify icon={icon} width={22} />
-    {title}
-  </Typography>
-);
+// const SectionTitle = ({ icon, title }) => (
+//   <Typography
+//     variant="h6"
+//     fontWeight={700}
+//     mb={1}
+//     sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+//   >
+//     <Iconify icon={icon} width={22} />
+//     {title}
+//   </Typography>
+// );
 
-export default function AllIntermediariesView({ setActiveStepId }) {
+export default function AllIntermediariesView({ setActiveStepId, setCurrentTab }) {
   const param = useParams();
   const { applicationId } = param;
   const { enqueueSnackbar } = useSnackbar();
@@ -40,7 +44,6 @@ export default function AllIntermediariesView({ setActiveStepId }) {
       return;
     }
 
-    // ✅ All appointed → go next
     enqueueSnackbar('All intermediaries appointed', { variant: 'success' });
     setActiveStepId('fund_position');
   };
@@ -80,14 +83,15 @@ export default function AllIntermediariesView({ setActiveStepId }) {
     <>
       <Grid container spacing={4}>
         <Grid item xs={12}>
-          <SectionTitle icon="solar:shield-check-bold" title="Debenture Trustee" />
-
-          <IntermediarySection data={appointedIntermediaries.debenture_trustee} />
+          <DebentureTrusteeCard data={appointedIntermediaries.debenture_trustee}
+           onGoToTab={() => setCurrentTab('debenture_trustee')}
+          />
         </Grid>
 
         <Grid item xs={12}>
-          <SectionTitle icon="solar:document-text-bold" title="Registrar & Transfer Agent (RTA)" />
-          <IntermediarySection data={appointedIntermediaries.rta} />
+          <RTACard data={appointedIntermediaries.rta}
+          onGoToTab={()=> setCurrentTab('rta')}
+          />
         </Grid>
 
         {/* <Grid item xs={12}>
@@ -101,13 +105,15 @@ export default function AllIntermediariesView({ setActiveStepId }) {
         </Grid> */}
 
         <Grid item xs={12}>
-          <SectionTitle icon="solar:calculator-bold" title="Valuer" />
-          <IntermediarySection data={appointedIntermediaries.valuer} />
+          <ValuerCard data={appointedIntermediaries.valuer}
+          onGoToTab={()=> setCurrentTab('valuer')}
+          />
         </Grid>
 
         <Grid item xs={12}>
-          <SectionTitle icon="solar:chart-bold" title="Credit Rating Agency" />
-          <IntermediarySection data={appointedIntermediaries.credit_rating} />
+          <CreditRatingCard data={appointedIntermediaries.credit_rating}
+          onGoToTab={() => setCurrentTab('credit_rating')}
+          />
         </Grid>
       </Grid>
       <Box

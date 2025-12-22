@@ -6,8 +6,6 @@ import IssueDocumentsCard from './issue-documents-card';
 import IssueDetailsCard from './issue-details-card';
 
 export default function MyBondNewIssue({
-  currentIssueDetail,
-  currentIssueDocument,
   saveStepData,
   setActiveStepId,
   percent,
@@ -49,20 +47,21 @@ export default function MyBondNewIssue({
   useEffect(() => {
     const total = detailsPercent + docsPercent; // SAME AS FUND POSITION
     percent?.(total);
-  }, [detailsPercent, docsPercent, percent]);
+  }, [detailsPercent, docsPercent]);
 
+  console.log('percent', detailsPercent);
+    console.log('Doc Percent', docsPercent);
+  
   return (
     <>
       <Stack spacing={3}>
         <IssueDetailsCard
-          currentIssueDetail={currentIssueDetail}
           setPercent={setDetailsPercent}
           setProgress={setDetailsCompleted}
           saveStepData={(data) => saveStepData('issueDetails', data)}
         />
 
         <IssueDocumentsCard
-          currentIssueDocument={currentIssueDocument}
           setPercent={setDocsPercent}
           setProgress={setDocsCompleted}
           saveStepData={(data) => saveStepData('documentData', data)}

@@ -225,8 +225,6 @@ export default function MybondStepper() {
       case 'my_bond_new_issue':
         return (
           <MyBondNewIssue
-            currentIssueDetail={formData.my_bond_new_issue?.issueDetails || null}
-            currentIssueDocument={formData.my_bond_new_issue?.documentData || null}
             percent={(p) => updateStepPercent('my_bond_new_issue', p)}
             setActiveStepId={setActiveStepId}
             saveStepData={(data) => saveStepData('my_bond_new_issue', data)}

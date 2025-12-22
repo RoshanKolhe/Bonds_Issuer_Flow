@@ -63,7 +63,7 @@ const TABS = [
 
 export default function IntermediariesView({ setActiveStepId }) {
   const settings = useSettingsContext();
-  const [currentTab, setCurrentTab] = useState('debenture_trustee');
+  const [currentTab, setCurrentTab] = useState('all');
 
   const handleChangeTab = useCallback((event, newValue) => {
     setCurrentTab(newValue);
@@ -91,7 +91,7 @@ export default function IntermediariesView({ setActiveStepId }) {
           />
         ))}
       </Tabs>
-      {currentTab === 'all' && <AllIntermediariesView setActiveStepId={setActiveStepId} />}
+      {currentTab === 'all' && <AllIntermediariesView setActiveStepId={setActiveStepId} setCurrentTab={setCurrentTab} />}
       {currentTab === 'debenture_trustee' && <DebentureTrusteeListView />}
       {currentTab === 'rta' && <RtaListView />}
       {/* {currentTab === 'lead_manager' && <LeadManagerListView />}
