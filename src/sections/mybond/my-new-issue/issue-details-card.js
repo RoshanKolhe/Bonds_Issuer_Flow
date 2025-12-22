@@ -20,38 +20,30 @@ import YupErrorMessage from 'src/components/error-field/yup-error-messages';
 import { useGetRedemptionTypes } from 'src/api/redemptionTypes';
 import axiosInstance from 'src/utils/axios';
 import { useParams } from 'src/routes/hook';
+import { useGetBondApplicationStepData } from 'src/api/bondApplications';
 
 export default function IssueDetailsCard({
-  currentIssueDetail,
   setProgress,
-  saveStepData,
   setPercent,
 }) {
-  const { enqueueSnackbar } = useSnackbar();
-  const { investorCtegories, investorCtegoriesLoading } = useGetInvestorCategories();
-  const [investorCategoriesData, setInvestorCategoriesData] = useState([]);
-
-  const [redemptionType, setRedemptionType] = useState();
-  const { redemptionTypes, redemptionTypesLoading } = useGetRedemptionTypes();
-
   const param = useParams();
-
   const { applicationId } = param;
-
-
-  useEffect(() => {
-    if (redemptionTypes && !redemptionTypesLoading) {
-      setRedemptionType(redemptionTypes)
-    }
-  }, [redemptionTypes, redemptionTypesLoading])
+  const { enqueueSnackbar } = useSnackbar();
+  const [redemptionType, setRedemptionType] = useState();
+  const [investorCategoriesData, setInvestorCategoriesData] = useState([]);
+  const [issueDetailsData, setIssueDetailsData] = useState(null);
+  const { investorCtegories, investorCtegoriesLoading } = useGetInvestorCategories();
+  const { redemptionTypes, redemptionTypesLoading } = useGetRedemptionTypes();
+  const { stepData, stepDataLoading } = useGetBondApplicationStepData(applicationId, 'issue_details');
   const paymentCycleOptions = [
     { label: 'Monthly', value: 'monthly' },
     { label: 'Quaterly', value: 'quarterly' },
     { label: 'Anually', value: 'annually' },
   ];
+
   const Schema = Yup.object().shape({
     issueType: Yup.string().required('Required'),
-    securityType: Yup.bool().required('Please select security type'),
+    securityType: Yup.string().required('Please select security type'),
     issueSize: Yup.string().required('Required'),
     tenureYears: Yup.string().required('Required'),
     preferedInvestorCategory: Yup.string().when('issueType', {
@@ -59,6 +51,7 @@ export default function IssueDetailsCard({
       then: (schema) => schema.required('Investor category is required'),
       otherwise: (schema) => schema.notRequired(),
     }),
+    preferedPaymentCycle: Yup.string().required('Payment cycle is required'),
     couponRate: Yup.string().required('Required'),
     minimumInvestmentPrice: Yup.string().required('Required'),
     redemptionType: Yup.string().required('Required'),
@@ -66,21 +59,20 @@ export default function IssueDetailsCard({
     totalUnit: Yup.string().required('Required'),
   });
 
-  const defaultValues = useMemo(
-    () => ({
-      issueType: currentIssueDetail?.issueType || 'public',
-      securityType: currentIssueDetail?.securityType || true,
-      issueSize: currentIssueDetail?.issueSize || '',
-      tenureYears: currentIssueDetail?.tenureYears || '',
-      couponRate: currentIssueDetail?.couponRate || '',
-      minimumInvestmentPrice: currentIssueDetail?.minimumInvestmentPrice || '',
-      redemptionType: currentIssueDetail?.redemptionType || '',
-      minimumPurchaseUnit: currentIssueDetail?.minimumPurchaseUnit || '',
-      totalUnit: currentIssueDetail?.totalUnit || '',
-      preferedPaymentCycle: currentIssueDetail?.preferedInvestorCategory || '',
-    }),
-    [currentIssueDetail]
-  );
+  const defaultValues = useMemo(() => ({
+    issueType: issueDetailsData?.placementType ?? 'public',
+    securityType: issueDetailsData?.securityType ?? 'secured',
+    issueSize: issueDetailsData?.issueSize ?? '',
+    tenureYears: issueDetailsData?.tenure ?? '',
+    couponRate: issueDetailsData?.couponRate ?? '',
+    minimumInvestmentPrice: issueDetailsData?.minimumInvestment ?? '',
+    minimumPurchaseUnit: issueDetailsData?.minimumUnitsToPurchase ?? '',
+    totalUnit: issueDetailsData?.totalUnits ?? '',
+    preferedPaymentCycle: issueDetailsData?.interestPaymentFrequency ?? 'monthly',
+    redemptionType: issueDetailsData?.redemptionTypeId ?? '',
+    preferedInvestorCategory: issueDetailsData?.investorCategories[0].id ?? '',
+  }), [issueDetailsData]);
+
 
   const methods = useForm({
     resolver: yupResolver(Schema),
@@ -110,41 +102,7 @@ export default function IssueDetailsCard({
     'totalUnit',
   ];
 
-  useEffect(() => {
-    let completed = 0;
-
-    requiredFields.forEach((field) => {
-      if (values[field]) completed++;
-    });
-
-    const percentValue = (completed / requiredFields.length) * 50;
-    setPercent?.(percentValue);
-  }, [values, setPercent]);
-
-  useEffect(() => {
-    if (currentIssueDetail && Object.keys(currentIssueDetail).length > 0) {
-      reset(currentIssueDetail);
-      setProgress?.(true);
-    }
-  }, [currentIssueDetail, reset, setProgress]);
-
-  useEffect(() => {
-    const size = parseFloat(values.issueSize);
-    const units = parseFloat(values.totalUnit);
-    const minUnit = parseFloat(values.minimumPurchaseUnit);
-
-    if (size > 0 && units > 0 && minUnit > 0) {
-      const minInvestment = (size / units) * minUnit;
-      setValue('minimumInvestmentPrice', minInvestment.toFixed(2), {
-        shouldValidate: true,
-      });
-    } else {
-      setValue('minimumInvestmentPrice', '', { shouldValidate: false });
-    }
-  }, [values.issueSize, values.totalUnit, values.minimumPurchaseUnit, setValue]);
-
   const issueType = watch('issueType');
-  const securityType = watch('securityType');
   const issueSize = watch('issueSize');
   const totalUnit = watch('totalUnit');
   const minimumPurchaseUnit = watch('minimumPurchaseUnit');
@@ -153,33 +111,26 @@ export default function IssueDetailsCard({
     if (value !== null) setValue('issueType', value);
   };
 
-  const handleSecurityTypeChange = (e, value) => {
-    if (value !== null) setValue('securityType', value);
-  };
-
   const onSubmit = handleSubmit(async (data) => {
     try {
       const payload = {
-        placementType: data.issueType, // public / private
-
-        isEbpIssue: false, // or true based on business logic
-
+        placementType: data.issueType,
+        isEbpIssue: false,
         tenure: Number(data.tenureYears),
-
-        interestPaymentFrequency: data.preferedPaymentCycle, // 0/1/2
-
+        interestPaymentFrequency: data.preferedPaymentCycle,
         minimumInvestment: Number(data.minimumInvestmentPrice),
-
         minimumUnitsToPurchase: Number(data.minimumPurchaseUnit),
-
+        bondIssueApplicationId: applicationId,
+        redemptionTypeId: data.redemptionType,
         totalUnits: Number(data.totalUnit),
-
         issueSize: Number(data.issueSize),
-
         couponRate: Number(data.couponRate),
-
-        securityType: data.securityType ? 'secured' : 'unsecured',
+        securityType: data.securityType,
       };
+
+      if (data.issueType === 'private') {
+        payload.investorCategoryIds = [data.preferedInvestorCategory]
+      }
 
       const response = await axiosInstance.patch(
         `/bonds-pre-issue/update-issue-details/${applicationId}`,
@@ -198,16 +149,6 @@ export default function IssueDetailsCard({
     }
   });
 
-
-  useEffect(() => {
-    if (issueType === 'public') {
-      setValue('preferedInvestorCategory', '', {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
-    }
-  }, [issueType, setValue]);
-
   useEffect(() => {
     if (investorCtegories && !investorCtegoriesLoading) {
       setInvestorCategoriesData(investorCtegories);
@@ -215,10 +156,10 @@ export default function IssueDetailsCard({
   }, [investorCtegories, investorCtegoriesLoading]);
 
   useEffect(() => {
-    if (currentIssueDetail) {
-      reset(currentIssueDetail);
+    if (stepData && !stepDataLoading) {
+      setIssueDetailsData(stepData);
     }
-  }, [currentIssueDetail]);
+  }, [stepData, stepDataLoading]);
 
   useEffect(() => {
     const size = parseFloat(issueSize);
@@ -235,7 +176,54 @@ export default function IssueDetailsCard({
     } else {
       setValue('minimumInvestmentPrice', '', { shouldValidate: false });
     }
-  }, [issueSize, totalUnit, minimumPurchaseUnit, setValue]);
+
+    if (issueType === 'public') {
+      setValue('preferedInvestorCategory', '', {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+  }, [issueSize, totalUnit, minimumPurchaseUnit, setValue, issueType]);
+
+  useEffect(() => {
+    if (redemptionTypes && !redemptionTypesLoading) {
+      setRedemptionType(redemptionTypes)
+    }
+  }, [redemptionTypes, redemptionTypesLoading]);
+
+  useEffect(() => {
+    let completed = 0;
+
+    requiredFields.forEach((field) => {
+      if (values[field]) completed++;
+    });
+
+    const percentValue = (completed / requiredFields.length) * 50;
+    setPercent?.(percentValue);
+  }, [values, setPercent]);
+
+  useEffect(() => {
+    if (issueDetailsData) {
+      reset(defaultValues);
+      setProgress?.(true);
+    }
+  }, [issueDetailsData, reset, setProgress, defaultValues]);
+
+  useEffect(() => {
+    const size = parseFloat(values.issueSize);
+    const units = parseFloat(values.totalUnit);
+    const minUnit = parseFloat(values.minimumPurchaseUnit);
+
+    if (size > 0 && units > 0 && minUnit > 0) {
+      const minInvestment = (size / units) * minUnit;
+      setValue('minimumInvestmentPrice', minInvestment.toFixed(2), {
+        shouldValidate: true,
+      });
+    } else {
+      setValue('minimumInvestmentPrice', '', { shouldValidate: false });
+    }
+  }, [values.issueSize, values.totalUnit, values.minimumPurchaseUnit, setValue]);
+
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
       <Card sx={{ p: 2, mb: '50px' }}>
@@ -322,8 +310,8 @@ export default function IssueDetailsCard({
                     onChange={(e, val) => val !== null && field.onChange(val)}
                     fullWidth
                   >
-                    <ToggleButton value={true}>Secured</ToggleButton>
-                    <ToggleButton value={false}>Unsecured</ToggleButton>
+                    <ToggleButton value={'secured'}>Secured</ToggleButton>
+                    <ToggleButton value={'unsecured'}>Unsecured</ToggleButton>
                   </ToggleButtonGroup>
                 )}
               />

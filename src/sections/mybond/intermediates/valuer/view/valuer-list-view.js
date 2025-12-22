@@ -19,7 +19,9 @@ import { TableHeadCustom } from 'src/components/table';
 import { VALUERS } from '../../intermediates-dummy-date';
 import ValuerTableToolbar from '../valuer-table-toolbar';
 import ValuerTableRow from '../valuer-table-row';
-import { useRouter } from 'src/routes/hook';
+import { useParams, useRouter } from 'src/routes/hook';
+import axiosInstance from 'src/utils/axios';
+import { useSnackbar } from 'notistack';
 
 // ------------------------------------------------------
 
@@ -35,6 +37,9 @@ const TABLE_HEAD = [
 // ------------------------------------------------------
 
 export default function ValuerListView() {
+  const params = useParams();
+  const { applicationId } = params;
+  const { enqueueSnackbar } = useSnackbar();
   const settings = useSettingsContext();
   const router = useRouter();
   const [tab, setTab] = useState('debenture_trustee');
@@ -68,8 +73,20 @@ export default function ValuerListView() {
     console.log('View Valuer:', id);
   };
 
-  const handleSendRequest = (id) => {
-    console.log('Send Request to Valuer:', id);
+  const handleSendRequest = async (id) => {
+    try {
+      const valuerData = VALUERS.find((trustee) => trustee.id === id);
+
+      const response = await axiosInstance.post(`/bonds-pre-issue/save-intermediaries/${applicationId}`, {
+        valuer: valuerData
+      });
+
+      if (response.success) {
+        enqueueSnackbar('Request send successfully');
+      }
+    } catch (error) {
+      console.error('error while sending request to debenture trustee :', error);
+    }
   };
 
   return (

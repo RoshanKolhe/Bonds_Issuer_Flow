@@ -182,47 +182,36 @@ export default function MybondStepper() {
   };
 
 
-    // useEffect(() => {
-    //   if (bondEstimation && !bondEstimationLoading && !dataInitialized) {
-  
-    //     setEstimationData(bondEstimation);
-    //     let currentStep = 'fund_position_and_credit_ratings';
-  
-    //     if (
-    //       bondEstimation.currentProgress.includes('fund_position') &&
-    //       bondEstimation.currentProgress.includes('credit_ratings')
-    //     ) {
-    //       updateStepPercent('fund_position_and_credit_ratings', 100);
-    //       currentStep = 'borrowing_details';
-    //     }
-  
-    //     if (
-    //       bondEstimation.currentProgress.includes('profitability_details') &&
-    //       bondEstimation.currentProgress.includes('capital_details') &&
-    //       bondEstimation.currentProgress.includes('borrowing_details')
-    //     ) {
-    //       updateStepPercent('audited_financial', 100);
-    //       updateStepPercent('borrowing_details', 100);
-    //       currentStep = 'financial_details';
-    //     }
-  
-    //     if (bondEstimation.currentProgress.includes('financial_details')) {
-    //       updateStepPercent('financial_details', 100);
-    //       currentStep = 'preliminary_bond_requirements';
-    //     }
-  
-    //     setActiveStepId(currentStep);
-  
-    //     setDataInitialized(true);
-    //   }
-    // }, [bondEstimation, bondEstimationLoading, dataInitialized]);
+  useEffect(() => {
+    if (bondApplication && !bondApplicationLoading && !dataInitialized) {
+
+      setApplicationData(bondApplication);
+
+      const completedStepCodes =
+        bondApplication.completedSteps?.map((step) => step.code) || [];
+
+      let currentStep = 'my_bond_new_issue';
+
+      if (
+        completedStepCodes.includes('initialized') &&
+        completedStepCodes.includes('issue_details') &&
+        completedStepCodes.includes('document_upload')
+      ) {
+        updateStepPercent('my_bond_new_issue', 100);
+        currentStep = 'intermediaries';
+      }
+
+      setActiveStepId(currentStep);
+      setDataInitialized(true);
+    }
+  }, [bondApplication, bondApplicationLoading, dataInitialized]);
 
 
-    useEffect(()=>{
-  if(bondApplication && !bondApplicationLoading){
-    setApplicationData(bondApplication)
-  }
-}, [bondApplication , bondApplicationLoading])
+  useEffect(() => {
+    if (bondApplication && !bondApplicationLoading) {
+      setApplicationData(bondApplication)
+    }
+  }, [bondApplication, bondApplicationLoading])
   const renderForm = () => {
     switch (activeStepId) {
       case 'my_bond_new_issue':

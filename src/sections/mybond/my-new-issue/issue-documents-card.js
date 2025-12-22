@@ -1,44 +1,58 @@
-import React, { useEffect, useMemo } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
-import * as Yup from 'yup';
-import { Box, Card, Grid, MenuItem, Typography } from '@mui/material';
-import { yupResolver } from '@hookform/resolvers/yup';
-
-import FormProvider, { RHFCustomFileUploadBox, RHFSelect } from 'src/components/hook-form';
-import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
-import YupErrorMessage from 'src/components/error-field/yup-error-messages';
-import { useSnackbar } from 'notistack';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Box, Card, Grid, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+import { useSnackbar } from 'notistack';
 
-// ---------------- component ----------------
+import FormProvider, { RHFCustomFileUploadBox } from 'src/components/hook-form';
+import { useGetBondFlowDocuments } from 'src/api/bond-documents';
+import axiosInstance from 'src/utils/axios';
+import { useParams } from 'src/routes/hook';
+import { useGetBondApplicationStepData } from 'src/api/bondApplications';
+
+// ------------------------------------------------------------
 
 export default function IssueDocumentsCard({
-  currentIssueDocument,
-  saveStepData,
-  setPercent,
   setProgress,
+  setPercent,
 }) {
+  const param = useParams();
+  const { applicationId } = param;
   const { enqueueSnackbar } = useSnackbar();
-  const DocumentSchema = Yup.object().shape({
-    boardResolution: Yup.mixed().required('Board Resolution is required'),
-    shareholderResolution: Yup.mixed().required('Shareholder Resolution is required'),
-    moaAoaType: Yup.string().required('Select MoA or AoA'),
-    moaAoa: Yup.mixed().required('MoA / AoA document is required'),
-    certificateOfIncorporation: Yup.mixed().required('Certificate of Incorporation is required'),
-    mgtFilling14: Yup.mixed().required('Management Filling 14 is required'),
-  });
+  const { documents, documentsLoading } = useGetBondFlowDocuments('document_upload');
+  const { stepData, stepDataLoading } = useGetBondApplicationStepData(applicationId, 'document_upload');
 
-  const defaultValues = useMemo(
-    () => ({
-      boardResolution: currentIssueDocument?.boardResolution || null,
-      shareholderResolution: currentIssueDocument?.shareholderResolution || null,
-      moaAoaType: currentIssueDocument?.moaAoaType || 'moa',
-      moaAoa: currentIssueDocument?.moaAoa || null,
-      mgtFilling14: currentIssueDocument?.mgtFilling14 || null,
-      certificateOfIncorporation: currentIssueDocument?.certificateOfIncorporation || null,
-    }),
-    [currentIssueDocument]
-  );
+  const normalizedDocuments = useMemo(() => {
+    if (!documents) return [];
+
+    return documents.map((d) => ({
+      id: d.documents.id,
+      code: d.documents.value,
+      label: d.documents.name,
+      description: d.documents.description,
+      isMandatory: d.isMandatory,
+    }));
+  }, [documents]);
+
+  const DocumentSchema = useMemo(() => {
+    const shape = {};
+    normalizedDocuments.forEach((doc) => {
+      shape[doc.code] = doc.isMandatory
+        ? Yup.mixed().required(`${doc.label} is required`)
+        : Yup.mixed().nullable();
+    });
+    return Yup.object().shape(shape);
+  }, [normalizedDocuments]);
+
+  const defaultValues = useMemo(() => {
+    const values = {};
+    normalizedDocuments.forEach((doc) => {
+      values[doc.code] = null;
+    });
+    return values;
+  }, [normalizedDocuments]);
 
   const methods = useForm({
     resolver: yupResolver(DocumentSchema),
@@ -47,49 +61,105 @@ export default function IssueDocumentsCard({
 
   const {
     watch,
-    control,
     handleSubmit,
-    reset,
     formState: { isSubmitting },
   } = methods;
 
   const values = watch();
-  const moaAoaType = useWatch({ control, name: 'moaAoaType' });
-
-  useEffect(() => {
-    let completed = 0;
-
-    if (values.boardResolution) completed++;
-    if (values.shareholderResolution) completed++;
-    if (values.moaAoa) completed++;
-    if (values.certificateOfIncorporation) completed++;
-    if (values.mgtFilling14) completed++;
-
-    const percentValue = (completed / 5) * 50;
-    setPercent?.(percentValue);
-  }, [values, setPercent]);
-
-  useEffect(() => {
-    if (currentIssueDocument && Object.keys(currentIssueDocument).length > 0) {
-      reset(defaultValues);
-      setProgress?.(true);
-    }
-  }, [currentIssueDocument, reset, defaultValues, setProgress]);
-
-  // -------------------------------------------------------------
-  const getMoaAoaLabel = () =>
-    moaAoaType === 'moa' ? 'MoA - Memorandum of Association' : 'AoA - Articles of Association';
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      saveStepData(data);
-      setProgress(true);
-      enqueueSnackbar('Documents saved', { variant: 'success' });
+      const payload = normalizedDocuments
+        .filter((doc) => data[doc.code])
+        .map((doc) => ({
+          documentsId: doc.id,
+          mediaId: data[doc.code].id,
+        }));
+
+      const response = await axiosInstance.patch(`/bonds-pre-issue/upload-documents/${applicationId}`, {
+        documents: payload,
+      });
+
+      if (response.failureCount > 0) {
+        enqueueSnackbar(
+          `${response.successCount} uploaded, ${response.failureCount} failed`,
+          { variant: 'warning' }
+        );
+      } else {
+        enqueueSnackbar('All documents uploaded successfully', {
+          variant: 'success',
+        });
+      }
+
+      setProgress?.(true);
     } catch (error) {
-      console.error(error);
-      enqueueSnackbar('Failed to save documents', { variant: 'error' });
+      enqueueSnackbar('Document upload failed', { variant: 'error' });
     }
   });
+
+  const mapUploadedDocsToFormValues = (
+    normalizedDocuments,
+    uploadedDocs
+  ) => {
+    const values = {};
+
+    normalizedDocuments.forEach((doc) => {
+      const uploaded = uploadedDocs?.find(
+        (u) =>
+          u.documentsId === doc.id &&
+          u.documentState === 'UPLOADED'
+      );
+
+      values[doc.code] = uploaded
+        ? {
+          id: uploaded.media.id,
+          name: uploaded.media.fileOriginalName,
+          preview: uploaded.media.fileUrl,
+          fileUrl: uploaded.media.fileUrl,
+          isUploaded: true,
+        }
+        : null;
+    });
+
+    return values;
+  };
+
+  useEffect(() => {
+    if (!normalizedDocuments.length) return;
+
+    const uploaded = normalizedDocuments.filter(
+      (doc) => values[doc.code]
+    ).length;
+
+    const percent = Math.round((uploaded / normalizedDocuments.length) * 100);
+    setPercent?.(percent);
+  }, [values, normalizedDocuments, setPercent]);
+
+  useEffect(() => {
+    if (
+      stepData &&
+      !stepDataLoading &&
+      normalizedDocuments.length
+    ) {
+      const mappedValues = mapUploadedDocsToFormValues(
+        normalizedDocuments,
+        stepData
+      );
+
+      methods.reset(mappedValues);
+      setProgress?.(true);
+    }
+  }, [
+    stepData,
+    stepDataLoading,
+    normalizedDocuments,
+    methods,
+    setProgress,
+  ]);
+
+  if (documentsLoading) {
+    return <Typography>Loading documents...</Typography>;
+  }
 
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
@@ -99,76 +169,27 @@ export default function IssueDocumentsCard({
         </Typography>
 
         <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <RHFCustomFileUploadBox
-              name="certificateOfIncorporation"
-              label="Certificate of Incorporation"
-              accept={{
-                'application/pdf': ['.pdf'],
-                'image/png': ['.png'],
-                'image/jpeg': ['.jpg', '.jpeg'],
-              }}
-            />
-            <YupErrorMessage name="certificateOfIncorporation" />
-          </Grid>
-          <Grid item xs={12}>
-            <RHFCustomFileUploadBox
-              name="boardResolution"
-              label="Board Resolution"
-              accept={{
-                'application/pdf': ['.pdf'],
-                'image/png': ['.png'],
-                'image/jpeg': ['.jpg', '.jpeg'],
-              }}
-            />
-            <YupErrorMessage name="boardResolution" />
-          </Grid>
-          <Grid item xs={12}>
-            <RHFSelect name="moaAoaType" label="Select Document Type">
-              <MenuItem value="moa">MoA - Memorandum of Association</MenuItem>
-              <MenuItem value="aoa">AoA - Articles of Association</MenuItem>
-            </RHFSelect>
-          </Grid>
-          <Grid item xs={12}>
-            <RHFCustomFileUploadBox
-              name="moaAoa"
-              label={getMoaAoaLabel()}
-              icon="mdi:file-document-edit-outline"
-              accept={{
-                'application/pdf': ['.pdf'],
-                'image/png': ['.png'],
-                'image/jpeg': ['.jpg', '.jpeg'],
-              }}
-            />
-            <YupErrorMessage name="moaAoa" />
-          </Grid>
-          <Grid item xs={12}>
-            <RHFCustomFileUploadBox
-              name="shareholderResolution"
-              label="Shareholder Resolution"
-              accept={{
-                'application/pdf': ['.pdf'],
-                'image/png': ['.png'],
-                'image/jpeg': ['.jpg', '.jpeg'],
-              }}
-            />
-            <YupErrorMessage name="shareholderResolution" />
-          </Grid>
-          <Grid item xs={12}>
-            <RHFCustomFileUploadBox
-              name="mgtFilling14"
-              label="Management Filling 14"
-              accept={{
-                'application/pdf': ['.pdf'],
-                'image/png': ['.png'],
-                'image/jpeg': ['.jpg', '.jpeg'],
-              }}
-            />
-            <YupErrorMessage name="mgtFilling14" />
-          </Grid>
+          {normalizedDocuments.map((doc) => (
+            <Grid item xs={12} key={doc.id}>
+              <RHFCustomFileUploadBox
+                name={doc.code}
+                label={doc.label}
+                accept={{
+                  'application/pdf': ['.pdf'],
+                  'image/png': ['.png'],
+                  'image/jpeg': ['.jpg', '.jpeg'],
+                }}
+              />
+            </Grid>
+          ))}
         </Grid>
+
         <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-          <LoadingButton type="submit" loading={isSubmitting} variant="contained">
+          <LoadingButton
+            type="submit"
+            loading={isSubmitting}
+            variant="contained"
+          >
             Save
           </LoadingButton>
         </Box>
