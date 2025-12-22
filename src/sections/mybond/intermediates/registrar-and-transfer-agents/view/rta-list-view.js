@@ -8,7 +8,9 @@ import { TableHeadCustom } from 'src/components/table';
 import { RTAS } from '../../intermediates-dummy-date';
 import RtaTableToolbar from '../rta-table-toolbar';
 import RtaTableRow from '../rta-table-row';
-import { useRouter } from 'src/routes/hook';
+import { useParams, useRouter } from 'src/routes/hook';
+import axiosInstance from 'src/utils/axios';
+import { useSnackbar } from 'notistack';
 
 // ------------------------------------------------------
 
@@ -24,6 +26,9 @@ const TABLE_HEAD = [
 // ------------------------------------------------------
 
 export default function RtaListView() {
+  const params = useParams();
+  const { applicationId } = params;
+  const { enqueueSnackbar } = useSnackbar();
   const settings = useSettingsContext();
   const router = useRouter();
   const [filterName, setFilterName] = useState('');
@@ -56,8 +61,20 @@ export default function RtaListView() {
     console.log('View Rta:', id);
   };
 
-  const handleSendRequest = (id) => {
-    console.log('Send Request to Rta:', id);
+  const handleSendRequest = async (id) => {
+    try {
+      const rtaData = RTAS.find((trustee) => trustee.id === id);
+
+      const response = await axiosInstance.post(`/bonds-pre-issue/save-intermediaries/${applicationId}`, {
+        registrarAndTransferAgent: rtaData
+      });
+
+      if (response.success) {
+        enqueueSnackbar('Request send successfully');
+      }
+    } catch (error) {
+      console.error('error while sending request to debenture trustee :', error);
+    }
   };
 
   return (

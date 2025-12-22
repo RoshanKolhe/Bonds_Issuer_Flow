@@ -26,7 +26,7 @@ export function useGetBondApplications(filter) {
         [data?.applications, error, isLoading, isValidating]
     );
 
-  
+
     console.log(memoizedValue?.bondApplications)
 
     return memoizedValue;
@@ -41,12 +41,32 @@ export function useGetBondApplication(applicationId) {
 
     const memoizedValue = useMemo(
         () => ({
-            bondApplication: data?.applications,
+            bondApplication: data?.applicationData,
             bondApplicationLoading: isLoading,
             bondApplicationError: error,
             bondApplicationValidating: isValidating,
         }),
-        [data?.applications, error, isLoading, isValidating]
+        [data, error, isLoading, isValidating]
+    );
+
+    return memoizedValue;
+}
+
+// ----------------------------------------------------------------------
+
+export function useGetBondApplicationStepData(applicationId, statusValue) {
+    const URL = (applicationId && statusValue) ? endpoints.bondApplications.dataByStatus(applicationId, statusValue) : null;
+
+    const { data, isLoading, error, isValidating } = useSWR(URL, fetcher);
+
+    const memoizedValue = useMemo(
+        () => ({
+            stepData: data?.stepData,
+            stepDataLoading: isLoading,
+            stepDataError: error,
+            stepDataValidating: isValidating,
+        }),
+        [data, error, isLoading, isValidating]
     );
 
     return memoizedValue;

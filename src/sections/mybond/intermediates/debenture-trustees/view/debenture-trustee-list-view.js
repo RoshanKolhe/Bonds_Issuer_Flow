@@ -5,21 +5,20 @@ import {
   Table,
   TableBody,
   TableContainer,
-  Tabs,
-  Tab,
   Button,
   Stack,
 } from '@mui/material';
 
 import Scrollbar from 'src/components/scrollbar';
-import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import { useSettingsContext } from 'src/components/settings';
 import { TableHeadCustom } from 'src/components/table';
 
 import { DEBENTURE_TRUSTEES } from '../../intermediates-dummy-date';
 import DebentureTrusteeTableToolbar from '../debenture-trustee-table-toolbar';
 import DebentureTrusteeTableRow from '../debenture-trustee-table-row';
-import { useRouter } from 'src/routes/hook';
+import { useParams, useRouter } from 'src/routes/hook';
+import axiosInstance from 'src/utils/axios';
+import { useSnackbar } from 'notistack';
 
 // ------------------------------------------------------
 
@@ -35,9 +34,11 @@ const TABLE_HEAD = [
 // ------------------------------------------------------
 
 export default function DebentureTrusteeListView() {
+  const params = useParams();
+  const {applicationId} = params;
+  const {enqueueSnackbar} = useSnackbar();
   const settings = useSettingsContext();
   const router = useRouter();
-  const [tab, setTab] = useState('debenture_trustee');
   const [filterName, setFilterName] = useState('');
   const [selected, setSelected] = useState([]);
 
@@ -68,8 +69,20 @@ export default function DebentureTrusteeListView() {
     console.log('View Debenture Trustee:', id);
   };
 
-  const handleSendRequest = (id) => {
-    console.log('Send Request to Debenture Trustee:', id);
+  const handleSendRequest = async (id) => {
+    try{
+      const trusteeData = DEBENTURE_TRUSTEES.find((trustee) => trustee.id === id);
+
+      const response = await axiosInstance.post(`/bonds-pre-issue/save-intermediaries/${applicationId}`, {
+        debentureTrustee: trusteeData
+      });
+
+      if(response.success){
+        enqueueSnackbar('Request send successfully');
+      }
+    }catch(error){
+      console.error('error while sending request to debenture trustee :', error);
+    }
   };
 
   return (

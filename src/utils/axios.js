@@ -90,7 +90,8 @@ export const endpoints = {
   bondApplications: {
     list: '/bond-applications',
     filterList: (filter) => `/bond-applications?filter=${filter}`,
-    details: (applicationId) => `/bond-applications/${applicationId}`
+    details: (applicationId) => `/bond-applications/${applicationId}`,
+    dataByStatus: (applicationId, statusValue) => `/bond-applications/${applicationId}/data-by-status/${statusValue}`
   },
   creditRatingAgencies: {
     list: '/credit-rating-agencies',
@@ -111,6 +112,9 @@ export const endpoints = {
   investorCategories: {
     list: '/investor-categories',
     filterList: (filter) => `/investor-categories?filter=${filter}`,
+  },
+  bondFlowDocuments: {
+    documentList: (status) => `/bonds-pre-issue/fetch-documents/${status}`
   },
   fieldOptions: {
     chargeTypes: '',

@@ -1,4 +1,4 @@
-import { Card, Grid, Typography, Stack, Chip, Divider, Box, Button } from '@mui/material';
+import { Grid, Typography, Box, Button } from '@mui/material';
 import Iconify from 'src/components/iconify';
 import IntermediarySection from './intermediary-section';
 import { useSnackbar } from 'notistack';
