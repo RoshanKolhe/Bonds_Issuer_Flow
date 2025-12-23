@@ -1,6 +1,26 @@
-import React from 'react';
-import { Box, Typography, Divider, Avatar, Card, Grid, Stack } from '@mui/material';
-import { useSearchParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import {
+  Box,
+  Typography,
+  Divider,
+  Avatar,
+  Card,
+  Grid,
+  Stack,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+  TableContainer,
+  Table,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableBody,
+  Paper,
+} from '@mui/material';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import Iconify from 'src/components/iconify';
 
 import {
   DEBENTURE_TRUSTEES,
@@ -27,27 +47,36 @@ const parseNumber = (value) =>
 
 export default function CompareIntermediaryView() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(true);
 
-  const type = searchParams.get('type'); // trustee | rta | legal | etc
+  const type = searchParams.get('type');
   const selectedIds = searchParams.get('ids')?.split(',') || [];
 
   const sourceData = DATA_MAP[type] || [];
   const selectedItems = sourceData.filter((i) => selectedIds.includes(i.id));
 
+  const handleClose = () => {
+    setOpen(false);
+    navigate(-1); // ⬅️ go back to previous page
+  };
+
   if (selectedItems.length < 2) {
     return (
-      <Typography textAlign="center" color="text.secondary">
-        Select at least 2 items to compare
-      </Typography>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogContent>
+          <Typography textAlign="center" color="text.secondary">
+            Select at least 2 items to compare
+          </Typography>
+        </DialogContent>
+      </Dialog>
     );
   }
 
   // ------------------ best values ------------------
 
   const bestExperience = Math.max(...selectedItems.map((i) => parseNumber(i.experience)));
-
   const bestResponse = Math.min(...selectedItems.map((i) => parseNumber(i.responseTime)));
-
   const bestFees = Math.min(
     ...selectedItems.map((i) => parseNumber(i.fees || i.feeStructure || '0'))
   );
@@ -57,85 +86,132 @@ export default function CompareIntermediaryView() {
     fontWeight: condition ? 700 : 400,
   });
 
+  const comparisonRows = [
+    {
+      label: 'Experience',
+      key: 'experience',
+      bestValue: bestExperience,
+    },
+    {
+      label: 'Response Time',
+      key: 'responseTime',
+      bestValue: bestResponse,
+      reverse: true,
+    },
+    {
+      label: 'Fees',
+      key: 'fees',
+      altKey: 'feeStructure',
+      bestValue: bestFees,
+      reverse: true,
+    },
+    { label: 'Regulatory', key: 'regulatory' },
+    { label: 'Past Issues', key: 'pastIssues' },
+    { label: 'Tech Capability', key: 'techCapability' },
+    { label: 'Rating', key: 'rating' },
+    { label: 'Charge Creation', key: 'chargeCreationSupport' },
+  ];
+
+
   // ------------------ render ------------------
 
   return (
-    <Box>
-      <Typography variant="h5" fontWeight="bold" textAlign="center" mb={3}>
-        Compare {type?.toUpperCase()}
-      </Typography>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="lg"
+      fullWidth
+    >
+      <DialogTitle
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontWeight: 700,
+        }}
+      >
+        COMPARE {type?.toUpperCase()}
+        <IconButton onClick={handleClose}>
+          <Iconify icon="eva:close-fill" />
+        </IconButton>
+      </DialogTitle>
 
-      <Grid container spacing={3}>
-        {selectedItems.map((item) => (
-          <Grid item xs={12} md={6} lg={4} key={item.id}>
-            <Card sx={{ p: 3, borderRadius: 3 }}>
-              <Box display="flex" alignItems="center" gap={2} mb={2}>
-                <Avatar sx={{ bgcolor: '#0D47A1', width: 56, height: 56 }}>
-                  {item.legalEntityName.charAt(0)}
-                </Avatar>
+      <DialogContent dividers>
+        <TableContainer
+          component={Paper}
+          sx={{
+            borderRadius: 2,
+            border: '1px solid #BDBDBD',
+            overflowX: 'auto',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          <Table>
+            {/* ---------- HEADER ---------- */}
+            <TableHead>
+              <TableRow>
+                <TableCell
+                  sx={{ backgroundColor: '#978e8eff', color: '#fff', fontWeight: 700 }}
+                >
+                  Parameter
+                </TableCell>
 
-                <Typography variant="h6" fontWeight="bold">
-                  {item.legalEntityName}
-                </Typography>
-              </Box>
-
-              <Divider sx={{ my: 2 }} />
-
-              <Stack spacing={1.2}>
-                {item.experience && (
-                  <Typography sx={highlight(parseNumber(item.experience) === bestExperience)}>
-                    <strong>Experience:</strong> {item.experience}
-                  </Typography>
-                )}
-
-                {item.responseTime && (
-                  <Typography sx={highlight(parseNumber(item.responseTime) === bestResponse)}>
-                    <strong>Response Time:</strong> {item.responseTime}
-                  </Typography>
-                )}
-
-                {(item.fees || item.feeStructure) && (
-                  <Typography
-                    sx={highlight(parseNumber(item.fees || item.feeStructure) === bestFees)}
+                {selectedItems.map((item) => (
+                  <TableCell
+                    key={item.id}
+                    sx={{
+                      backgroundColor: 'info.darker',
+                      color: '#fff',
+                      fontWeight: 700,
+                      textAlign: 'center',
+                    }}
                   >
-                    <strong>Fees:</strong> {item.fees || item.feeStructure}
-                  </Typography>
-                )}
+                    {item.legalEntityName}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
 
-                {item.regulatory && (
-                  <Typography>
-                    <strong>Regulatory:</strong> {item.regulatory}
-                  </Typography>
-                )}
+            {/* ---------- BODY ---------- */}
+            <TableBody>
+              {comparisonRows.map((row) => (
+                <TableRow key={row.label}>
+                  {/* Parameter */}
+                  <TableCell sx={{ fontWeight: 600 }}>
+                    {row.label}
+                  </TableCell>
 
-                {item.pastIssues && (
-                  <Typography>
-                    <strong>Past Issues:</strong> {item.pastIssues}
-                  </Typography>
-                )}
+                  {/* Values */}
+                  {selectedItems.map((item) => {
+                    const rawValue =
+                      item[row.key] ?? (row.altKey ? item[row.altKey] : '-');
 
-                {item.techCapability && (
-                  <Typography>
-                    <strong>Tech:</strong> {item.techCapability}
-                  </Typography>
-                )}
+                    const numericValue = parseNumber(rawValue);
 
-                {item.rating && (
-                  <Typography>
-                    <strong>Rating:</strong> {item.rating}
-                  </Typography>
-                )}
+                    const isBest =
+                      row.bestValue !== undefined &&
+                      numericValue === row.bestValue;
 
-                {item.chargeCreationSupport && (
-                  <Typography>
-                    <strong>Charge Creation:</strong> {item.chargeCreationSupport}
-                  </Typography>
-                )}
-              </Stack>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
+                    return (
+                      <TableCell
+                        key={item.id}
+                        sx={{
+                          textAlign: 'center',
+                          fontWeight: isBest ? 700 : 500,
+                          color: isBest ? 'success.main' : 'inherit',
+                        }}
+                      >
+                        {rawValue || '-'}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </DialogContent>
+
+    </Dialog>
   );
 }

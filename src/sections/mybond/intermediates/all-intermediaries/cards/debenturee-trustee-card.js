@@ -20,15 +20,15 @@ export default function DebentureTrusteeCard({ data, onGoToTab }) {
 
   const dataComponent = () => (
     <Stack spacing={0.5}>
-      <Typography fontWeight={600}>{data.name}</Typography>
+      <Typography fontWeight={600}>{data.legalEntityName}</Typography>
       <Typography variant="body2">
-        Experience: {data.experience}
+        Experience: <b> {data.experience}</b>
       </Typography>
       <Typography variant="body2">
-        SEBI Reg No: {data.sebiRegNo}
+        SEBI Reg No: <b>{data.regulatory}</b>
       </Typography>
       <Typography variant="body2" color="success.main">
-        {data.status}
+       <b> {data.status}</b>
       </Typography>
     </Stack>
   );
@@ -53,7 +53,7 @@ export default function DebentureTrusteeCard({ data, onGoToTab }) {
           </Typography>
         </Grid>
 
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={8} >
           {data ? dataComponent() : emptyDataComponent()}
         </Grid>
       </Grid>
