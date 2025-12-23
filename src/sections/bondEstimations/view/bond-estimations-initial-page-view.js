@@ -1,7 +1,7 @@
 import { useGetBondEstimations } from "src/api/bondEstimations";
 import ROIGuidance from "../roi-guidance";
 import BondsEstimationListView from "./bond-estimations-list-view";
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { buildFilter } from 'src/utils/filters';
 import { useTable } from 'src/components/table';
 
@@ -17,7 +17,6 @@ export default function BondEstimationsInitialPageView() {
     const table = useTable();
     const [filters, setFilters] = useState(defaultFilters);
 
-    // 🔑 BUILD FILTER HERE (correct place)
     const filter = buildFilter({
         page: table.page,
         rowsPerPage: table.rowsPerPage,
@@ -33,19 +32,31 @@ export default function BondEstimationsInitialPageView() {
 
     const { bondEstimations, bondEstimationsLoading, count } = useGetBondEstimations(filterList);
 
+    const isInitialLoad =
+        !filters.name &&
+        filters.status === 'all';
+
+
     return (
         <>
             {
-                (bondEstimations.length === 0 && !bondEstimationsLoading) ? <ROIGuidance /> : <BondsEstimationListView bondEstimations={bondEstimations}
-                    bondEstimationsLoading={bondEstimationsLoading}
-                    count={count}
-                    table={table}
-                    filters={filters}
-                    setFilters={setFilters}
-                />
+                bondEstimations.length === 0 &&
+                    !bondEstimationsLoading &&
+                    isInitialLoad ? (
+                    <ROIGuidance />
+                ) : (
+                    <BondsEstimationListView
+                        bondEstimations={bondEstimations}
+                        bondEstimationsLoading={bondEstimationsLoading}
+                        count={count}
+                        table={table}
+                        filters={filters}
+                        setFilters={setFilters}
+                    />
+                )
             }
         </>
-    )
+    );
 }
 
 

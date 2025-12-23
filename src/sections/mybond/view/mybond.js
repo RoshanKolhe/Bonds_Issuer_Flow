@@ -24,7 +24,6 @@ export default function MyBondCreate() {
   const table = useTable();
   const [filters, setFilters] = useState(defaultFilters);
 
-  // 🔑 BUILD FILTER HERE (correct place)
   const filter = buildFilter({
     page: table.page,
     rowsPerPage: table.rowsPerPage,
@@ -40,15 +39,20 @@ export default function MyBondCreate() {
 
   const { bondApplications, bondApplicationsLoading, count } = useGetBondApplications(filterList);
 
+  const isInitialLoad =
+    !filters.name &&
+    filters.status === 'all';
+
   return (
     <>
       {/* <MyBondStart /> */}
 
       {
-        (bondApplications.length === 0 && !bondApplicationsLoading) ? <MyBondStart /> : <BondsApplicationListView bondsApplication={bondApplications} bondApplicationsLoading={bondApplicationsLoading} count={count}
-                    table={table}
-                    filters={filters}
-                    setFilters={setFilters} />
+        bondApplications.length === 0 && !bondApplicationsLoading && isInitialLoad ? (<MyBondStart />) : (<BondsApplicationListView bondsApplication={bondApplications} bondApplicationsLoading={bondApplicationsLoading} count={count}
+          table={table}
+          filters={filters}
+          setFilters={setFilters} />
+        )
       }
     </>
   );
