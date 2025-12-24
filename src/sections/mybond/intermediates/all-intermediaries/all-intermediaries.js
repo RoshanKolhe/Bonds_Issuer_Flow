@@ -1,6 +1,4 @@
-import { Grid, Typography, Box, Button } from '@mui/material';
-import Iconify from 'src/components/iconify';
-import IntermediarySection from './intermediary-section';
+import { Grid, Box, Button } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useParams } from 'src/routes/hook';
 import { useGetBondApplicationStepData } from 'src/api/bondApplications';
@@ -10,19 +8,7 @@ import RTACard from './cards/rta-card';
 import ValuerCard from './cards/valuer-card';
 import CreditRatingCard from './cards/creditrating-card';
 
-// const SectionTitle = ({ icon, title }) => (
-//   <Typography
-//     variant="h6"
-//     fontWeight={700}
-//     mb={1}
-//     sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-//   >
-//     <Iconify icon={icon} width={22} />
-//     {title}
-//   </Typography>
-// );
-
-export default function AllIntermediariesView({ setActiveStepId, setCurrentTab }) {
+export default function AllIntermediariesView({ setActiveStepId, setCurrentTab, percent }) {
   const param = useParams();
   const { applicationId } = param;
   const { enqueueSnackbar } = useSnackbar();
@@ -35,12 +21,27 @@ export default function AllIntermediariesView({ setActiveStepId, setCurrentTab }
   const { stepData, stepDataLoading } = useGetBondApplicationStepData(applicationId, 'intermediary_appointments_pending');
 
   const handleNext = () => {
-    const allIntermediaries = Object.values().flat();
+    const allIntermediaries = [
+      appointedIntermediaries.debenture_trustee,
+      appointedIntermediaries.rta,
+      appointedIntermediaries.valuer,
+      ...(appointedIntermediaries.credit_rating || []),
+    ].filter(Boolean);
 
-    const hasPending = allIntermediaries.some((item) => item.status !== 'Appointed');
+    if (allIntermediaries.length === 0) {
+      enqueueSnackbar('No intermediaries found', { variant: 'error' });
+      return;
+    }
+
+    const hasPending = allIntermediaries.some(
+      (item) => item.status !== 'Appointed'
+    );
 
     if (hasPending) {
-      enqueueSnackbar('Please appoint all intermediaries before proceeding', { variant: 'error' });
+      enqueueSnackbar(
+        'Please appoint all intermediaries before proceeding',
+        { variant: 'error' }
+      );
       return;
     }
 
@@ -49,48 +50,55 @@ export default function AllIntermediariesView({ setActiveStepId, setCurrentTab }
   };
 
   useEffect(() => {
-    if (stepData && !stepDataLoading) {
-      if (stepData.debentureTrustee) {
-        appointedIntermediaries.debenture_trustee = {
-          ...stepData.debentureTrustee,
-          status: 'Appointed'
-        }
-      };
+    if (!stepData || stepDataLoading) return;
 
-      if (stepData.creditRatingAgency.length) {
-        appointedIntermediaries.credit_rating = stepData.creditRatingAgency.map((agency) => ({
+    setAppointedIntermediaries((prev) => ({
+      ...prev,
+      debenture_trustee: stepData.debentureTrustee
+        ? { ...stepData.debentureTrustee, status: 'Appointed' }
+        : null,
+
+      rta: stepData.registrarAndTransferAgent
+        ? { ...stepData.registrarAndTransferAgent, status: 'Appointed' }
+        : null,
+
+      valuer: stepData.valuer
+        ? { ...stepData.valuer, status: 'Appointed' }
+        : null,
+
+      credit_rating: stepData.creditRatingAgency?.length
+        ? stepData.creditRatingAgency.map((agency) => ({
           ...agency,
-          status: 'Appointed'
+          status: 'Appointed',
         }))
-      };
-
-      if (stepData.registrarAndTransferAgent) {
-        appointedIntermediaries.rta = {
-          ...stepData.registrarAndTransferAgent,
-          status: 'Appointed'
-        }
-      };
-
-      if (stepData.valuer) {
-        appointedIntermediaries.valuer = {
-          ...stepData.valuer,
-          status: 'Appointed'
-        }
-      };
-    }
+        : [],
+    }));
   }, [stepData, stepDataLoading]);
+
+  useEffect(() => {
+    let count = 0;
+
+    if(appointedIntermediaries.debenture_trustee) count++;
+    if(appointedIntermediaries.rta) count++;
+    if(appointedIntermediaries.credit_rating) count++;
+    if(appointedIntermediaries.valuer) count++;
+
+    const percentage = (count/4) * 100;
+    percent?.(percentage);
+  }, [appointedIntermediaries, percent])
+
   return (
     <>
       <Grid container spacing={4}>
         <Grid item xs={12}>
           <DebentureTrusteeCard data={appointedIntermediaries.debenture_trustee}
-           onGoToTab={() => setCurrentTab('debenture_trustee')}
+            onGoToTab={() => setCurrentTab('debenture_trustee')}
           />
         </Grid>
 
         <Grid item xs={12}>
           <RTACard data={appointedIntermediaries.rta}
-          onGoToTab={()=> setCurrentTab('rta')}
+            onGoToTab={() => setCurrentTab('rta')}
           />
         </Grid>
 
@@ -106,13 +114,13 @@ export default function AllIntermediariesView({ setActiveStepId, setCurrentTab }
 
         <Grid item xs={12}>
           <ValuerCard data={appointedIntermediaries.valuer}
-          onGoToTab={()=> setCurrentTab('valuer')}
+            onGoToTab={() => setCurrentTab('valuer')}
           />
         </Grid>
 
         <Grid item xs={12}>
           <CreditRatingCard data={appointedIntermediaries.credit_rating}
-          onGoToTab={() => setCurrentTab('credit_rating')}
+            onGoToTab={() => setCurrentTab('credit_rating')}
           />
         </Grid>
       </Grid>

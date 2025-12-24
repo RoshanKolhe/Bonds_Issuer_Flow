@@ -61,7 +61,7 @@ const TABS = [
 
 // ----------------------------------------------------------------------
 
-export default function IntermediariesView({ setActiveStepId }) {
+export default function IntermediariesView({ setActiveStepId, percent }) {
   const settings = useSettingsContext();
   const [currentTab, setCurrentTab] = useState('all');
 
@@ -91,7 +91,7 @@ export default function IntermediariesView({ setActiveStepId }) {
           />
         ))}
       </Tabs>
-      {currentTab === 'all' && <AllIntermediariesView setActiveStepId={setActiveStepId} setCurrentTab={setCurrentTab} />}
+      {currentTab === 'all' && <AllIntermediariesView setActiveStepId={setActiveStepId} setCurrentTab={setCurrentTab} percent={percent}/>}
       {currentTab === 'debenture_trustee' && <DebentureTrusteeListView />}
       {currentTab === 'rta' && <RtaListView />}
       {/* {currentTab === 'lead_manager' && <LeadManagerListView />}

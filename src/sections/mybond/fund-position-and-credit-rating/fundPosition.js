@@ -4,22 +4,23 @@ import { Box, Card, Grid, Typography } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useGetBondApplicationStepData } from 'src/api/bondApplications';
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
 import { useParams } from 'src/routes/hook';
 import axiosInstance from 'src/utils/axios';
 import * as Yup from 'yup';
 
 export default function FundPosition({
-  currentFundPosition,
-  saveStepData,
   setPercent,
   setProgress,
 }) {
   const params = useParams();
   const { applicationId } = params;
   const { enqueueSnackbar } = useSnackbar();
+  const { stepData, stepDataLoading } = useGetBondApplicationStepData(applicationId, 'fund_position');
+  const [fundPositionData, setFundPositionData] = useState(null);
 
   const newFundPositionSchema = Yup.object().shape({
     cashBalance: Yup.string().required('Cash Balance is required'),
@@ -36,16 +37,16 @@ export default function FundPosition({
 
   const defaultValues = useMemo(
     () => ({
-      cashBalance: currentFundPosition?.cashBalance || '',
-      cashBalanceDate: currentFundPosition?.cashBalanceDate
-        ? new Date(currentFundPosition.cashBalanceDate)
+      cashBalance: fundPositionData?.cashBalance || '',
+      cashBalanceDate: fundPositionData?.cashBalanceDate
+        ? new Date(fundPositionData.cashBalanceDate)
         : null,
-      bankBalance: currentFundPosition?.bankBalance || '',
-      bankBalanceDate: currentFundPosition?.bankBalanceDate
-        ? new Date(currentFundPosition.bankBalanceDate)
+      bankBalance: fundPositionData?.bankBalance || '',
+      bankBalanceDate: fundPositionData?.bankBalanceDate
+        ? new Date(fundPositionData.bankBalanceDate)
         : null,
     }),
-    [currentFundPosition]
+    [fundPositionData]
   );
 
   const methods = useForm({
@@ -63,25 +64,15 @@ export default function FundPosition({
 
   const values = watch();
 
-  // const onSubmit = handleSubmit(async (data) => {
-  //     try {
-  //         const response = await axiosInstance.patch(`/bond-estimations/fund-positions/${applicationId}`, data);
-  //         if (response.data.success) {
-  //             setProgress(true);
-  //             enqueueSnackbar('Fund position saved', { variant: 'success' });
-  //         }
-  //     } catch (error) {
-  //         console.error('Error while updating fund position in bond estimations :', error);
-  //     }
-  // });
   const onSubmit = handleSubmit(async (data) => {
     try {
-      console.log('Form Submitted Data:', data);
-      saveStepData(data);
-      setProgress(true);
-      enqueueSnackbar('Fund position saved (Mocked)', { variant: 'success' });
+      const response = await axiosInstance.patch(`/bonds-pre-issue/fund-position/${applicationId}`, data);
+      if (response.data.success) {
+        setProgress(true);
+        enqueueSnackbar('Fund position saved', { variant: 'success' });
+      }
     } catch (error) {
-      console.error('Mocked submit error:', error);
+      console.error('Error while updating fund position in bond estimations :', error);
     }
   });
 
@@ -100,25 +91,20 @@ export default function FundPosition({
 
   useEffect(() => {
     calculatePercent();
-  }, [values]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [values.cashBalance, values.cashBalanceDate, values.bankBalance, values.bankBalanceDate]);
 
-  // Restore saved data when user returns to this step
   useEffect(() => {
-    if (currentFundPosition && Object.keys(currentFundPosition).length > 0) {
-      reset({
-        cashBalance: currentFundPosition.cashBalance || '',
-        cashBalanceDate: currentFundPosition.cashBalanceDate
-          ? new Date(currentFundPosition.cashBalanceDate)
-          : null,
-        bankBalance: currentFundPosition.bankBalance || '',
-        bankBalanceDate: currentFundPosition.bankBalanceDate
-          ? new Date(currentFundPosition.bankBalanceDate)
-          : null,
-      });
-
-      setProgress(true); // mark as completed if previously filled
+    if (stepData && !stepDataLoading) {
+      setFundPositionData(stepData);
     }
-  }, [currentFundPosition, reset]);
+  }, [stepData, stepDataLoading]);
+
+  useEffect(() => {
+    if (fundPositionData) {
+      reset(defaultValues);
+    }
+  }, [fundPositionData, reset, defaultValues]);
 
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>

@@ -1,21 +1,27 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Box, Grid, Card, Typography } from '@mui/material';
 
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
-import { useForm, useFieldArray, useFormContext } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import PropTypes from 'prop-types';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
 import { useSnackbar } from 'notistack';
+import { useParams } from 'src/routes/hook';
+import { useGetBondApplicationStepData } from 'src/api/bondApplications';
+import axiosInstance from 'src/utils/axios';
 
 export default function CapitalDetails({
-  currentCapitalDetails,
   setPercent,
   setProgress,
-  saveStepData,
 }) {
+  const params = useParams();
+  const { applicationId } = params;
   const { enqueueSnackbar } = useSnackbar();
+  const { stepData, stepDataLoading } = useGetBondApplicationStepData(applicationId, 'capital_details');
+  const [capitalDetailsData, setCapitalDetailsData] = useState(null);
+
   const capitalSchema = Yup.object().shape({
     shareCapital: Yup.number()
       .typeError('Share Capital must be a number')
@@ -34,11 +40,11 @@ export default function CapitalDetails({
 
   const defaultValues = useMemo(
     () => ({
-      shareCapital: currentCapitalDetails?.shareCapital || null,
-      reserveSurplus: currentCapitalDetails?.reserveSurplus || null,
-      netWorth: currentCapitalDetails?.netWorth || null,
+      shareCapital: capitalDetailsData?.shareCapital || '',
+      reserveSurplus: capitalDetailsData?.reserveSurplus || '',
+      netWorth: capitalDetailsData?.netWorth || '',
     }),
-    [currentCapitalDetails]
+    [capitalDetailsData]
   );
 
   const methods = useForm({
@@ -47,15 +53,14 @@ export default function CapitalDetails({
     mode: 'onChange',
   });
 
-  const { control, setValue, watch, handleSubmit, reset } = methods;
+  const { setValue, watch, handleSubmit, reset } = methods;
 
   const shareCapital = watch('shareCapital');
   const reserveSurplus = watch('reserveSurplus');
-  const netWorth = watch('netWorth');
 
   useEffect(() => {
     const total = (parseFloat(shareCapital) || 0) + (parseFloat(reserveSurplus) || 0);
-    setValue('netWorth', total.toFixed(2)); // keep 2 decimals
+    setValue('netWorth', total.toFixed(2));
   }, [shareCapital, reserveSurplus, setValue]);
 
   useEffect(() => {
@@ -74,32 +79,30 @@ export default function CapitalDetails({
     setPercent?.(percentVal);
   }, [shareCapital, reserveSurplus, setPercent]);
 
-  // ✅ Restore saved data + mark completed
-  useEffect(() => {
-    if (currentCapitalDetails && Object.keys(currentCapitalDetails).length > 0) {
-      reset(defaultValues);
-      setProgress?.(true);
-      setPercent?.(50);
-    }
-  }, [currentCapitalDetails, reset, defaultValues, setProgress, setPercent]);
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      console.log('Form Submitted Data:', data);
-      saveStepData(data);
-      setProgress(true);
-      enqueueSnackbar('Fund position saved (Mocked)', { variant: 'success' });
+      const response = await axiosInstance.patch(`/bonds-pre-issue/capital-details/${applicationId}`, data);
+      if (response.data.success) {
+        setProgress(true);
+        enqueueSnackbar('Capital details saved', { variant: 'success' });
+      }
     } catch (error) {
-      console.error('Mocked submit error:', error);
+      console.error('Error while updating capital details in bond estimations :', error);
     }
   });
+
   useEffect(() => {
-    if (currentCapitalDetails && Object.keys(currentCapitalDetails).length > 0) {
-      reset(defaultValues);
-      setProgress?.(true);
-      setPercent?.(50);
+    if (stepData && !stepDataLoading) {
+      setCapitalDetailsData(stepData);
     }
-  }, [currentCapitalDetails, reset, defaultValues, setProgress, setPercent]);
+  }, [stepData, stepDataLoading]);
+
+  useEffect(() => {
+    if (capitalDetailsData) {
+      reset(defaultValues);
+    }
+  }, [capitalDetailsData, reset, defaultValues]);
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
