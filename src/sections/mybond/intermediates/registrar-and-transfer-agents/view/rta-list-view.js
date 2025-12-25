@@ -70,8 +70,8 @@ export default function RtaListView() {
         registrarAndTransferAgent: rtaData
       });
 
-      if (response.success) {
-        enqueueSnackbar('Request send successfully');
+      if (response?.data?.success) {
+        enqueueSnackbar('Request send successfully', {variant:'success'});
       }
     } catch (error) {
       console.error('error while sending request to debenture trustee :', error);

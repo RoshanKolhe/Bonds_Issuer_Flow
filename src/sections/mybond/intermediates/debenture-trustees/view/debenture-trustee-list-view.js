@@ -79,8 +79,8 @@ export default function DebentureTrusteeListView() {
         debentureTrustee: trusteeData
       });
 
-      if (response.success) {
-        enqueueSnackbar('Request send successfully');
+      if (response?.data?.success) {
+        enqueueSnackbar('Request send successfully', {variant: 'success'});
       }
     } catch (error) {
       console.error('error while sending request to debenture trustee :', error);
