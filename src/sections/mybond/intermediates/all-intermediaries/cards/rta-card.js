@@ -19,12 +19,25 @@ export default function RTACard({ data, onGoToTab }) {
     );
 
     const dataComponent = () => (
-        <Stack spacing={0.5}>
-            <Typography fontWeight={600}>{data.name}</Typography>
-            <Typography variant="body2">Connectivity: {data.connectivity}</Typography>
-            <Typography variant="body2">Response SLA: {data.responseTime}</Typography>
-            <Typography variant="body2" color="success.main">
-                {data.status}
+        <Stack p={2}>
+            <Typography fontWeight={600}>{data.legalEntityName}</Typography>
+            <Typography variant="body2">Experience: <b>{data.experience}</b></Typography>
+            <Typography variant="body2">Response SLA: <b>{data.responseTime}</b></Typography>
+            <Typography
+                variant="body2"
+                sx={{
+                    position: 'absolute',
+                    top: 12,
+                    right: 0,
+                    pr: 2,
+
+                    color:
+                        data.status === 'Appointed'
+                            ? 'success.main'
+                            : 'warning.main',
+                }}
+            >
+                <b>{data.status}</b>
             </Typography>
         </Stack>
     )

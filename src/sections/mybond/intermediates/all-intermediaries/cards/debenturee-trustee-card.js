@@ -19,28 +19,47 @@ export default function DebentureTrusteeCard({ data, onGoToTab }) {
   );
 
   const dataComponent = () => (
-    <Stack spacing={0.5}>
-      <Typography fontWeight={600}>{data.legalEntityName}</Typography>
+  <Stack sx={{ p: 2 }}>      <Typography fontWeight={600}>{data.legalEntityName}</Typography>
       <Typography variant="body2">
         Experience: <b> {data.experience}</b>
       </Typography>
       <Typography variant="body2">
         SEBI Reg No: <b>{data.regulatory}</b>
       </Typography>
-      <Typography variant="body2" color="success.main">
-       <b> {data.status}</b>
-      </Typography>
+       <Typography
+                variant="body2"
+                sx={{
+                    position: 'absolute',
+                    top: 12,
+                    right: 0,
+                    pr:2,
+
+                    color:
+                        data.status === 'Appointed'
+                            ? 'success.main'
+                            : 'warning.main',
+                }}
+            >
+                <b>{data.status}</b>
+            </Typography>
     </Stack>
   );
 
   return (
-    <Card sx={{ p: 0 }}>
+    <Card>
       <Grid container spacing={2}>
         <Grid
-          item
+         item
           xs={12}
           md={4}
-          sx={{ borderRight: { md: '2px dashed lightgray' }, p: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          sx={{
+            borderRight: { md: '2px dashed lightgray' },
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+
+            p: 2,
+          }}
         >
           <Typography
             variant="h6"
