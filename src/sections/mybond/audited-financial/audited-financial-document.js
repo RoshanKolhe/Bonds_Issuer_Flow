@@ -12,15 +12,18 @@ import KYCTitle from 'src/sections/kyc/kyc-title';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { useSnackbar } from 'notistack';
+import { useGetBondApplicationStepData } from 'src/api/bondApplications';
+import { useParams } from 'src/routes/hook';
 
 export default function AuditedFinancialDocument({
-  currentAuditedDetails,
-  saveStepData,
   setActiveStepId,
   percent,
 }) {
+  const params = useParams();
+  const {applicationId} = params;
   const { enqueueSnackbar } = useSnackbar();
-
+  const { stepData, stepDataLoading } = useGetBondApplicationStepData(applicationId, 'financial_statements');
+  const [currentData, setCurrentData] = useState(null);
   const [isBaseYearDone, setBaseYearDone] = useState(false);
   const [baseYearPercent, setBaseYearPercent] = useState(20);
 
@@ -33,16 +36,6 @@ export default function AuditedFinancialDocument({
   const [itrDone, setItrDone] = useState(false);
   const [gstr9Done, setGstr9Done] = useState(false);
   const [gstr3bDone, setGstr3bDone] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
-
-
-  const [payloadData, setPayloadData] = useState({
-    baseYear: '2025',
-    auditFinancial: null,
-    itr: null,
-    gstr9: null,
-    gstr3b: null,
-  });
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 10 }, (_, i) => {
@@ -50,9 +43,11 @@ export default function AuditedFinancialDocument({
     return { value: year.toString(), label: `${year - 1} - ${year}` };
   });
 
+  const year = new Date().getFullYear();
+
   const methods = useForm({
     defaultValues: {
-      baseYear: '2025',
+      baseYear: year,
     },
   });
 
@@ -60,7 +55,7 @@ export default function AuditedFinancialDocument({
   const selectedYear = watch('baseYear');
 
   useEffect(() => {
-    setBaseYearDone(!!selectedYear); // TRUE when year is selected
+    setBaseYearDone(!!selectedYear);
   }, [selectedYear]);
 
   const handleNextClick = () => {
@@ -93,20 +88,22 @@ export default function AuditedFinancialDocument({
   ]);
 
   useEffect(() => {
-  if (isInitialized) {
-    saveStepData(payloadData);
-  }
-}, [payloadData, isInitialized, saveStepData]);
-
-
-  useEffect(() => {
-  if (!isInitialized && currentAuditedDetails) {
-    setPayloadData({...currentAuditedDetails, baseYear: '2025'});
-    methods.reset({ baseYear: currentAuditedDetails.baseYear || '' });
-    setIsInitialized(true);
-  }
-}, [currentAuditedDetails, isInitialized, methods]);
-
+    if (stepData && !stepDataLoading) {
+      setCurrentData({
+        financialStatements: stepData?.financialStatements,
+        incomeTaxReturns: stepData?.incomeTaxReturns,
+        gstr9: stepData?.gstr9,
+        gst3b: stepData?.gst3b
+      })
+    } else {
+      setCurrentData({
+        financialStatements: [],
+        incomeTaxReturns: [],
+        gstr9: [],
+        gst3b: []
+      })
+    }
+  }, [stepData, stepDataLoading]);
 
   return (
     <Container>
@@ -144,29 +141,29 @@ export default function AuditedFinancialDocument({
         <AuditedFinancialStatement
           setPercent={setFinancialPercent}
           setProgress={setFinancialDone}
-          setData={(data) => setPayloadData((prev) => ({ ...prev, auditFinancial: data }))}
-          currentAuditedFinancial={currentAuditedDetails.auditFinancial}
+          currentBaseYear={selectedYear}
+          currentData={currentData?.financialStatements}
         />
 
         <AuditedIncomeTaxReturn
           setPercent={setItrPercent}
           setProgress={setItrDone}
-          setData={(data) => setPayloadData((prev) => ({ ...prev, itr: data }))}
-          currentAuditedIncomeTaxReturn={currentAuditedDetails.itr}
+          currentBaseYear={selectedYear}
+          currentData={currentData?.incomeTaxReturns}
         />
 
         <AuditedGSTR9
           setPercent={setGstr9Percent}
           setProgress={setGstr9Done}
-          setData={(data) => setPayloadData((prev) => ({ ...prev, gstr9: data }))}
-          currentAuditedGSTR9={currentAuditedDetails.gstr9}
+          currentBaseYear={selectedYear}
+          currentData={currentData?.gstr9}
         />
 
         <AuditedGST3B
           setPercent={setGstr3bPercent}
           setProgress={setGstr3bDone}
-          setData={(data) => setPayloadData((prev) => ({ ...prev, gstr3b: data }))}
-          currentAuditedGST3B={currentAuditedDetails.gstr3b}
+          currentBaseYear={selectedYear}
+          currentData={currentData?.gst3b}
         />
       </FormProvider>
 

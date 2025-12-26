@@ -429,7 +429,7 @@
 //   setProgress: PropTypes.func,
 // };
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
@@ -442,46 +442,40 @@ import FormProvider, { RHFAutocomplete, RHFCustomFileUploadBox } from 'src/compo
 import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
 import { useGetCreditRatingAgencies, useGetCreditRatings } from 'src/api/creditRatingsAndAgencies';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
+import { useGetBondApplicationStepData } from 'src/api/bondApplications';
+import { useParams } from 'src/routes/hook';
+import RatingPendingNotice from './ratingPending';
 
-const SELECTED_AGENCIES = [
-  { id: '6c0561c2-a431-4d0c-ae26-ab484eed4335', name: 'Acuite Ratings & Research' },
-  { id: 'a9aaab26-3d2b-4917-a3aa-21a02ce996fb', name: 'India Ratings & Research' },
-];
-
-export default function CreditRating({ saveStepData, setPercent, setProgress, setActiveStepId }) {
+export default function CreditRating({ percent, setActiveStepId }) {
+  const params = useParams();
+  const { applicationId } = params;
   const { enqueueSnackbar } = useSnackbar();
   const { creditRatings = [] } = useGetCreditRatings();
   const { creditRatingAgencies } = useGetCreditRatingAgencies();
+  const { stepData, stepDataLoading } = useGetBondApplicationStepData(applicationId, 'credit_rating_approval');
+  const [creditRatingsData, setCreditRatingsData] = useState(null);
 
   const Schema = Yup.object().shape({
     ratings: Yup.array().of(
       Yup.object().shape({
-        agencyId: Yup.number().required(),
+        agency: Yup.object().required('Credit Rating agency is required'),
         rating: Yup.object().required('Rating is required'),
         validFrom: Yup.date().required('Valid from is required'),
         creditRatingLetter: Yup.mixed().required('Rating letter required'),
       })
     ),
   });
-  const selectedAgencyObjects = useMemo(() => {
-    if (!creditRatingAgencies?.length) return [];
-
-    return SELECTED_AGENCIES.map((sel) =>
-      creditRatingAgencies.find((api) => api.id === sel.id)
-    ).filter(Boolean);
-  }, [creditRatingAgencies]);
 
   const defaultValues = useMemo(
     () => ({
-      ratings: selectedAgencyObjects.map((agency) => ({
-        agency,
-        agencyId: agency.id,
-        rating: null,
-        validFrom: null,
-        creditRatingLetter: null,
+      ratings: creditRatingsData?.creditRatings?.map((rating) => ({
+        agency: rating?.creditRatingAgencies || null,
+        rating: rating?.creditRatings || null,
+        validFrom: new Date(rating?.validFrom) || null,
+        creditRatingLetter: rating?.ratingLetter || null,
       })),
     }),
-    [selectedAgencyObjects]
+    [creditRatingsData]
   );
 
   const methods = useForm({
@@ -507,48 +501,7 @@ export default function CreditRating({ saveStepData, setPercent, setProgress, se
     ? values.every((r) => r.rating && r.validFrom && r.creditRatingLetter)
     : false;
 
-  const handleNextClick = () => {
-    if (!isCreditRatingComplete) {
-      enqueueSnackbar('Please complete all Credit Rating details', {
-        variant: 'warning',
-      });
-      return;
-    }
-
-    // mark step complete
-    setProgress?.(true);
-
-    // move to next step
-    setActiveStepId?.('regulatory_filing');
-  };
-
   const { reset } = methods;
-
-  useEffect(() => {
-    if (!selectedAgencyObjects.length) return;
-
-    reset({
-      ratings: selectedAgencyObjects.map((agency) => ({
-        agency,
-        agencyId: agency.id,
-        rating: null,
-        validFrom: null,
-        creditRatingLetter: null,
-      })),
-    });
-  }, [selectedAgencyObjects, reset]);
-
-  useEffect(() => {
-    if (!values?.length) {
-      setPercent?.(0);
-      return;
-    }
-
-    const completed = values.filter((r) => r.rating && r.validFrom && r.creditRatingLetter).length;
-
-    const percent = (completed / values.length) * 50;
-    setPercent?.(percent);
-  }, [values, setPercent]);
 
   const onSubmit = (data) => {
     console.log('📤 Credit Rating Payload:', data);
@@ -557,109 +510,146 @@ export default function CreditRating({ saveStepData, setPercent, setProgress, se
       variant: 'success',
     });
 
-    saveStepData(data);
-    setProgress(true);
+    setActiveStepId?.('regulatory_filing');
   };
 
+  const handleNextClick = () => {
+    if (!isCreditRatingComplete) {
+      enqueueSnackbar('Please complete all Credit Rating details', {
+        variant: 'warning',
+      });
+      return;
+    }
+
+    // move to next step
+    setActiveStepId?.('regulatory_filing');
+  };
+
+  useEffect(() => {
+    if (stepData && !stepDataLoading) {
+      setCreditRatingsData(stepData);
+    }
+  }, [stepData, stepDataLoading]);
+
+  useEffect(() => {
+    if (!creditRatingsData?.creditRatings?.length) return;
+
+    reset(defaultValues);
+  }, [creditRatingsData, reset, defaultValues]);
+
+  useEffect(() => {
+    if (!values?.length) {
+      percent?.(0);
+      return;
+    }
+
+    const completed = values.filter((r) => r.rating && r.validFrom && r.creditRatingLetter).length;
+
+    const percentage = (completed / values.length) * 100;
+    percent?.(percentage);
+  }, [values, percent]);
+
   return (
-    <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-      <Card sx={{ p: 4 }}>
-        <Typography variant="h6" fontWeight={600} mb={3}>
-          Credit Rating Details
-        </Typography>
+    fields.length > 0 ? (
+      <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+\          <Typography variant="h6" fontWeight={600} mb={3}>
+            Credit Rating Details
+          </Typography>
 
-        <Grid container spacing={4}>
-          {fields.map((item, index) => (
-            <Grid item xs={12} key={item.id}>
-              <Card sx={{ p: 3, border: '1px solid #e0e0e0' }}>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} md={6}>
-                    <RHFAutocomplete
-                      name={`ratings.${index}.agency`}
-                      label="Credit Rating Agency"
-                      options={creditRatingAgencies || []}
-                      getOptionLabel={(option) => option?.name || ''}
-                      isOptionEqualToValue={(option, value) => option.id === value.id}
-                      disabled
-                    />
+          <Grid container spacing={4}>
+            {fields.map((item, index) => (
+              <Grid item xs={12} key={item.id}>
+                <Card sx={{ p: 3, border: '1px solid #e0e0e0' }}>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} md={6}>
+                      <RHFAutocomplete
+                        name={`ratings.${index}.agency`}
+                        label="Credit Rating Agency"
+                        options={creditRatingAgencies || []}
+                        getOptionLabel={(option) => option?.name || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                        disabled
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} md={6}>
+                      <RHFAutocomplete
+                        name={`ratings.${index}.rating`}
+                        label="Credit Rating"
+                        options={creditRatings || []}
+                        getOptionLabel={(option) => option?.name || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                      />
+                    </Grid>
                   </Grid>
 
-                  <Grid item xs={12} md={6}>
-                    <RHFAutocomplete
-                      name={`ratings.${index}.rating`}
-                      label="Credit Rating"
-                      options={creditRatings || []}
-                      getOptionLabel={(option) => option?.name || ''}
-                      isOptionEqualToValue={(option, value) => option.id === value.id}
-                    />
-                  </Grid>
-                </Grid>
-
-                {/* Valid From */}
-                <Controller
-                  name={`ratings.${index}.validFrom`}
-                  control={control}
-                  render={({ field, fieldState }) => (
-                    <DatePicker
-                      label="Valid From"
-                      value={field.value}
-                      onChange={field.onChange}
-                      slotProps={{
-                        textField: {
-                          fullWidth: true,
-                          error: !!fieldState.error,
-                          helperText: fieldState.error?.message,
-                        },
-                      }}
-                      sx={{ my: 5 }}
-                    />
-                  )}
-                />
-
-                <Grid item xs={12}>
-                  <RHFCustomFileUploadBox
-                    name={`ratings.${index}.creditRatingLetter`}
-                    label="Upload Credit Rating Letter"
-                    accept={{
-                      'application/pdf': ['.pdf'],
-                      'image/png': ['.png'],
-                      'image/jpeg': ['.jpg', '.jpeg'],
-                    }}
+                  {/* Valid From */}
+                  <Controller
+                    name={`ratings.${index}.validFrom`}
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <DatePicker
+                        label="Valid From"
+                        value={field.value}
+                        onChange={field.onChange}
+                        slotProps={{
+                          textField: {
+                            fullWidth: true,
+                            error: !!fieldState.error,
+                            helperText: fieldState.error?.message,
+                          },
+                        }}
+                        sx={{ my: 5 }}
+                      />
+                    )}
                   />
-                  <YupErrorMessage name="mgtFilling14" />
-                </Grid>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
 
-        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
-          <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-            Save
-          </LoadingButton>
-        </Box>
-      </Card>
-      <Grid item xs={12}>
-        <Box
-          sx={{
-            mt: 3,
-            display: 'flex',
-            justifyContent: 'flex-end',
-            gap: 2,
-            m: 2,
-          }}
-        >
-          <LoadingButton type="button" variant="contained" onClick={handleNextClick}>
-            Next
-          </LoadingButton>
-        </Box>
-      </Grid>
-    </FormProvider>
+                  <Grid item xs={12}>
+                    <RHFCustomFileUploadBox
+                      name={`ratings.${index}.creditRatingLetter`}
+                      label="Upload Credit Rating Letter"
+                      accept={{
+                        'application/pdf': ['.pdf'],
+                        'image/png': ['.png'],
+                        'image/jpeg': ['.jpg', '.jpeg'],
+                      }}
+                    />
+                    <YupErrorMessage name={`ratings.${index}.creditRatingLetter`} />
+                  </Grid>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+
+          {/* <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+            <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+              Save
+            </LoadingButton>
+          </Box> */}
+        {creditRatingsData?.approvalCompleted && <Grid item xs={12}>
+          <Box
+            sx={{
+              mt: 3,
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 2,
+              m: 2,
+            }}
+          >
+            <LoadingButton type="button" variant="contained" onClick={handleNextClick}>
+              Next
+            </LoadingButton>
+          </Box>
+        </Grid>}
+      </FormProvider>
+    ) : (
+      <RatingPendingNotice />
+    )
   );
 }
 
 CreditRating.propTypes = {
   saveStepData: PropTypes.func,
-  setPercent: PropTypes.func,
+  percent: PropTypes.func,
   setProgress: PropTypes.func,
 };

@@ -114,9 +114,6 @@ export function useNavData() {
             title: t('my bonds'),
             path: paths.dashboard.mybond.root,
             icon: ICONS.bonds,
-            children: [
-              { title: t('create'), path: paths.dashboard.mybond.create },
-            ],
           },
             {
             title: t('signatories'),

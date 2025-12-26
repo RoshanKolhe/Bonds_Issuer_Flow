@@ -1,8 +1,4 @@
 
-
-
-
-//
 import axios from 'axios';
 // config
 import { HOST_API } from 'src/config-global';
@@ -117,8 +113,8 @@ export const endpoints = {
     documentList: (status) => `/bonds-pre-issue/fetch-documents/${status}`
   },
   fieldOptions: {
-    chargeTypes: '',
-    ownershipTypes: '',
-    collateralTypes: ''
+    chargeTypes: '/charge-types',
+    ownershipTypes: '/ownership-types',
+    collateralTypes: '/collateral-types'
   }
 };

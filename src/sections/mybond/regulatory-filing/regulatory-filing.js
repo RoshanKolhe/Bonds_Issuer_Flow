@@ -258,7 +258,96 @@ export default function RegulatoryFiling({
           <Typography variant="h5" sx={{ color: '#1976d2', fontWeight: 600, mb: 4 }}>
             Regulatory Filings
           </Typography>
-          <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
+          <Typography variant="h5" sx={{ mb: 3, fontWeight: 600, mt: 5 }}>
+            Term Sheet:
+          </Typography>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={3}>
+              <RHFTextField name="sebiApprovalNo" label="Approval number" fullWidth />
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Controller
+                name="sebiDate"
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <DatePicker
+                    {...field}
+                    label="Date"
+                    value={
+                      field.value
+                        ? field.value instanceof Date
+                          ? field.value
+                          : new Date(field.value)
+                        : null
+                    }
+                    onChange={(newValue) => field.onChange(newValue)}
+                    format="dd/MM/yyyy"
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!error,
+                        helperText: error?.message,
+                      },
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+            {/* <Grid item xs={12} md={6}>
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600, lineHeight: '48px' }}>
+                  Authority:
+                </Typography>
+
+                <ToggleButtonGroup
+                  value={sebiAuthority}
+                  exclusive
+                  onChange={(e, val) => val && setSebiAuthority(val)}
+                  sx={{
+                    height: 48,
+                    border: 'none !important', // remove outer group border
+                    '&& .MuiToggleButton-root': {
+                      border: '1px solid #000000ff !important',
+                    },
+                    '&& .MuiToggleButton-root.Mui-selected': {
+                      border: '1px solid #1976d2 !important',
+                      backgroundColor: '#1976d2',
+                      color: '#fff',
+                    },
+                  }}
+                >
+                  {['SEBI', 'NBH', 'RBI'].map((option) => (
+                    <ToggleButton
+                      key={option}
+                      value={option.toLowerCase()}
+                      sx={{
+                        minWidth: 90,
+                        height: 48,
+                        fontSize: '16px',
+                        px: 2,
+                      }}
+                    >
+                      {option}
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
+              </Stack>
+            </Grid> */}
+            <Grid item xs={12}>
+              <RHFCustomFileUploadBox
+                name="sebi"
+                label="Term Sheet"
+                icon="mdi:file-document-outline"
+                accept={{
+                  'application/pdf': ['.pdf'],
+                  'image/png': ['.png'],
+                  'image/jpeg': ['.jpg', '.jpeg'],
+                }}
+              />
+              <YupErrorMessage name="sebi" />
+            </Grid>
+          </Grid>
+          <Typography variant="h5" sx={{ mb: 3, fontWeight: 600, mt: 5 }}>
             PAS-4
           </Typography>
           <Grid container spacing={3}>
@@ -312,95 +401,6 @@ export default function RegulatoryFiling({
                 }}
               />
               <YupErrorMessage name="informationMemorandum" />
-            </Grid>
-          </Grid>
-          <Typography variant="h5" sx={{ mb: 3, fontWeight: 600, mt: 5 }}>
-            Term Sheet:
-          </Typography>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={3}>
-              <RHFTextField name="sebiApprovalNo" label="Approval number" fullWidth />
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <Controller
-                name="sebiDate"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <DatePicker
-                    {...field}
-                    label="Date"
-                    value={
-                      field.value
-                        ? field.value instanceof Date
-                          ? field.value
-                          : new Date(field.value)
-                        : null
-                    }
-                    onChange={(newValue) => field.onChange(newValue)}
-                    format="dd/MM/yyyy"
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        error: !!error,
-                        helperText: error?.message,
-                      },
-                    }}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Stack direction="row" alignItems="center" spacing={2}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, lineHeight: '48px' }}>
-                  Authority:
-                </Typography>
-
-                <ToggleButtonGroup
-                  value={sebiAuthority}
-                  exclusive
-                  onChange={(e, val) => val && setSebiAuthority(val)}
-                  sx={{
-                    height: 48,
-                    border: 'none !important', // remove outer group border
-                    '&& .MuiToggleButton-root': {
-                      border: '1px solid #000000ff !important',
-                    },
-                    '&& .MuiToggleButton-root.Mui-selected': {
-                      border: '1px solid #1976d2 !important',
-                      backgroundColor: '#1976d2',
-                      color: '#fff',
-                    },
-                  }}
-                >
-                  {['SEBI', 'NBH', 'RBI'].map((option) => (
-                    <ToggleButton
-                      key={option}
-                      value={option.toLowerCase()}
-                      sx={{
-                        minWidth: 90,
-                        height: 48,
-                        fontSize: '16px',
-                        px: 2,
-                      }}
-                    >
-                      {option}
-                    </ToggleButton>
-                  ))}
-                </ToggleButtonGroup>
-              </Stack>
-            </Grid>
-            <Grid item xs={12}>
-              <RHFCustomFileUploadBox
-                name="sebi"
-                label="Term Sheet"
-                icon="mdi:file-document-outline"
-                accept={{
-                  'application/pdf': ['.pdf'],
-                  'image/png': ['.png'],
-                  'image/jpeg': ['.jpg', '.jpeg'],
-                }}
-              />
-              <YupErrorMessage name="sebi" />
             </Grid>
           </Grid>
           {/* <Typography variant="h5" sx={{ mb: 3, fontWeight: 600, mt: 5 }}>

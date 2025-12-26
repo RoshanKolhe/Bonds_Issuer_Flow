@@ -1,16 +1,30 @@
-import React, { useEffect, useMemo } from 'react';
-import { Box, Grid, Card, Typography, Button, MenuItem, Divider } from '@mui/material';
-import { useForm, useFieldArray, useFormContext } from 'react-hook-form';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  Box,
+  Grid,
+  Card,
+  Typography,
+  Button,
+  MenuItem,
+} from '@mui/material';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
+import FormProvider, {
+  RHFSelect,
+  RHFTextField,
+} from 'src/components/hook-form';
 import PropTypes from 'prop-types';
 import { LoadingButton } from '@mui/lab';
 import { toNumber } from 'lodash';
+import axiosInstance from 'src/utils/axios';
+import { useParams } from 'src/routes/hook';
+import { useSnackbar } from 'notistack';
+import { useGetBondApplicationStepData } from 'src/api/bondApplications';
 
 const repaymentTerm = [
   { label: 'Monthly', value: 'monthly' },
-  { label: 'Yearly', value: 'yearly' },
+  { label: 'Annually', value: 'annually' },
   { label: 'Quarterly', value: 'quarterly' },
 ];
 
@@ -23,7 +37,13 @@ const borrowingTypes = [
   { label: 'External', value: 'external' },
 ];
 
-export default function BorrowingDetails({ currentDetails, onSave, setCurrentFormCount }) {
+export default function BorrowingDetails({ percent, setActiveStepId }) {
+  const params = useParams();
+  const { applicationId } = params;
+  const { enqueueSnackbar } = useSnackbar();
+  const { stepData, stepDataLoading } = useGetBondApplicationStepData(applicationId, 'borrowing_details');
+  const [currentBorrowingDetails, setCurrentBorrowingDetails] = useState([]);
+
   const borrowingSchema = Yup.object().shape({
     borrowings: Yup.array().of(
       Yup.object().shape({
@@ -49,29 +69,30 @@ export default function BorrowingDetails({ currentDetails, onSave, setCurrentFor
   const defaultValues = useMemo(
     () => ({
       borrowings:
-        currentDetails?.borrowings?.length > 0
-          ? currentDetails.borrowings.map((details) => ({
-              lenderName: details?.lenderName || '',
-              lenderAmount: details?.lenderAmount ? toNumber(details?.lenderAmount) : '',
-              repaymentTerms: details?.repaymentTerms || '',
-              borrowingType: details?.borrowingType || '',
-              interestPayment: details?.interestPayment || '',
-              monthlyPrincipal: details?.monthlyPrincipal || '',
-              monthlyInterest: details?.monthlyInterest || '',
-            }))
+        currentBorrowingDetails?.length > 0
+          ? currentBorrowingDetails.map((details) => ({
+            lenderName: details?.lenderName || '',
+            lenderAmount: details?.lenderAmount ? toNumber(details?.lenderAmount) : '',
+            repaymentTerms: (details?.repaymentTerms !== null && details?.repaymentTerms !== undefined) ? details?.repaymentTerms : '',
+            borrowingType: details?.borrowingType || '',
+            interestPayment: details?.interestPayment || '',
+            monthlyPrincipal: details?.monthlyPrincipal || '',
+            monthlyInterest: details?.monthlyInterest || '',
+          }))
           : [
-              {
-                lenderName: '',
-                lenderAmount: '',
-                repaymentTerms: '',
-                borrowingType: '',
-                interestPayment: '',
-                monthlyPrincipal: '',
-                monthlyInterest: '',
-              },
-            ],
+            {
+              lenderName: '',
+              lenderAmount: '',
+              repaymentTerms: '',
+              borrowingType: '',
+              interestPayment: '',
+              monthlyPrincipal: '',
+              monthlyInterest: '',
+            },
+          ],
+
     }),
-    [currentDetails]
+    [currentBorrowingDetails]
   );
 
   const methods = useForm({
@@ -80,7 +101,14 @@ export default function BorrowingDetails({ currentDetails, onSave, setCurrentFor
     mode: 'onSubmit',
   });
 
-  const { control, setValue, watch, handleSubmit, reset } = methods;
+  const {
+    control,
+    setValue,
+    watch,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting }
+  } = methods;
 
   const { fields, append } = useFieldArray({
     control,
@@ -99,17 +127,75 @@ export default function BorrowingDetails({ currentDetails, onSave, setCurrentFor
     });
   };
 
-  useEffect(() => {
-    if (currentDetails) reset(defaultValues);
-  }, [currentDetails, reset, defaultValues]);
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      const payload = {
+        borrowingDetails: data.borrowings.map((borrowing) => ({
+          ...borrowing,
+          bondIssueApplicationId: applicationId,
+          isActive: true,
+          isDeleted: false
+        }))
+      };
 
-  const onSubmit = (data) => {
-    console.log('✅ Full Form Data:', data);
-    onSave(data);
+      const response = await axiosInstance.patch(`/bonds-pre-issue/borrowing-details/${applicationId}`, payload);
 
-    // if API success
-    setCurrentFormCount(1);
+      if (response?.data?.success) {
+        enqueueSnackbar('Borrowing details submitted', { variant: 'success' });
+        setActiveStepId('collateral_assets');
+      }
+    } catch (error) {
+      console.error('Error while submitting borrowing details form :', error);
+    }
+  });
+
+  const calculateCompletion = () => {
+    const borrowings = watch('borrowings') || [];
+
+    if (!borrowings.length) {
+      percent?.(0);
+      return;
+    }
+
+    let validCount = 0;
+
+    borrowings.forEach((item) => {
+      const allFilled =
+        item.lenderName &&
+        item.lenderAmount &&
+        item.repaymentTerms !== '' &&
+        item.borrowingType &&
+        item.interestPayment &&
+        item.monthlyPrincipal &&
+        item.monthlyInterest;
+
+      if (allFilled) validCount++;
+    });
+
+    const percentage = Math.round((validCount / borrowings.length) * 100);
+
+    percent?.(percentage);
   };
+
+  useEffect(() => {
+    const subscription = watch(() => {
+      calculateCompletion();
+    });
+    return () => subscription.unsubscribe();
+  }, [watch("borrowings")]);
+
+  useEffect(() => {
+    if (currentBorrowingDetails && currentBorrowingDetails?.length > 0) {
+      reset(defaultValues);
+      percent?.(100);
+    }
+  }, [currentBorrowingDetails, reset, defaultValues]);
+
+  useEffect(() => {
+    if(stepData && !stepDataLoading){
+      setCurrentBorrowingDetails(stepData);
+    }
+  }, [stepData, stepDataLoading]);
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
@@ -204,16 +290,8 @@ export default function BorrowingDetails({ currentDetails, onSave, setCurrentFor
                 />
               </Grid>
             </Grid>
-            <Grid container justifyContent="flex-end" sx={{ mt: 3 }}>
-              <Grid item xs={12} md={3} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <LoadingButton type="submit" variant="contained" sx={{ color: '#fff' }}>
-                  Save
-                </LoadingButton>
-              </Grid>
-            </Grid>
           </Card>
         ))}
-
         <Box textAlign="center">
           <Button
             variant="contained"
@@ -224,6 +302,7 @@ export default function BorrowingDetails({ currentDetails, onSave, setCurrentFor
               fontWeight: 600,
               px: 3,
               py: 1,
+              mt: 3,
               borderRadius: 2,
               textTransform: 'none',
               '&:hover': {
@@ -234,14 +313,24 @@ export default function BorrowingDetails({ currentDetails, onSave, setCurrentFor
             + Add Another Borrowing
           </Button>
         </Box>
+        <Grid container justifyContent="flex-end" sx={{ mt: 3 }}>
+          <Grid item xs={12} md={3} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <LoadingButton
+              loading={isSubmitting}
+              type="submit"
+              variant="contained"
+              sx={{ color: '#fff' }}
+            >
+              Save All borrowings
+            </LoadingButton>
+          </Grid>
+        </Grid>
       </Box>
     </FormProvider>
   );
 }
 
 BorrowingDetails.propTypes = {
-  setActiveStep: PropTypes.func,
-  currentDetails: PropTypes.object,
-  onSave: PropTypes.func,
-  setCurrentFormCount: PropTypes.func,
+  percent: PropTypes.func,
+  setActiveStepId: PropTypes.func
 };

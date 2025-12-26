@@ -25,7 +25,7 @@ export default function ProfitabilityDetails({
   const defaultValues = useMemo(
     () => ({
       netProfit: currentDetails?.netProfit || '',
-      ebidta: currentDetails?.ebidta || '',
+      ebidta: currentDetails?.EBIDTA || '',
     }),
     [currentDetails]
   );
@@ -108,13 +108,13 @@ export default function ProfitabilityDetails({
             </Grid>
           </Grid>
 
-          <Grid container justifyContent="flex-end" sx={{ mt: 3 }}>
+          {/* <Grid container justifyContent="flex-end" sx={{ mt: 3 }}>
             <Grid item xs={12} md={3} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
               <LoadingButton type="submit" variant="contained" sx={{ color: '#fff' }}>
                 Save
               </LoadingButton>
             </Grid>
-          </Grid>
+          </Grid> */}
         </Card>
       </Box>
     </FormProvider>

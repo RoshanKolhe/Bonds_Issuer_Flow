@@ -2,14 +2,10 @@ import { useState, useEffect } from 'react';
 import { Box, Card, Stack, Typography } from '@mui/material';
 
 import MainFile from './borrowing/main';
-import FinancialDetails from './financial-details/financial-details';
 import LaunchIssue from './launch-issue';
-import IsinActivation from './isin-activation';
-import RegulatoryFiling from './regulatory-filing/regulatory-filing';
 import AuditedFinancialDocument from './audited-financial/audited-financial-document';
 import FundAndCreditForm from './fund-position-and-credit-rating/fundAndCreditForm';
 import ProgressStepper from 'src/components/progress-stepper/ProgressStepper';
-import PriliminaryAndCollateralView from './preliminary-requirements-and collatral-details/priliminaryAndCollateralView';
 import ExecuteDocument from './execute-documents/execute-documents';
 import IsinActivationMain from './isin-activation/isin-activation-main';
 import IntermediariesView from './intermediates/intermediates-view/intermediate-view';
@@ -19,6 +15,8 @@ import FinancialProfitableMainFile from './financial-details/financial-profitabl
 import CreditRating from './creadit-rating/creditRatings';
 import { useParams } from 'src/routes/hook';
 import { useGetBondApplication } from 'src/api/bondApplications';
+import RegulatoryFilingMain from './regulatory-filing/regulatory-filing-main';
+import BorrowingDetails from './borrowing/borrowing-details';
 
 export default function MybondStepper() {
   const params = useParams()
@@ -209,6 +207,47 @@ export default function MybondStepper() {
         currentStep = 'fund_position';
       }
 
+      if (
+        completedStepCodes.includes('fund_position') &&
+        completedStepCodes.includes('capital_details')
+      ) {
+        updateStepPercent('fund_position', 100);
+        currentStep = 'audited_financial';
+      }
+
+      if (
+        completedStepCodes.includes('financial_statements') &&
+        completedStepCodes.includes('income_tax_returns') &&
+        completedStepCodes.includes('gstr-9') &&
+        completedStepCodes.includes('gst-3b')
+      ) {
+        updateStepPercent('audited_financial', 100);
+        currentStep = 'borrowing_details';
+      }
+
+      if (
+        completedStepCodes.includes('borrowing_details')
+      ) {
+        updateStepPercent('borrowing_details', 100);
+        currentStep = 'collateral_assets';
+      }
+
+
+      if (
+        completedStepCodes.includes('collateral_assets') &&
+        completedStepCodes.includes('collateral_assets_approval')
+      ) {
+        updateStepPercent('collateral_assets', 100);
+        currentStep = 'financial_details';
+      }
+
+      if (
+        completedStepCodes.includes('financial_details')
+      ) {
+        updateStepPercent('financial_details', 100);
+        currentStep = 'credit_rating';
+      }
+
       setActiveStepId(currentStep);
       setDataInitialized(true);
     }
@@ -227,75 +266,54 @@ export default function MybondStepper() {
           <MyBondNewIssue
             percent={(p) => updateStepPercent('my_bond_new_issue', p)}
             setActiveStepId={setActiveStepId}
-            saveStepData={(data) => saveStepData('my_bond_new_issue', data)}
           />
         );
 
       case 'intermediaries':
         return (
           <IntermediariesView
-            currentIssue={formData.my_bond_new_issue}
             percent={(p) => updateStepPercent('intermediaries', p)}
             setActiveStepId={setActiveStepId}
-            saveStepData={(data) => saveStepData('intermediaries', data)}
           />
         );
 
       case 'fund_position':
         return (
           <FundAndCreditForm
-            // currentFund={formData.fund_position}
             percent={(p) => updateStepPercent('fund_position', p)}
             setActiveStepId={setActiveStepId}
-            currentFundPosition={formData.fund_position?.fundData || null}
-            currentCapitalDetails={formData.fund_position?.capitalDetails || null}
-            // currentCreditRatings={
-            //   Array.isArray(formData.fund_position?.creditRatingData)
-            //     ? formData.fund_position.creditRatingData
-            //     : []
-            // }
-            saveStepData={(section, data) => saveStepData('fund_position', { [section]: data })}
           />
         );
 
       case 'audited_financial':
         return (
           <AuditedFinancialDocument
-            currentAuditedDetails={formData.audited_financial}
             percent={(p) => updateStepPercent('audited_financial', p)}
             setActiveStepId={setActiveStepId}
-            saveStepData={(data) => saveStepData('audited_financial', data)}
           />
         );
 
       case 'borrowing_details':
         return (
-          <MainFile
-            currentDetails={formData.borrowing_details}
+          <BorrowingDetails
             percent={(p) => updateStepPercent('borrowing_details', p)}
             setActiveStepId={setActiveStepId}
-            saveStepData={(data) => saveStepData('borrowing_details', data)}
           />
         );
 
       case 'collateral_assets':
         return (
           <CollateralAssets
-            currentCollateral={formData.collateral_assets?.collateralData || null}
             percent={(p) => updateStepPercent('collateral_assets', p)}
             setActiveStepId={setActiveStepId}
-            saveStepData={(data) => saveStepData('collateral_assets', data)}
           />
         );
 
       case 'financial_details':
         return (
           <FinancialProfitableMainFile
-            currentFinancial={formData.financial_details?.financialStatements || null}
-            currentProfitability={formData.financial_details?.profitabilityStatements || null}
             percent={(p) => updateStepPercent('financial_details', p)}
             setActiveStepId={setActiveStepId}
-            saveStepData={(section, data) => saveStepData('financial_details', { [section]: data })}
           />
         );
 
@@ -326,8 +344,12 @@ export default function MybondStepper() {
 
       case 'regulatory_filing':
         return (
-          <RegulatoryFiling
-            currentRegulatory={formData.regulatory_filing}
+          <RegulatoryFilingMain
+            currentPAS4Regulatory={formData.regulatory_filing?.pas4}
+            currentTermSheetRegulatory={formData.regulatory_filing?.sebiApprovals}
+            currentInformationMemorandumRegulatory={formData.regulatory_filing?.memorandum}
+            currentInPrincipleRegulatory={formData.regulatory_filing?.inPrinciple}
+            currentTrusteeDueDiligenceRegulatory={formData.regulatory_filing?.trusteeDueDiligence}
             percent={(p) => updateStepPercent('regulatory_filing', p)}
             setActiveStepId={setActiveStepId}
             saveStepData={(data) => saveStepData('regulatory_filing', data)}
