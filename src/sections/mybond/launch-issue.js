@@ -125,7 +125,7 @@ export default function LaunchIssue({
         <Card sx={{ p: 3 }}>
           <Grid container spacing={4}>
             <Grid item xs={12}>
-              <Typography variant="h4" sx={{ color: '#1976d2', fontWeight: 600 }}>
+              <Typography variant="h5" color='primary'  fontWeight= 'bold'>
                 Launch Issue
               </Typography>
             </Grid>

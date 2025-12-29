@@ -94,7 +94,7 @@ export default function ProfitabilityDetails({
             border: '1px solid #e0e0e0',
           }}
         >
-          <Typography variant="h3" fontWeight={600} color="#1874ED" mb={2}>
+          <Typography variant="h5" color="primary" fontWeight='bold' mb={2}>
             Profitability Details
           </Typography>
 

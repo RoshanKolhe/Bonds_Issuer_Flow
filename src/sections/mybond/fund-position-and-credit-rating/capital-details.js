@@ -88,7 +88,10 @@ export default function CapitalDetails({
         enqueueSnackbar('Capital details saved', { variant: 'success' });
       }
     } catch (error) {
-      console.error('Error while updating capital details in bond estimations :', error);
+      const message =
+        error?.error?.message || 'Error while updating capital details in bond estimations :';
+      enqueueSnackbar(message, { variant: 'error' });
+      console.error(error);
     }
   });
 
@@ -116,7 +119,7 @@ export default function CapitalDetails({
             border: '1px solid #e0e0e0',
           }}
         >
-          <Typography variant="h3" fontWeight={600} color="#1874ED" mb={2}>
+        <Typography variant="h5"  fontWeight="bold" color="primary" mb={2}>
             Capital Details
           </Typography>
 

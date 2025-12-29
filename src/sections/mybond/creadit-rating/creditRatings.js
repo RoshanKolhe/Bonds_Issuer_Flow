@@ -552,76 +552,76 @@ export default function CreditRating({ percent, setActiveStepId }) {
   return (
     fields.length > 0 ? (
       <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-          <Typography variant="h6" fontWeight={600} mb={3}>
-            Credit Rating Details
-          </Typography>
+        <Typography variant="h5" color="primary" fontWeight='bold'>
+          Credit Rating Details
+        </Typography>
 
-          <Grid container spacing={4}>
-            {fields.map((item, index) => (
-              <Grid item xs={12} key={item.id}>
-                <Card sx={{ p: 3, border: '1px solid #e0e0e0' }}>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                      <RHFAutocomplete
-                        name={`ratings.${index}.agency`}
-                        label="Credit Rating Agency"
-                        options={creditRatingAgencies || []}
-                        getOptionLabel={(option) => option?.name || ''}
-                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                        disabled
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} md={6}>
-                      <RHFAutocomplete
-                        name={`ratings.${index}.rating`}
-                        label="Credit Rating"
-                        options={creditRatings || []}
-                        getOptionLabel={(option) => option?.name || ''}
-                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                      />
-                    </Grid>
-                  </Grid>
-
-                  {/* Valid From */}
-                  <Controller
-                    name={`ratings.${index}.validFrom`}
-                    control={control}
-                    render={({ field, fieldState }) => (
-                      <DatePicker
-                        label="Valid From"
-                        value={field.value}
-                        onChange={field.onChange}
-                        slotProps={{
-                          textField: {
-                            fullWidth: true,
-                            error: !!fieldState.error,
-                            helperText: fieldState.error?.message,
-                          },
-                        }}
-                        sx={{ my: 5 }}
-                      />
-                    )}
-                  />
-
-                  <Grid item xs={12}>
-                    <RHFCustomFileUploadBox
-                      name={`ratings.${index}.creditRatingLetter`}
-                      label="Upload Credit Rating Letter"
-                      accept={{
-                        'application/pdf': ['.pdf'],
-                        'image/png': ['.png'],
-                        'image/jpeg': ['.jpg', '.jpeg'],
-                      }}
+        <Grid container spacing={4}>
+          {fields.map((item, index) => (
+            <Grid item xs={12} key={item.id}>
+              <Card sx={{ p: 3, border: '1px solid #e0e0e0' }}>
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    <RHFAutocomplete
+                      name={`ratings.${index}.agency`}
+                      label="Credit Rating Agency"
+                      options={creditRatingAgencies || []}
+                      getOptionLabel={(option) => option?.name || ''}
+                      isOptionEqualToValue={(option, value) => option.id === value.id}
+                      disabled
                     />
-                    <YupErrorMessage name={`ratings.${index}.creditRatingLetter`} />
                   </Grid>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
 
-          {/* <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+                  <Grid item xs={12} md={6}>
+                    <RHFAutocomplete
+                      name={`ratings.${index}.rating`}
+                      label="Credit Rating"
+                      options={creditRatings || []}
+                      getOptionLabel={(option) => option?.name || ''}
+                      isOptionEqualToValue={(option, value) => option.id === value.id}
+                    />
+                  </Grid>
+                </Grid>
+
+                {/* Valid From */}
+                <Controller
+                  name={`ratings.${index}.validFrom`}
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <DatePicker
+                      label="Valid From"
+                      value={field.value}
+                      onChange={field.onChange}
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          error: !!fieldState.error,
+                          helperText: fieldState.error?.message,
+                        },
+                      }}
+                      sx={{ my: 5 }}
+                    />
+                  )}
+                />
+
+                <Grid item xs={12}>
+                  <RHFCustomFileUploadBox
+                    name={`ratings.${index}.creditRatingLetter`}
+                    label="Upload Credit Rating Letter"
+                    accept={{
+                      'application/pdf': ['.pdf'],
+                      'image/png': ['.png'],
+                      'image/jpeg': ['.jpg', '.jpeg'],
+                    }}
+                  />
+                  <YupErrorMessage name={`ratings.${index}.creditRatingLetter`} />
+                </Grid>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
             <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
               Save
             </LoadingButton>

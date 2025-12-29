@@ -24,7 +24,7 @@ import CreditRatingAgency from '../credit-rating-agency/credit-rating-agency';
 const TABS = [
   {
     value: 'all',
-    label: 'All',
+    label: 'Appointed',
     icon: <Iconify icon="solar:layers-bold" width={22} />,
   },
   {

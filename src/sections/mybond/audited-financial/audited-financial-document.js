@@ -8,7 +8,6 @@ import AuditedIncomeTaxReturn from './audited-income-tax-return';
 import AuditedGSTR9 from './audited-gstr9';
 import AuditedGST3B from './audited-gstr3b';
 import { Box, Button, Container } from '@mui/material';
-import KYCTitle from 'src/sections/kyc/kyc-title';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { useSnackbar } from 'notistack';
@@ -20,7 +19,7 @@ export default function AuditedFinancialDocument({
   percent,
 }) {
   const params = useParams();
-  const {applicationId} = params;
+  const { applicationId } = params;
   const { enqueueSnackbar } = useSnackbar();
   const { stepData, stepDataLoading } = useGetBondApplicationStepData(applicationId, 'financial_statements');
   const [currentData, setCurrentData] = useState(null);
@@ -107,11 +106,13 @@ export default function AuditedFinancialDocument({
 
   return (
     <Container>
-      <KYCTitle
-        title="Audited Financial"
-        subtitle="Upload audited financial documents for assessment"
-      />
-
+  
+      <Typography variant="h5" fontWeight="bold" color="primary">
+        Audited Financial
+      </Typography>
+      <Typography variant="body2" mb={2} >
+        Upload audited financial documents for assessment
+      </Typography>
       <FormProvider methods={methods}>
         <Grid container sx={{ p: 4, borderRadius: 2, border: '1px solid #ddd', boxShadow: 2 }}>
           <Grid xs={12}>

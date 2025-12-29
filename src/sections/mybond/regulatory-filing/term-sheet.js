@@ -81,7 +81,7 @@ export default function TermSheet({ currentData, saveStepData, setPercent, setPr
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Container>
         <Card sx={{ p: 3 }}>
-          <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
+           <Typography variant="h5" color='primary'  fontWeight= 'bold'  mb={2}>
             Term Sheet
           </Typography>
 

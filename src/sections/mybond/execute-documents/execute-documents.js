@@ -91,7 +91,7 @@ export default function ExecuteDocument({
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Card sx={{ p: 3, mb: 4 }}>
-        <Typography variant="h5" fontWeight={600} sx={{ mb: 2 }}>
+         <Typography variant="h5" color='primary'  fontWeight= 'bold'  mb={2}>
           Execute Documents
         </Typography>
 

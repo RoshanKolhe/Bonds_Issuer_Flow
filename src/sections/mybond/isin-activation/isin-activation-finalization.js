@@ -117,7 +117,7 @@ export default function IsinActivationFinalization({
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Card sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h5" fontWeight={600} sx={{ mb: 2 }}>
+       <Typography variant="h5" color='primary'  fontWeight= 'bold'  mb={2}>
           ISIN Activation & Finalization
         </Typography>
 

@@ -86,7 +86,7 @@ export default function TrusteeDueDiligence({
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Container>
         <Card sx={{ p: 3 }}>
-          <Typography variant="h5" sx={{ mb: 2, fontWeight: 600 }}>
+          <Typography variant="h5" color='primary' fontWeight='bold' mb={2}>
             Trustee Review & Due Diligence
           </Typography>
 

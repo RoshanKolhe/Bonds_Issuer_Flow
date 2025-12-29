@@ -42,7 +42,7 @@ export default function IssueDetailsCard({
   ];
 
   const Schema = Yup.object().shape({
-    issueType: Yup.string().required('Required'),
+    issueType: Yup.string().required('Issure type is required'),
     securityType: Yup.string().required('Please select security type'),
     issueSize: Yup.string().required('Required'),
     tenureYears: Yup.string().required('Required'),
@@ -143,7 +143,7 @@ export default function IssueDetailsCard({
       }
     } catch (error) {
       const message =
-        error?.response?.data?.error?.message || 'Failed to save issue details';
+        error?.error?.message || 'Failed to save issue details';
       enqueueSnackbar(message, { variant: 'error' });
       console.error(error);
     }
@@ -228,31 +228,21 @@ export default function IssueDetailsCard({
     <FormProvider methods={methods} onSubmit={onSubmit}>
       <Card sx={{ p: 2, mb: '50px' }}>
         <CardContent>
-          <Typography variant="h6" fontWeight="bold" color="primary">
+          <Typography variant="h5" mb={2} fontWeight="bold" color="primary">
             New Issue Setup
           </Typography>
 
           <Grid container spacing={3}>
             <Grid item xs={12} sm={4}>
-              <Typography variant="body2" color="text.secondary" mb={1}>
-                Issue Type*
-              </Typography>
-              <ToggleButtonGroup
-                value={issueType}
-                exclusive
-                onChange={handleIssueTypeChange}
-                fullWidth
-              >
-                <ToggleButton value="public">Public</ToggleButton>
-                <ToggleButton value="private">Private</ToggleButton>
-              </ToggleButtonGroup>
+              <RHFSelect name="issueType" label="Issue Type *">
+                <MenuItem value="">Select issue type</MenuItem>
+                <MenuItem value="public">Public</MenuItem>
+                <MenuItem value="private">Private</MenuItem>
+              </RHFSelect>
             </Grid>
             {issueType === 'private' && (
               <Grid item xs={12} sm={4}>
-                <Typography variant="body2" color="text.secondary" mb={1}>
-                  Prefered Investor Category*
-                </Typography>
-                <RHFSelect name="preferedInvestorCategory">
+                <RHFSelect name="preferedInvestorCategory" label="Prefered Investor Category*">
                   <MenuItem value="">Select category</MenuItem>
                   {investorCategoriesData?.length > 0 ? (
                     investorCategoriesData.map((cat) => (
@@ -268,21 +258,16 @@ export default function IssueDetailsCard({
             )}
 
             <Grid item xs={12} sm={4}>
-              <Typography variant="body2" color="text.secondary" mb={1}>
-                Tenure (Years)*
-              </Typography>
               <RHFTextField
                 name="tenureYears"
+                label="Tenure (Years)*"
                 inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                 onInput={(e) => (e.target.value = e.target.value.replace(/[^0-9.]/g, ''))}
               />
             </Grid>
 
             <Grid item xs={12} sm={4}>
-              <Typography variant="body2" color="text.secondary" mb={1}>
-                Redemption Type*
-              </Typography>
-              <RHFSelect name="redemptionType">
+              <RHFSelect name="redemptionType" label=" Redemption Type*">
                 <MenuItem value="">Select Redemption</MenuItem>
                 {redemptionType?.length > 0 ? (
                   redemptionType.map((red) => (
@@ -297,58 +282,26 @@ export default function IssueDetailsCard({
             </Grid>
 
             <Grid item xs={12} sm={4}>
-              <Typography variant="body2" color="text.secondary" mb={1}>
-                Security Type*
-              </Typography>
-              <Controller
-                name="securityType"
-                control={control}
-                render={({ field }) => (
-                  <ToggleButtonGroup
-                    exclusive
-                    value={field.value}
-                    onChange={(e, val) => val !== null && field.onChange(val)}
-                    fullWidth
-                  >
-                    <ToggleButton value={'secured'}>Secured</ToggleButton>
-                    <ToggleButton value={'unsecured'}>Unsecured</ToggleButton>
-                  </ToggleButtonGroup>
-                )}
-              />
+              <RHFSelect name="securityType" label="Security Type*">
+                <MenuItem value="">Select security type</MenuItem>
+                <MenuItem value="secured">Secured</MenuItem>
+                <MenuItem value="unsecured">Unsecured</MenuItem>
+              </RHFSelect>
             </Grid>
             <Grid item xs={12} sm={4}>
-              <Typography variant="body2" color="text.secondary" mb={1}>
-                Interest Payment Cycle*
-              </Typography>
-              <Controller
-                name="preferedPaymentCycle"
-                control={control}
-                render={({ field }) => (
-                  <ToggleButtonGroup
-                    exclusive
-                    value={field.value}
-                    onChange={(e, val) => {
-                      if (val !== null) {
-                        field.onChange(val);
-                      }
-                    }}
-                    fullWidth
-                  >
-                    {paymentCycleOptions.map((option) => (
-                      <ToggleButton key={option.value} value={option.value}>
-                        {option.label}
-                      </ToggleButton>
-                    ))}
-                  </ToggleButtonGroup>
-                )}
-              />
+              <RHFSelect name="preferedPaymentCycle" label="Interest Payment Cycle*">
+                <MenuItem value="">Select Interest Payment Cycle</MenuItem>
+                {paymentCycleOptions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </RHFSelect>
             </Grid>
             <Grid item xs={12} sm={4}>
-              <Typography variant="body2" color="text.secondary" mb={1}>
-                Coupon Rate(%)*
-              </Typography>
               <RHFTextField
                 name="couponRate"
+                label="Coupon Rate(%)*"
                 placeholder="e.g., 5.25"
                 onInput={(e) => {
                   let value = e.target.value;
@@ -377,21 +330,17 @@ export default function IssueDetailsCard({
               />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <Typography variant="body2" color="text.secondary" mb={1}>
-                Issue Size*
-              </Typography>
               <RHFTextField
                 name="issueSize"
+                label="Issue Size*"
                 inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                 onInput={(e) => (e.target.value = e.target.value.replace(/[^0-9.]/g, ''))}
               />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <Typography variant="body2" color="text.secondary" mb={1}>
-                Total Units
-              </Typography>
               <RHFTextField
                 name="totalUnit"
+                label="Total Units"
                 placeholder="e.g., 5.25"
                 inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                 onInput={(e) => (e.target.value = e.target.value.replace(/[^0-9.]/g, ''))}
@@ -399,21 +348,16 @@ export default function IssueDetailsCard({
             </Grid>
 
             <Grid item xs={12} sm={4}>
-              <Typography variant="body2" color="text.secondary" mb={1}>
-                Minimum Purchase Unit
-              </Typography>
               <RHFTextField
                 name="minimumPurchaseUnit"
+                label=" Minimum Purchase Unit*"
                 placeholder="e.g., 5.25"
                 inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                 onInput={(e) => (e.target.value = e.target.value.replace(/[^0-9.]/g, ''))}
               />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <Typography variant="body2" color="text.secondary" mb={1}>
-                Minimum Investment Price
-              </Typography>
-              <RHFTextField name="minimumInvestmentPrice" placeholder="Auto calculated" disabled />
+              <RHFTextField name="minimumInvestmentPrice" label="Minimum Investment Price" placeholder="Auto calculated" disabled />
             </Grid>
           </Grid>
           <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>

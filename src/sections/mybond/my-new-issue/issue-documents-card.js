@@ -164,7 +164,7 @@ export default function IssueDocumentsCard({
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
       <Card sx={{ p: 2 }}>
-        <Typography variant="h6" fontWeight="bold" mb={2}>
+          <Typography variant="h5" mb={2} fontWeight="bold" color="primary">
           Upload Documents
         </Typography>
 

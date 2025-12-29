@@ -103,7 +103,7 @@ export default function InformationMemorandum({
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Container>
         <Card sx={{ p: 3 }}>
-          <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
+          <Typography variant="h5" color='primary'  fontWeight= 'bold'  mb={2}>
             Prospectus / Information Memorandum
           </Typography>
 

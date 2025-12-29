@@ -62,8 +62,9 @@ export default function CreditRatingAgency() {
   return (
       <>
       <Typography
-        variant="h6"
-        fontWeight={700}
+        variant="h5"
+        fontWeight="bold"
+        color="primary"
         sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}
       >
         <Iconify icon="solar:chart-bold" width={22} />

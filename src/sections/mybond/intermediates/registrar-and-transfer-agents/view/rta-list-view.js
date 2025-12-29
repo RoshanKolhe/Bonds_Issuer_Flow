@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Card, Container, Grid, Stack, Table, TableBody, TableContainer } from '@mui/material';
+import { Button, Card, Container, Grid, Stack, Table, TableBody, TableContainer, Typography } from '@mui/material';
 
 import Scrollbar from 'src/components/scrollbar';
 import { useSettingsContext } from 'src/components/settings';
@@ -12,6 +12,7 @@ import { useParams, useRouter } from 'src/routes/hook';
 import axiosInstance from 'src/utils/axios';
 import { useSnackbar } from 'notistack';
 import RtaCardView from './rta-card-view';
+import Iconify from 'src/components/iconify';
 
 // ------------------------------------------------------
 
@@ -80,7 +81,15 @@ export default function RtaListView() {
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
-      <Stack direction="row" spacing={2} sx={{ p: 2 }} justifyContent="flex-end">
+      <Stack direction="row" spacing={2} sx={{ p: 2 }} justifyContent="space-between">
+        <Typography  variant="h5"
+          fontWeight="bold"
+          color="primary"
+          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Iconify icon="solar:document-text-bold" width={20}/>
+          RTA'S
+        </Typography>
+        <Stack direction={'row'} spacing={2}>
         <Button
           variant="contained"
           disabled={selected.length < 2}
@@ -97,6 +106,7 @@ export default function RtaListView() {
         >
           Send Request
         </Button>
+        </Stack>
       </Stack>
 
         {/* Search */}

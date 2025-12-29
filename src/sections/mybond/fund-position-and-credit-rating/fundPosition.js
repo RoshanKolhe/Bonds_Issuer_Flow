@@ -72,7 +72,10 @@ export default function FundPosition({
         enqueueSnackbar('Fund position saved', { variant: 'success' });
       }
     } catch (error) {
-      console.error('Error while updating fund position in bond estimations :', error);
+       const message =
+        error?.error?.message || 'Error while updating fund position in bond estimations :';
+      enqueueSnackbar(message, { variant: 'error' });
+      console.error(error);
     }
   });
 
@@ -110,7 +113,8 @@ export default function FundPosition({
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
       <Card sx={{ p: 4, borderRadius: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', mb: 4 }}>
-        <Typography variant="h3" sx={{ color: '#1565c0', fontWeight: 600 }}>
+
+        <Typography variant="h5"  fontWeight="bold" color="primary">
           Fund Position
         </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>

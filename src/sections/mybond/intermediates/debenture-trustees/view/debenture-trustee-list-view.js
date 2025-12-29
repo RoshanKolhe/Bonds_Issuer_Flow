@@ -8,6 +8,7 @@ import {
   Button,
   Stack,
   Grid,
+  Typography,
 } from '@mui/material';
 
 import Scrollbar from 'src/components/scrollbar';
@@ -21,6 +22,7 @@ import { useParams, useRouter } from 'src/routes/hook';
 import axiosInstance from 'src/utils/axios';
 import { useSnackbar } from 'notistack';
 import DebentureTrusteeCardView from './debenture-trustee-card';
+import Iconify from 'src/components/iconify';
 
 // ------------------------------------------------------
 
@@ -80,7 +82,7 @@ export default function DebentureTrusteeListView() {
       });
 
       if (response?.data?.success) {
-        enqueueSnackbar('Request send successfully', {variant: 'success'});
+        enqueueSnackbar('Request send successfully', { variant: 'success' });
       }
     } catch (error) {
       console.error('error while sending request to debenture trustee :', error);
@@ -89,31 +91,49 @@ export default function DebentureTrusteeListView() {
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
-      <Stack direction="row" spacing={2} sx={{ p: 2 }} justifyContent="flex-end">
-        <Button
-          variant="contained"
-          disabled={selected.length < 2}
-          sx={{ textTransform: 'none' }}
-          onClick={handleCompare}
-        >
-          Compare
-        </Button>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{ p: 2 }}
+      >
 
-        <Button
-          variant="contained"
-          disabled={isSendDisabled}
-          onClick={() => console.log('Send Request:', selected)}
+        <Typography
+          variant="h5"
+          fontWeight="bold"
+          color="primary"
+          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
         >
-          Send Request
-        </Button>
+          <Iconify icon="solar:shield-check-bold" width={22} />
+          Debenture Trustee's
+        </Typography>
+        <Stack direction="row" spacing={2}>
+          <Button
+            variant="contained"
+            disabled={selected.length < 2}
+            sx={{ textTransform: 'none' }}
+            onClick={handleCompare}
+          >
+            Compare
+          </Button>
+
+          <Button
+            variant="contained"
+            disabled={isSendDisabled}
+            onClick={() => console.log('Send Request:', selected)}
+          >
+            Send Request
+          </Button>
+        </Stack>
       </Stack>
+
       {/* <Card> */}
       {/* Search */}
       <Stack spacing={3}>
-      <DebentureTrusteeTableToolbar filterName={filterName} onFilterName={setFilterName} />
+        <DebentureTrusteeTableToolbar filterName={filterName} onFilterName={setFilterName} />
 
-      {/* Table */}
-      {/* <TableContainer>
+        {/* Table */}
+        {/* <TableContainer>
           <Scrollbar>
             <Table sx={{ minWidth: 960 }}>
               <TableHeadCustom
@@ -139,20 +159,20 @@ export default function DebentureTrusteeListView() {
             </Table>
           </Scrollbar>
         </TableContainer> */}
-      {/* </Card> */}
+        {/* </Card> */}
 
-      <Grid container spacing={3}>
-        {filteredData.map((row) => (
-          <DebentureTrusteeCardView
-            key={row.id}   
-            row={row}
-            selected={selected.includes(row.id)}
-            onSelectRow={handleSelectRow}
-            onView={() => handleView(row.id)}
-            onSendRequest={() => handleSendRequest(row.id)}
-          />
-        ))}
-      </Grid>
+        <Grid container spacing={3}>
+          {filteredData.map((row) => (
+            <DebentureTrusteeCardView
+              key={row.id}
+              row={row}
+              selected={selected.includes(row.id)}
+              onSelectRow={handleSelectRow}
+              onView={() => handleView(row.id)}
+              onSendRequest={() => handleSendRequest(row.id)}
+            />
+          ))}
+        </Grid>
       </Stack>
     </Container>
   );

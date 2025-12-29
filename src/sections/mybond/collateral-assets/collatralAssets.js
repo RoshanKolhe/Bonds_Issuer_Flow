@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
-import { Box, Button, Card, Grid, MenuItem, Typography } from '@mui/material';
+import { Box, Button, Card, Grid, MenuItem, Stack, Typography } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
@@ -235,9 +235,7 @@ export default function CollateralAssets({
           gap: 4,
         }}
       >
-        <Typography variant="h5" sx={{ color: '#1976d2', fontWeight: 600, mb: 4 }}>
-          Collateral & Asset Verification
-        </Typography>
+
 
         {fields.map((field, index) => (
           <Card
@@ -251,231 +249,172 @@ export default function CollateralAssets({
               mt: '0px',
             }}
           >
+            <Typography variant="h5" fontWeight='bold' mb={2} color="primary">
+              Collateral & Asset Verification
+            </Typography>
             <Grid container spacing={3}>
               {/* Collateral Type */}
-              <Grid item xs={12} md={6}>
-                <Grid container alignItems="center" spacing={2}>
-                  <Grid item xs={4} md={3}>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      Collateral Type
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={8} md={9}>
-                    <RHFSelect name={`collateralAssets.${index}.collateralType`} label="Collateral Type" defaultValue="">
-                      {collateralTypesData.length > 0 ? (
-                        collateralTypesData.map((type) => (
-                          <MenuItem key={type.id} value={type.id}>
-                            {type.label}
-                          </MenuItem>
-                        ))
-                      ) : (
-                        <MenuItem disabled value="">
-                          No collateral types
-                        </MenuItem>
-                      )}
-                    </RHFSelect>
-                  </Grid>
-                </Grid>
+              <Grid item xs={12} md={4}>
+
+                <RHFSelect name={`collateralAssets.${index}.collateralType`} label="Collateral Type" defaultValue="">
+                  {collateralTypesData.length > 0 ? (
+                    collateralTypesData.map((type) => (
+                      <MenuItem key={type.id} value={type.id}>
+                        {type.label}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled value="">
+                      No collateral types
+                    </MenuItem>
+                  )}
+                </RHFSelect>
               </Grid>
 
               {/* Charge Type */}
-              <Grid item xs={12} md={6}>
-                <Grid container alignItems="center" spacing={2}>
-                  <Grid item xs={4} md={3}>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      Charge Type
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={8} md={9}>
-                    <RHFSelect name={`collateralAssets.${index}.chargeType`} label="Charge Type" defaultValue="">
-                      {chargeTypesData.length > 0 ? (
-                        chargeTypesData.map((type) => (
-                          <MenuItem key={type.id} value={type.id}>
-                            {type.label}
-                          </MenuItem>
-                        ))
-                      ) : (
-                        <MenuItem disabled value="">
-                          No charge types
-                        </MenuItem>
-                      )}
-                    </RHFSelect>
-                  </Grid>
-                </Grid>
+              <Grid item xs={12} md={4}>
+
+
+                <RHFSelect name={`collateralAssets.${index}.chargeType`} label="Charge Type" defaultValue="">
+                  {chargeTypesData.length > 0 ? (
+                    chargeTypesData.map((type) => (
+                      <MenuItem key={type.id} value={type.id}>
+                        {type.label}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled value="">
+                      No charge types
+                    </MenuItem>
+                  )}
+                </RHFSelect>
+              </Grid>
+              <Grid item xs={12} md={4}>
+
+                <RHFSelect name={`collateralAssets.${index}.ownershipType`} label="Ownership Type" defaultValue="">
+                  {ownershipTypesData.length > 0 ? (
+                    ownershipTypesData.map((type) => (
+                      <MenuItem key={type.id} value={type.id}>
+                        {type.label}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled value="">
+                      No ownership types
+                    </MenuItem>
+                  )}
+                </RHFSelect>
               </Grid>
 
               {/* Asset Description */}
-              <Grid item xs={12} md={12}>
-                <Grid container alignItems="center" spacing={2}>
-                  <Grid item xs={12} md={12}>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      Asset Description
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} md={12}>
-                    <RHFTextField multiline name={`collateralAssets.${index}.description`} fullWidth />
-                  </Grid>
-                </Grid>
-              </Grid>
+
 
               {/* Estimated Value */}
-              <Grid item xs={12} md={6}>
-                <Grid container alignItems="center" spacing={2}>
-                  <Grid item xs={4} md={3}>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      Estimated Value
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={8} md={9}>
-                    <RHFTextField name={`collateralAssets.${index}.estimatedValue`} fullWidth />
-                  </Grid>
-                </Grid>
+              <Grid item xs={12} md={4}>
+                <RHFTextField name={`collateralAssets.${index}.estimatedValue`} label="Estimated Value" fullWidth />
               </Grid>
 
               {/* Security Document Ref */}
-              <Grid item xs={12} md={6}>
-                <Grid container alignItems="center" spacing={2}>
-                  <Grid item xs={4} md={3}>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      Security Document Ref
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={8} md={9}>
-                    <RHFTextField name={`collateralAssets.${index}.securityDocRef`} fullWidth />
-                  </Grid>
-                </Grid>
+              <Grid item xs={12} md={4}>
+
+
+                <RHFTextField name={`collateralAssets.${index}.securityDocRef`} label="Security Document Ref" fullWidth />
+
               </Grid>
 
               {/* Valuation Date */}
-              <Grid item xs={12} md={6}>
-                <Grid container alignItems="center" spacing={2}>
-                  <Grid item xs={4} md={3}>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      Valuation Date
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={8} md={9}>
-                    <Controller
-                      name={`collateralAssets.${index}.valuationDate`}
-                      control={control}
-                      render={({ field, fieldState: { error } }) => (
-                        <DatePicker
-                          label="Valuation Date"
-                          value={
-                            field.value
-                              ? field.value instanceof Date
-                                ? field.value
-                                : new Date(field.value)
-                              : null
-                          }
-                          onChange={(newValue) => {
-                            field.onChange(newValue);
-                          }}
-                          slotProps={{
-                            textField: {
-                              fullWidth: true,
-                              error: !!error,
-                              helperText: error?.message,
-                            },
-                          }}
-                        />
-                      )}
-                    />
-                  </Grid>
-                </Grid>
-              </Grid>
+
 
               {/* Trust Name */}
-              <Grid item xs={12} md={6}>
-                <Grid container alignItems="center" spacing={2}>
-                  <Grid item xs={4} md={3}>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      Trust Name
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={8} md={9}>
-                    <RHFTextField name={`collateralAssets.${index}.trustName`} fullWidth />
-                  </Grid>
-                </Grid>
+              <Grid item xs={12} md={4}>
+                <RHFTextField name={`collateralAssets.${index}.trustName`} label="  Trust Name" fullWidth />
               </Grid>
 
               {/* Ownership Type */}
-              <Grid item xs={12} md={6}>
-                <Grid container alignItems="center" spacing={2}>
-                  <Grid item xs={4} md={3}>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      Ownership Type
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={8} md={9}>
-                    <RHFSelect name={`collateralAssets.${index}.ownershipType`} label="Ownership Type" defaultValue="">
-                      {ownershipTypesData.length > 0 ? (
-                        ownershipTypesData.map((type) => (
-                          <MenuItem key={type.id} value={type.id}>
-                            {type.label}
-                          </MenuItem>
-                        ))
-                      ) : (
-                        <MenuItem disabled value="">
-                          No ownership types
-                        </MenuItem>
-                      )}
-                    </RHFSelect>
-                  </Grid>
-                </Grid>
-              </Grid>
+
 
               {/* Remarks */}
               <Grid item xs={12} md={6}>
-                <Grid container alignItems="center" spacing={2}>
-                  <Grid item xs={4} md={3}>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      Remarks
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={8} md={9}>
-                    <RHFTextField name={`collateralAssets.${index}.remark`} fullWidth />
-                  </Grid>
-                </Grid>
+                <RHFTextField name={`collateralAssets.${index}.remark`} label="Remarks" fullWidth />
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+
+                <Controller
+                  name={`collateralAssets.${index}.valuationDate`}
+                  label="Valuation Date"
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <DatePicker
+                      label="Valuation Date"
+                      value={
+                        field.value
+                          ? field.value instanceof Date
+                            ? field.value
+                            : new Date(field.value)
+                          : null
+                      }
+                      onChange={(newValue) => {
+                        field.onChange(newValue);
+                      }}
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          error: !!error,
+                          helperText: error?.message,
+                        },
+                      }}
+                    />
+                  )}
+                />
+
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <RHFTextField
+                  name={`collateralAssets.${index}.description`}
+                  label="Asset Description"
+                  multiline
+                  rows={3}
+                  fullWidth
+                />
               </Grid>
 
               <Grid item xs={12} md={12}>
-                <Typography sx={{ py: '20px' }}>Security Document</Typography>
-                <RHFCustomFileUploadBox
-                  name={`collateralAssets.${index}.securityDocument`}
-                  label="Security Document"
-                  accept={{
-                    'application/pdf': ['.pdf'],
-                    'image/png': ['.png'],
-                    'image/jpeg': ['.jpg', '.jpeg'],
-                  }}
-                />
-                <YupErrorMessage name={`collateralAssets.${index}.securityDocument`} />
+                <Stack spacing={2}>
+                  <RHFCustomFileUploadBox
+                    name={`collateralAssets.${index}.securityDocument`}
+                    label="Security Document"
+                    accept={{
+                      'application/pdf': ['.pdf'],
+                      'image/png': ['.png'],
+                      'image/jpeg': ['.jpg', '.jpeg'],
+                    }}
+                  />
+                  <YupErrorMessage name={`collateralAssets.${index}.securityDocument`} />
 
-                <Typography sx={{ py: '20px' }}>Asset Cover Certificate</Typography>
-                <RHFCustomFileUploadBox
-                  name={`collateralAssets.${index}.assetCoverCertificate`}
-                  label="Asset Cover Certificate"
-                  accept={{
-                    'application/pdf': ['.pdf'],
-                    'image/png': ['.png'],
-                    'image/jpeg': ['.jpg', '.jpeg'],
-                  }}
-                />
-                <YupErrorMessage name={`collateralAssets.${index}.assetCoverCertificate`} />
 
-                <Typography sx={{ py: '20px' }}>Valuation Report</Typography>
-                <RHFCustomFileUploadBox
-                  name={`collateralAssets.${index}.valuationReport`}
-                  label="Valuation Report"
-                  accept={{
-                    'application/pdf': ['.pdf'],
-                    'image/png': ['.png'],
-                    'image/jpeg': ['.jpg', '.jpeg'],
-                  }}
-                />
-                <YupErrorMessage name={`collateralAssets.${index}.valuationReport`} />
+                  <RHFCustomFileUploadBox
+                    name={`collateralAssets.${index}.assetCoverCertificate`}
+                    label="Asset Cover Certificate"
+                    accept={{
+                      'application/pdf': ['.pdf'],
+                      'image/png': ['.png'],
+                      'image/jpeg': ['.jpg', '.jpeg'],
+                    }}
+                  />
+                  <YupErrorMessage name={`collateralAssets.${index}.assetCoverCertificate`} />
 
+                  <RHFCustomFileUploadBox
+                    name={`collateralAssets.${index}.valuationReport`}
+                    label="Valuation Report"
+                    accept={{
+                      'application/pdf': ['.pdf'],
+                      'image/png': ['.png'],
+                      'image/jpeg': ['.jpg', '.jpeg'],
+                    }}
+                  />
+                  <YupErrorMessage name={`collateralAssets.${index}.valuationReport`} />
+                </Stack>
               </Grid>
             </Grid>
           </Card>

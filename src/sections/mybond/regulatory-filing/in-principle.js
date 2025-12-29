@@ -113,7 +113,7 @@ export default function InPrincipleApproval({
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Container>
         <Card sx={{ p: 3 }}>
-          <Typography variant="h5" sx={{ mb: 2, fontWeight: 600 }}>
+          <Typography variant="h5" color='primary' fontWeight='bold' mb={2}>
             In-Principle Listing Approval
           </Typography>
 
