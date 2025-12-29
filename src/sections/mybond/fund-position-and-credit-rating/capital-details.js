@@ -95,6 +95,7 @@ export default function CapitalDetails({
   useEffect(() => {
     if (stepData && !stepDataLoading) {
       setCapitalDetailsData(stepData);
+      setProgress(true);
     }
   }, [stepData, stepDataLoading]);
 

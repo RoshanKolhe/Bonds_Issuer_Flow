@@ -55,10 +55,10 @@ export default function InformationMemorandum({
     if (referenceNoMemorandum) completed++;
     if (informationMemorandum) completed++;
 
-    const pct = Math.round((completed / 4) * 20);
+    const pct = Math.round((completed / 4) * 35);
 
     setPercent?.(pct);
-    setProgress?.(pct === 20);
+    setProgress?.(pct === 35);
   }, [
     filingDateMemorandum,
     fileNameMemorandum,

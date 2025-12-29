@@ -51,10 +51,10 @@ export default function PAS4({ currentData, saveStepData, setPercent, setProgres
     if (approvalNoPas4) completed++;
     if (pas4) completed++;
 
-    const pct = Math.round((completed / 5) * 20);
+    const pct = Math.round((completed / 5) * 35);
 
     setPercent?.(pct);
-    setProgress?.(pct === 20);
+    setProgress?.(pct === 35);
   }, [
     filingDatePas4,
     fileNamePas4,

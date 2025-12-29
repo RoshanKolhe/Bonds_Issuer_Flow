@@ -1,6 +1,14 @@
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Container, Grid, Typography, Box, Card } from '@mui/material';
+import {
+  Container,
+  Grid,
+  Typography,
+  Box,
+  Card,
+  Alert,
+  MenuItem,
+} from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useForm, Controller } from 'react-hook-form';
 import { enqueueSnackbar } from 'notistack';
@@ -16,21 +24,32 @@ import YupErrorMessage from 'src/components/error-field/yup-error-messages';
 export default function InPrincipleApproval({
   currentData,
   saveStepData,
-  setPercent,
-  setProgress,
+  percent,
+  setActiveStepId,
 }) {
   /* ---------------- SCHEMA ---------------- */
   const Schema = Yup.object().shape({
-    principleApprovalNo: Yup.string().required('Approval number is required'),
-    principleDate: Yup.date().nullable().required('Date is required'),
-    principle: Yup.mixed().required('Upload is required'),
+    exchange: Yup.string()
+      .oneOf(['BSE', 'NSE'])
+      .required('Stock exchange is required'),
+
+    inPrincipleApprovalNo: Yup.string()
+      .required('Approval number is required'),
+
+    inPrincipleApprovalDate: Yup.date()
+      .nullable()
+      .required('Approval date is required'),
+
+    inPrincipleApprovalLetter: Yup.mixed()
+      .required('In-principle approval letter is required'),
   });
 
   /* ---------------- DEFAULT VALUES ---------------- */
   const defaultValues = {
-    principleApprovalNo: '',
-    principleDate: null,
-    principle: null,
+    exchange: '',
+    inPrincipleApprovalNo: '',
+    inPrincipleApprovalDate: null,
+    inPrincipleApprovalLetter: null,
   };
 
   const methods = useForm({
@@ -40,28 +59,22 @@ export default function InPrincipleApproval({
 
   const { handleSubmit, control, watch, reset } = methods;
 
-  const principleApprovalNo = watch('principleApprovalNo');
-  const principleDate = watch('principleDate');
-  const principle = watch('principle');
+  const exchange = watch('exchange');
+  const approvalNo = watch('inPrincipleApprovalNo');
+  const approvalDate = watch('inPrincipleApprovalDate');
+  const approvalLetter = watch('inPrincipleApprovalLetter');
 
-  /* ---------------- PERCENT LOGIC ---------------- */
+  /* ---------------- PERCENT LOGIC (BINARY) ---------------- */
   useEffect(() => {
-    let completed = 0;
-
-    if (principleApprovalNo) completed++;
-    if (principleDate) completed++;
-    if (principle) completed++;
-
-    const pct = Math.round((completed / 3) * 20);
-
-    setPercent?.(pct);
-    setProgress?.(pct === 20);
+    percent?.(
+      exchange && approvalNo && approvalDate && approvalLetter ? 100 : 0
+    );
   }, [
-    principleApprovalNo,
-    principleDate,
-    principle,
-    setPercent,
-    setProgress,
+    exchange,
+    approvalNo,
+    approvalDate,
+    approvalLetter,
+    percent,
   ]);
 
   /* ---------------- RESET ON EDIT ---------------- */
@@ -70,29 +83,28 @@ export default function InPrincipleApproval({
       reset({
         ...defaultValues,
         ...currentData,
-        principleDate: currentData.principleDate
-          ? new Date(currentData.principleDate)
+        inPrincipleApprovalDate: currentData.inPrincipleApprovalDate
+          ? new Date(currentData.inPrincipleApprovalDate)
           : null,
       });
-
-      setPercent?.(20);
-      setProgress?.(true);
+      percent?.(100);
     }
-  }, [currentData, reset, setPercent, setProgress]);
+  }, [currentData, reset, percent]);
 
   /* ---------------- SUBMIT ---------------- */
   const onSubmit = (data) => {
     const payload = {
-      principleApprovalNo: data.principleApprovalNo,
-      principleDate: data.principleDate,
-      principle: data.principle,
+      exchange: data.exchange,
+      inPrincipleApprovalNo: data.inPrincipleApprovalNo,
+      inPrincipleApprovalDate: data.inPrincipleApprovalDate,
+      inPrincipleApprovalLetter: data.inPrincipleApprovalLetter,
     };
 
     saveStepData?.(payload);
-    setPercent?.(20);
-    setProgress?.(true);
+    percent?.(100);
+    setActiveStepId?.('isin_activation');
 
-    enqueueSnackbar('In-Principle Approval saved successfully!', {
+    enqueueSnackbar('In-Principle Listing Approval saved successfully', {
       variant: 'success',
     });
   };
@@ -101,22 +113,44 @@ export default function InPrincipleApproval({
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Container>
         <Card sx={{ p: 3 }}>
-          <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
+          <Typography variant="h5" sx={{ mb: 2, fontWeight: 600 }}>
             In-Principle Listing Approval
           </Typography>
 
+          {/* INFO MESSAGE */}
+          <Alert severity="info" sx={{ mb: 3 }}>
+            In-Principle Listing Approval is issued by the stock exchange
+            (BSE or NSE) and is mandatory before ISIN activation and
+            subscription opening.
+          </Alert>
+
           <Grid container spacing={3}>
+            {/* EXCHANGE */}
             <Grid item xs={12} md={4}>
               <RHFTextField
-                name="principleApprovalNo"
+                name="exchange"
+                label="Stock Exchange"
+                select
+                fullWidth
+              >
+                <MenuItem value="BSE">BSE</MenuItem>
+                <MenuItem value="NSE">NSE</MenuItem>
+              </RHFTextField>
+            </Grid>
+
+            {/* APPROVAL NUMBER */}
+            <Grid item xs={12} md={4}>
+              <RHFTextField
+                name="inPrincipleApprovalNo"
                 label="Approval Number"
                 fullWidth
               />
             </Grid>
 
+            {/* APPROVAL DATE */}
             <Grid item xs={12} md={4}>
               <Controller
-                name="principleDate"
+                name="inPrincipleApprovalDate"
                 control={control}
                 render={({ field, fieldState }) => (
                   <DatePicker
@@ -135,19 +169,20 @@ export default function InPrincipleApproval({
               />
             </Grid>
 
+            {/* APPROVAL LETTER */}
             <Grid item xs={12}>
               <RHFCustomFileUploadBox
-                name="principle"
-                label="Upload In-Principle Approval"
+                name="inPrincipleApprovalLetter"
+                label="Upload In-Principle Approval Letter"
                 icon="mdi:file-document-outline"
               />
-              <YupErrorMessage name="principle" />
+              <YupErrorMessage name="inPrincipleApprovalLetter" />
             </Grid>
           </Grid>
 
           <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
             <LoadingButton type="submit" variant="contained">
-              Save
+              Save & Continue
             </LoadingButton>
           </Box>
         </Card>

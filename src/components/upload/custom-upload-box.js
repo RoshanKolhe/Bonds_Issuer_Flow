@@ -131,7 +131,7 @@ export default function CustomUploadBox({
                     >
                         {/* ICON */}
                         <Stack spacing={1} alignItems="center">
-                            <Box component='div' sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                            <Box component='div' sx={{ display: 'flex', gap: '10px', alignItems: 'center', textAlign: 'center' }}>
                                 <Iconify icon={icon || "eva:cloud-upload-fill"} width={32} />
                                 {label && <Typography variant="subtitle1">
                                     {label}

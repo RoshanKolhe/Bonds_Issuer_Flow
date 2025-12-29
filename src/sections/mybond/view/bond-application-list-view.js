@@ -168,6 +168,8 @@ export default function BondsApplicationListView({ bondsApplication, bondsApplic
       setIsLoading(true);
       const response = await axiosInstance.post('/bonds-pre-issue/new-application');
       if (response.data.success) {
+        localStorage.removeItem('formData');
+        localStorage.removeItem('stepsProgress');
         navigate(paths.dashboard.mybond.bondIssue(response.data?.application?.id));
       }
     } catch (error) {

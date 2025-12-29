@@ -28,20 +28,22 @@ export default function FinancialProfitableMainFile({
   }, [financialPercent, profitabilityPercent, percent]);
 
   const handleNextClick = () => {
+
     if (!financialCompleted) {
       enqueueSnackbar('financial ratios are not filled', {
         variant: 'warning',
       });
+      return;
+    }
 
-      if (!profitabilityCompleted) {
-        enqueueSnackbar('Profitability details are not filled', {
-          variant: 'warning',
-        });
-        return;
-      }
+    if (!profitabilityCompleted) {
+      enqueueSnackbar('Profitability details are not filled', {
+        variant: 'warning',
+      });
+      return;
+    }
 
-      setActiveStepId('credit_rating');
-    };
+    setActiveStepId('credit_rating');
 
   }
 

@@ -552,7 +552,7 @@ export default function CreditRating({ percent, setActiveStepId }) {
   return (
     fields.length > 0 ? (
       <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-\          <Typography variant="h6" fontWeight={600} mb={3}>
+          <Typography variant="h6" fontWeight={600} mb={3}>
             Credit Rating Details
           </Typography>
 

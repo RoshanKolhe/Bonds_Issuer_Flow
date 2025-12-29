@@ -97,6 +97,7 @@ export default function FundPosition({
   useEffect(() => {
     if (stepData && !stepDataLoading) {
       setFundPositionData(stepData);
+      setProgress(true);
     }
   }, [stepData, stepDataLoading]);
 

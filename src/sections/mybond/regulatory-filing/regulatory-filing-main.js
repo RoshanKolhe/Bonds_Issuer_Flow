@@ -25,21 +25,17 @@ export default function RegulatoryFilingMain({
   const [pas4Percent, setPas4Percent] = useState(0);
   const [termSheetPercent, setTermSheetPercent] = useState(0);
   const [memorandumPercent, setMemorandumPercent] = useState(0);
-  const [inPrinciplePercent, setInPrinciplePercent] = useState(0);
-  const [trusteeDueDiligencePercent, setTrusteeDueDiligencePercent] = useState(0);
 
   /* ---------------- COMPLETION FLAGS ---------------- */
   const [pas4Completed, setPas4Completed] = useState(false);
   const [termSheetCompleted, setTermSheetCompleted] = useState(false);
   const [memorandumCompleted, setMemorandumCompleted] = useState(false);
-  const [inPrincipleCompleted, setInPrincipleCompleted] = useState(false);
-  const [trusteeDueDiligenceCompleted, setTrusteeDueDiligenceCompleted] = useState(false);
 
   /* ---------------- TOTAL PERCENT ---------------- */
   useEffect(() => {
-    const total = pas4Percent + termSheetPercent + memorandumPercent + inPrinciplePercent + trusteeDueDiligencePercent;
+    const total = pas4Percent + termSheetPercent + memorandumPercent ;
     percent?.(Math.round(total));
-  }, [pas4Percent, termSheetPercent, memorandumPercent, inPrinciplePercent, trusteeDueDiligencePercent, percent]);
+  }, [pas4Percent, termSheetPercent, memorandumPercent, percent]);
 
   /* ---------------- NEXT ---------------- */
   const handleNextClick = () => {
@@ -62,21 +58,7 @@ export default function RegulatoryFilingMain({
       return;
     }
 
-    if (!trusteeDueDiligenceCompleted) {
-      enqueueSnackbar('Please complete Trustee Due Diligence section', {
-        variant: 'warning',
-      });
-      return;
-    }
-
-    if (!inPrincipleCompleted) {
-      enqueueSnackbar('Please complete In-Principle Listing Approval section', {
-        variant: 'warning',
-      });
-      return;
-    }
-
-    setActiveStepId?.('isin_activation');
+    setActiveStepId?.('trustee_due_diligence');
   };
 
   return (
@@ -108,26 +90,6 @@ export default function RegulatoryFilingMain({
           setPercent={setMemorandumPercent}
           setProgress={setMemorandumCompleted}
           saveStepData={(data) => saveStepData({ memorandum: data })}
-        />
-      </Grid>
-
-      {/* ---------------- DEBENTURE ---------------- */}
-      <Grid item xs={12}>
-        <TrusteeDueDiligence
-          currentData={currentTrusteeDueDiligenceRegulatory}
-          setPercent={setTrusteeDueDiligencePercent}
-          setProgress={setTrusteeDueDiligenceCompleted}
-          saveStepData={(data) => saveStepData({ trusteeDueDiligence: data })}
-        />
-      </Grid>
-
-      {/* ---------------- IN-PRINCIPLE ---------------- */}
-      <Grid item xs={12}>
-        <InPrincipleApproval
-          currentData={currentInPrincipleRegulatory}
-          setPercent={setInPrinciplePercent}
-          setProgress={setInPrincipleCompleted}
-          saveStepData={(data) => saveStepData({ inPrinciple: data })}
         />
       </Grid>
 

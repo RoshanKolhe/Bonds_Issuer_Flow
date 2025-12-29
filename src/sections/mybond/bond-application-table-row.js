@@ -28,6 +28,15 @@ export default function BondApplicationsTableRow({ row, selected, onViewRow, onS
   const confirm = useBoolean();
   const popover = usePopover();
 
+  const localStatusMapper = [
+    {label: 'Regulatory Filing', code: 'Regulatory filings'},
+    {label: 'Trustee Due Diligence', code: 'trustee_due_diligence'},
+    {label: 'Principle Listing Approval', code: 'principle_listing_approval'},
+    {label: 'ISIN Activation', code: 'isin_activation'},
+    {label: 'Execute Documents', code: 'execute_document'},
+    {label: 'Launch Issue', code: 'launch_issue'}
+  ]
+
   const getColor = () => {
     if (currentStatus?.code) {
       return 'warning';
@@ -46,7 +55,7 @@ export default function BondApplicationsTableRow({ row, selected, onViewRow, onS
             variant="soft"
             color={getColor()}
           >
-            {currentStatus?.label}
+            {(!currentStatus || currentStatus?.code === 'credit_rating_approval') ? localStatusMapper?.find((status) => status.code === localStorage.getItem('activeStepId'))?.label : currentStatus?.label}
           </Label>
         </TableCell>
 

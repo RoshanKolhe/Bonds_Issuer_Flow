@@ -22,6 +22,7 @@ import * as Yup from 'yup';
 import ApprovalCard from '../approval-card';
 import { useGetBondApplicationStepData } from 'src/api/bondApplications';
 import { useParams } from 'src/routes/hook';
+import ValuatorApprovalPendingNotice from './valuatorApprovalPending';
 
 export default function CollateralAssets({
   percent,
@@ -53,7 +54,7 @@ export default function CollateralAssets({
   const [chargeTypesData, setChargeTypesData] = useState([]);
   const [collateralTypesData, setCollateralTypesData] = useState([]);
   const [ownershipTypesData, setOwnershipTypesData] = useState([]);
-
+  const [approvalScreen, setApprovalScreen] = useState(false);
   const newCollateralSchema = Yup.object().shape({
     collateralAssets: Yup.array()
       .of(
@@ -101,8 +102,10 @@ export default function CollateralAssets({
     reset,
     watch,
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = methods;
+
+  console.log('errors :', errors);
 
   const values = watch();
 
@@ -153,7 +156,8 @@ export default function CollateralAssets({
 
       if (response?.data?.success) {
         enqueueSnackbar('Collateral assets submitted', { variant: 'success' });
-        setActiveStepId('financial_details');
+        setApprovalScreen(true);
+        // setActiveStepId('financial_details');
       }
     } catch (error) {
       console.error('Error while submitting collateral assets form :', error);
@@ -162,18 +166,18 @@ export default function CollateralAssets({
 
   const calculatePercent = () => {
     let completed = 0;
-    if (values.collateralAssets.length > 0) completed++;
-    if (values.collateralAssets[0].collateralType) completed++;
-    if (values.collateralAssets[0].chargeType) completed++;
-    if (values.collateralAssets[0].description) completed++;
-    if (values.collateralAssets[0].estimatedValue) completed++;
-    if (values.collateralAssets[0].ownershipType) completed++;
-    if (values.collateralAssets[0].securityDocRef) completed++;
-    if (values.collateralAssets[0].trustName) completed++;
-    if (values.collateralAssets[0].valuationDate) completed++;
-    if (values.collateralAssets[0].securityDocument) completed++;
-    if (values.collateralAssets[0].assetCoverCertificate) completed++;
-    if (values.collateralAssets[0].valuationReport) completed++;
+    if (values.collateralAssets?.length > 0) completed++;
+    if (values.collateralAssets[0]?.collateralType) completed++;
+    if (values.collateralAssets[0]?.chargeType) completed++;
+    if (values.collateralAssets[0]?.description) completed++;
+    if (values.collateralAssets[0]?.estimatedValue) completed++;
+    if (values.collateralAssets[0]?.ownershipType) completed++;
+    if (values.collateralAssets[0]?.securityDocRef) completed++;
+    if (values.collateralAssets[0]?.trustName) completed++;
+    if (values.collateralAssets[0]?.valuationDate) completed++;
+    if (values.collateralAssets[0]?.securityDocument) completed++;
+    if (values.collateralAssets[0]?.assetCoverCertificate) completed++;
+    if (values.collateralAssets[0]?.valuationReport) completed++;
 
     const TOTAL = 12;
 
@@ -214,13 +218,14 @@ export default function CollateralAssets({
   }, [ownershipTypes, ownershipTypesLoading]);
 
   useEffect(() => {
-    if (stepData && !stepDataLoading) {
+    if (stepData?.length > 0 && !stepDataLoading) {
       setCurrentCollateralAssets(stepData);
     }
   }, [stepData, stepDataLoading]);
 
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
+      {approvalScreen && <ValuatorApprovalPendingNotice />}
       <Box
         sx={{
           minHeight: '100vh',

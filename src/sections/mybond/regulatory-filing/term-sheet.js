@@ -41,10 +41,10 @@ export default function TermSheet({ currentData, saveStepData, setPercent, setPr
     if (sebiDate) completed++;
     if (sebi) completed++;
 
-    const pct = Math.round((completed / 3) * 20);
+    const pct = Math.round((completed / 3) * 30);
 
     setPercent?.(pct);
-    setProgress?.(pct === 20);
+    setProgress?.(pct === 30);
   }, [sebiApprovalNo, sebiDate, sebi, setPercent, setProgress]);
 
   useEffect(() => {

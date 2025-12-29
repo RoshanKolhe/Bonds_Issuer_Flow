@@ -17,6 +17,8 @@ import { useParams } from 'src/routes/hook';
 import { useGetBondApplication } from 'src/api/bondApplications';
 import RegulatoryFilingMain from './regulatory-filing/regulatory-filing-main';
 import BorrowingDetails from './borrowing/borrowing-details';
+import TrusteeDueDiligence from './regulatory-filing/trustee-due-diligence';
+import InPrincipleApproval from './regulatory-filing/in-principle';
 
 export default function MybondStepper() {
   const params = useParams()
@@ -86,29 +88,34 @@ export default function MybondStepper() {
       number: 8,
       lines: ['Credit Rating'],
     },
-    // {
-    //   id: 'preliminary_bond_requirements',
-    //   number: 7,
-    //   lines: ['Preliminary', 'Requirements'],
-    // },
     {
       id: 'regulatory_filing',
       number: 9,
       lines: ['Regulatory', 'Filing'],
     },
     {
-      id: 'isin_activation',
+      id: 'trustee_due_diligence',
       number: 10,
+      lines: ['Trustee', 'Due Diligence'],
+    },
+    {
+      id: 'principle_listing_approval',
+      number: 11,
+      lines: ['Principle', 'Listing Approval'],
+    },
+    {
+      id: 'isin_activation',
+      number: 12,
       lines: ['ISIN', 'Activation'],
     },
     {
       id: 'execute_document',
-      number: 11,
+      number: 13,
       lines: ['Execute', 'Document'],
     },
     {
       id: 'launch_issue',
-      number: 12,
+      number: 14,
       lines: ['Launch', 'Issue'],
     },
   ];
@@ -120,13 +127,14 @@ export default function MybondStepper() {
     audited_financial: { percent: 0 },
     borrowing_details: { percent: 0 },
     financial_details: { percent: 0 },
-    // preliminary_bond_requirements: { percent: 0 },
     collateral_assets: { percent: 0 },
     regulatory_filing: { percent: 0 },
     isin_activation: { percent: 0 },
     execute_document: { percent: 0 },
     launch_issue: { percent: 0 },
     credit_rating: { percent: 0 },
+    trustee_due_diligence: { percent: 0 },
+    principle_listing_approval: { percent: 0 }
   });
 
   useEffect(() => {
@@ -348,13 +356,32 @@ export default function MybondStepper() {
             currentPAS4Regulatory={formData.regulatory_filing?.pas4}
             currentTermSheetRegulatory={formData.regulatory_filing?.sebiApprovals}
             currentInformationMemorandumRegulatory={formData.regulatory_filing?.memorandum}
-            currentInPrincipleRegulatory={formData.regulatory_filing?.inPrinciple}
-            currentTrusteeDueDiligenceRegulatory={formData.regulatory_filing?.trusteeDueDiligence}
             percent={(p) => updateStepPercent('regulatory_filing', p)}
             setActiveStepId={setActiveStepId}
             saveStepData={(data) => saveStepData('regulatory_filing', data)}
           />
         );
+
+      case 'trustee_due_diligence':
+        return (
+          <TrusteeDueDiligence
+            currentData={formData?.trustee_due_diligence}
+            percent={(p) => updateStepPercent('trustee_due_diligence', p)}
+            setActiveStepId={setActiveStepId}
+            saveStepData={(data) => saveStepData('trustee_due_diligence', data)}
+          />
+        );
+
+      case 'principle_listing_approval':
+        return (
+          <InPrincipleApproval
+            currentData={formData?.principle_listing_approval}
+            percent={(p) => updateStepPercent('principle_listing_approval', p)}
+            setActiveStepId={setActiveStepId}
+            saveStepData={(data) => saveStepData('principle_listing_approval', data)}
+          />
+        );
+
       case 'isin_activation':
         return (
           <IsinActivationMain
