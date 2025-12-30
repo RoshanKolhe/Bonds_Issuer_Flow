@@ -22,7 +22,7 @@ import {
   TextField,
 } from '@mui/material';
 import { useSnackbar } from 'src/components/snackbar';
-import FormProvider, { RHFAutocomplete, RHFSelect } from 'src/components/hook-form';
+import FormProvider, { RHFAutocomplete, RHFCustomFileUploadBox, RHFSelect } from 'src/components/hook-form';
 import axiosInstance from 'src/utils/axios';
 import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
@@ -117,7 +117,9 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
       setValue('creditRatingLetter', uploadRes?.data?.files[0], { shouldValidate: true });
 
     } catch (err) {
-      enqueueSnackbar('File upload failed', { variant: 'error' });
+      enqueueSnackbar(
+        err?.error?.message || 'Domething went wrong while saving credit rating ', {variant: 'error'}
+      );
     }
   };
 
@@ -205,7 +207,7 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
   return (
     <FormProvider methods={methods} onSubmit={handleAddRating}>
       <Card sx={{ p: 4, borderRadius: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', mb: 4 }}>
-        <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
+        <Typography variant="h5" color='primary' fontWeight='bold'  sx={{ mb: 3}}>
           Credit Ratings Available
         </Typography>
 
@@ -276,18 +278,29 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
           )}
         />
 
-        <RHFFileUploadBox
+        {/* <RHFFileUploadBox
           name="creditRatingLetter"
           label="Upload Credit Rating Letter"
           icon="mdi:file-document-outline"
           maxSizeMB={2}
           onDrop={async (files) => handleFileUpload(files[0])}
-        />
+        /> */}
+        
+                    <RHFCustomFileUploadBox
+                      name="creditRatingLetter"
+                      label="Upload Credit Rating Letter"
+                      icon="mdi:file-document-outline"
+                    accept={{
+                      'application/pdf': ['.pdf'],
+                      'application/msword': ['.doc'],
+                      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+                    }}
+                    />
 
         <YupErrorMessage name="creditRatingLetter" />
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1, mt: 2 }}>
-          <LoadingButton type='submit' loading={isSubmitting}>
+          <LoadingButton type='submit' variant='contained' loading={isSubmitting}>
             {isEditing ? 'Update Rating' : 'Add Rating'}
           </LoadingButton>
         </Box>

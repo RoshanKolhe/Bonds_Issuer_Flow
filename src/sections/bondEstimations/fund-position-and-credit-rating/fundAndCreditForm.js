@@ -14,12 +14,12 @@ export default function FundAndCreditForm({ currentFundPosition, currentCreditRa
 
     const handleNextClick = () => {
         if (!fundpositionCompleted) {
-            enqueueSnackbar('please complete fund position section');
+            enqueueSnackbar('please complete fund position section' , {variant: 'error'});
             return;
         }
 
         if (!creditRatingCompleted) {
-            enqueueSnackbar('please complete credit rating section');
+            enqueueSnackbar('please complete credit rating section', {variant:'error'});
             return;
         }
 

@@ -59,6 +59,11 @@ export default function FundPosition({ currentFundPosition, setPercent, setProgr
                 enqueueSnackbar('Fund position saved', { variant: 'success' });
             }
         } catch (error) {
+            enqueueSnackbar(
+                error?.error?.message ||
+                'Something went wrong while saving fund position.',
+                { variant: 'error' }
+            );
             console.error('Error while updating fund position in bond estimations :', error);
         }
     });
@@ -90,10 +95,10 @@ export default function FundPosition({ currentFundPosition, setPercent, setProgr
     return (
         <FormProvider methods={methods} onSubmit={onSubmit}>
             <Card sx={{ p: 4, borderRadius: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', mb: 4 }}>
-                <Typography variant="h3" sx={{ color: '#1565c0', fontWeight: 600 }}>
+                <Typography variant="h5" color='primary' fontWeight='bold' >
                     Fund Position
                 </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
+                <Typography variant="body2" sx={{ mb: 3 }}>
                     Add and manage your borrowing information
                 </Typography>
 

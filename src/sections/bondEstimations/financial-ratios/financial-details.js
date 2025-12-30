@@ -62,22 +62,16 @@ export default function FinancialDetails({ setActiveStepId, percent }) {
     <>
       <FormProvider methods={methods}>
         <Box display="flex" flexDirection="column" gap={3}>
-          <Box
-            sx={{
-              border: '2px solid #1877F2',
-              pl: 2,
-              py: 2,
-            }}
-          >
-            <Typography variant="h3" color="#1877F2" fontWeight={600}>
-              Financial Ratios
-            </Typography>
-            <Typography variant="body1" color="#5E5E5E">
-              Provide your company’s key financial ratios to assess financial health
-            </Typography>
-          </Box>
+
+
 
           <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
+            <Typography variant="h5" color="primary" fontWeight='bold'>
+              Financial Ratios
+            </Typography>
+            <Typography variant="body2" mb={3}>
+              Provide your company’s key financial ratios to assess financial health
+            </Typography>
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <RHFTextField name="debtEquityRatio" label="Debt-Equity Ratio (DER)" fullWidth />

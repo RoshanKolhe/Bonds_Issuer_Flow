@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 // @mui
@@ -15,7 +15,7 @@ import DialogContent from '@mui/material/DialogContent';
 // components
 import Iconify from 'src/components/iconify';
 import { useSnackbar } from 'src/components/snackbar';
-import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
+import FormProvider, { RHFCustomFileUploadBox, RHFSelect, RHFTextField } from 'src/components/hook-form';
 import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
 import axios from 'axios';
 import { useAuthContext } from 'src/auth/hooks';
@@ -102,18 +102,18 @@ export default function SignatoriesNewEditForm({
       phoneNumber: currentUser?.phone || '',
       panCard: currentUser?.panCardFile
         ? {
-            id: currentUser.panCardFile.id,
-            name: currentUser.panCardFile.fileOriginalName,
-            url: currentUser.panCardFile.fileUrl,
-          }
+          id: currentUser.panCardFile.id,
+          name: currentUser.panCardFile.fileOriginalName,
+          url: currentUser.panCardFile.fileUrl,
+        }
         : null,
 
       boardResolution: currentUser?.boardResolutionFile
         ? {
-            id: currentUser.boardResolutionFile.id,
-            name: currentUser.boardResolutionFile.fileOriginalName,
-            url: currentUser.boardResolutionFile.fileUrl,
-          }
+          id: currentUser.boardResolutionFile.id,
+          name: currentUser.boardResolutionFile.fileOriginalName,
+          url: currentUser.boardResolutionFile.fileUrl,
+        }
         : null,
 
       role: !isCustom
@@ -135,6 +135,10 @@ export default function SignatoriesNewEditForm({
     defaultValues,
   });
 
+  const panCard = useWatch({
+    control: methods.control,
+    name: 'panCard',
+  });
   const {
     reset,
     handleSubmit,
@@ -156,97 +160,84 @@ export default function SignatoriesNewEditForm({
     );
   };
 
-  const uploadFile = async (file) => {
-    if (!file) return null;
+  // const uploadFile = async (file) => {
+  //   if (!file) return null;
 
-    const fd = new FormData();
-    fd.append('file', file);
+  //   const fd = new FormData();
+  //   fd.append('file', file);
 
-    const res = await axiosInstance.post('/files', fd, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+  //   const res = await axiosInstance.post('/files', fd, {
+  //     headers: { 'Content-Type': 'multipart/form-data' },
+  //   });
 
-    return res?.data?.files?.[0]?.id || null;
-  };
+  //   return res?.data?.files?.[0]?.id || null;
+  // };
 
-  const handlePanUpload = async (file) => {
-    try {
-      if (!file) return;
 
-      enqueueSnackbar('Uploading PAN...', { variant: 'info' });
+  useEffect(() => {
+    if (!panCard?.id) return;
+    const handlePanUpload = async () => {
+      try {
+        const formData = new FormData();
+        formData.append('fileId', panCard.id);
+        const extractRes = await axiosInstance.post('/extract/pan-info', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },})
 
-      const uploadFormData = new FormData();
-      uploadFormData.append('file', file);
+        const panData = extractRes?.data?.data || extractRes?.data;
 
-      const uploadRes = await axiosInstance.post('/files', uploadFormData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+        const panNumberFromApi = panData?.extractedPanNumber || '';
+        const dobFromApi = panData?.extractedDateOfBirth || '';
+        const panHolderNameFromApi = panData?.extractedPanHolderName || '';
 
-      const uploaded = uploadRes?.data?.files?.[0];
-      if (!uploaded || !uploaded.id) {
-        throw new Error('PAN file upload failed');
-      }
-      setIsPanUploaded(true);
+        if (!panNumberFromApi && !dobFromApi && !panHolderNameFromApi) {
+          enqueueSnackbar(
+            "We couldn't fetch details from your PAN document. Please fill the details manually.",
+            { variant: 'error' }
+          );
+          return;
+        }
 
-      enqueueSnackbar('Extracting PAN details…', { variant: 'info' });
+        // Autofill PAN form fields
+        methods.setValue('submittedPanFullName', panHolderNameFromApi || '', {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
 
-      const extractRes = await axiosInstance.post('/extract/pan-info', uploadFormData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+        methods.setValue('submittedPanNumber', panNumberFromApi || '', {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
 
-      const panData = extractRes?.data?.data || extractRes?.data;
+        if (dobFromApi) {
+          methods.setValue('submittedDateOfBirth', new Date(dobFromApi), {
+            shouldValidate: true,
+            shouldDirty: true,
+          });
+        }
 
-      const panNumberFromApi = panData?.extractedPanNumber || '';
-      const dobFromApi = panData?.extractedDateOfBirth || '';
-      const panHolderNameFromApi = panData?.extractedPanHolderName || '';
+        // Keep extracted values for API payload
+        setExtractedPan({
+          extractedPanFullName: panHolderNameFromApi || '',
+          extractedPanNumber: panNumberFromApi || '',
+          extractedDateOfBirth: dobFromApi || '',
+        });
 
-      if (!panNumberFromApi && !dobFromApi && !panHolderNameFromApi) {
+        enqueueSnackbar('PAN details extracted successfully', { variant: 'success' });
+      } catch (err) {
+        console.error('Error in PAN upload/extraction:', err);
         enqueueSnackbar(
           "We couldn't fetch details from your PAN document. Please fill the details manually.",
           { variant: 'error' }
         );
-        return;
       }
-
-      // Autofill PAN form fields
-      methods.setValue('submittedPanFullName', panHolderNameFromApi || '', {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
-
-      methods.setValue('submittedPanNumber', panNumberFromApi || '', {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
-
-      if (dobFromApi) {
-        methods.setValue('submittedDateOfBirth', new Date(dobFromApi), {
-          shouldValidate: true,
-          shouldDirty: true,
-        });
-      }
-
-      // Keep extracted values for API payload
-      setExtractedPan({
-        extractedPanFullName: panHolderNameFromApi || '',
-        extractedPanNumber: panNumberFromApi || '',
-        extractedDateOfBirth: dobFromApi || '',
-      });
-
-      enqueueSnackbar('PAN details extracted successfully', { variant: 'success' });
-    } catch (err) {
-      console.error('Error in PAN upload/extraction:', err);
-      enqueueSnackbar(
-        "We couldn't fetch details from your PAN document. Please fill the details manually.",
-        { variant: 'error' }
-      );
-    }
-  };
+    };
+    handlePanUpload();
+  }, [panCard?.id]);
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const panFileId = await uploadFile(data.panCard);
-      const boardFileId = await uploadFile(data.boardResolution);
 
       const isCustom = data.role === 'OTHER';
       const signatoryId = currentUser?.id;
@@ -267,8 +258,10 @@ export default function SignatoriesNewEditForm({
           submittedPanNumber: data.submittedPanNumber,
           submittedDateOfBirth: data.submittedDateOfBirth,
 
-          panCardFileId: String(panFileId),
-          boardResolutionFileId: String(boardFileId),
+          panCardFileId: data.panCard?.id ? String(data.panCard.id) : null,
+          boardResolutionFileId: data.boardResolution?.id
+            ? String(data.boardResolution.id)
+            : null,
           designationType: isCustom ? 'custom' : 'dropdown',
           designationValue: isCustom
             ? data.customDesignation
@@ -367,52 +360,20 @@ export default function SignatoriesNewEditForm({
           )}
 
           <Grid item xs={12}>
-            <Box sx={{ mb: 3 }}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 2,
-                  flexWrap: 'wrap',
-                  mb: 1,
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography sx={{ fontWeight: 600 }}>Check Uploaded PanCard :</Typography>
-                </Box>
-
-                {currentUser?.panCardFile?.fileUrl ? (
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    startIcon={<Iconify icon="mdi:eye" />}
-                    sx={{
-                      height: 36,
-                      textTransform: 'none',
-                      fontWeight: 600,
-                    }}
-                    onClick={() => window.open(currentUser.panCardFile.fileUrl, '_blank')}
-                  >
-                    Preview Document
-                  </Button>
-                ) : (
-                  <Typography color="text.secondary">No file uploaded.</Typography>
-                )}
-              </Box>
-            </Box>
-            <RHFFileUploadBox
+            <RHFCustomFileUploadBox
               name="panCard"
               label="Upload PAN*"
-              accept="application/pdf,image/*"
-              fileType="pan"
-              required={!isEditMode}
-              error={!!errors.panCard}
-              onDrop={async (files) => {
-                const file = files[0];
-                if (!file) return;
-                methods.setValue('panCard', file, { shouldValidate: true });
-                await handlePanUpload(file);
-              }}
+              disabled= ""
+            // accept="application/pdf,image/*"
+            // fileType="pan"
+            // required={!isEditMode}
+            // error={!!errors.panCard}
+            // onDrop={async (files) => {
+            //   const file = files[0];
+            //   if (!file) return;
+            //   methods.setValue('panCard', file, { shouldValidate: true });
+            //   await handlePanUpload(file);
+            // }}
             />
             {getErrorMessage('panCard')}
           </Grid>
@@ -456,48 +417,9 @@ export default function SignatoriesNewEditForm({
           </Grid>
 
           <Grid item xs={12}>
-            <Box sx={{ mb: 3 }}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 2,
-                  flexWrap: 'wrap',
-                  mb: 1,
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography sx={{ fontWeight: 600 }}>
-                    Check Uploaded Board Resolution :
-                  </Typography>
-                </Box>
-
-                {currentUser?.boardResolutionFile?.fileUrl ? (
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    startIcon={<Iconify icon="mdi:eye" />}
-                    sx={{
-                      height: 36,
-                      textTransform: 'none',
-                      fontWeight: 600,
-                    }}
-                    onClick={() => window.open(currentUser.boardResolutionFile.fileUrl, '_blank')}
-                  >
-                    Preview Document
-                  </Button>
-                ) : (
-                  <Typography color="text.secondary">No file uploaded.</Typography>
-                )}
-              </Box>
-            </Box>
-            <RHFFileUploadBox
+            <RHFCustomFileUploadBox
               name="boardResolution"
               label="Board Resolution*"
-              accept="application/pdf,image/*"
-              fileType="boardResolution"
-              required={!isEditMode}
-              error={!!errors.boardResolution}
             />
             {getErrorMessage('boardResolution')}
           </Grid>

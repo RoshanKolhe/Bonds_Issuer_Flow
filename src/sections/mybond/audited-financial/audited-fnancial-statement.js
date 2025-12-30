@@ -244,13 +244,12 @@ export default function AuditedFinancialStatement({
         enqueueSnackbar('Failed to save audited financials', { variant: 'error' });
       }
     } catch (error) {
-      console.error('Error while uploading financials:', error);
-
       enqueueSnackbar(
-        error?.response?.data?.error?.message ||
+        error?.error?.message ||
         'Something went wrong while saving audited financials',
         { variant: 'error' }
       );
+      console.error('Error while uploading financials:', error);
     }
   };
 

@@ -6,7 +6,7 @@ import TableCell from '@mui/material/TableCell';
 import ListItemText from '@mui/material/ListItemText';
 // utils
 import { format } from 'date-fns';
-import { IconButton, Tooltip } from '@mui/material';
+import { Box, IconButton, Tooltip } from '@mui/material';
 import Iconify from 'src/components/iconify';
 import Label from 'src/components/label';
 
@@ -18,8 +18,22 @@ export default function DocumentTableRow({ row, selected, onSelectRow, onViewRow
   return (
     <TableRow hover selected={selected}>
       <TableCell>{name || 'NA'}</TableCell>
+      <TableCell>
+        <Tooltip title={description}>
+          <Box
+            sx={{
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
+            {description || 'NA'}
+          </Box>
+        </Tooltip>
 
-      <TableCell>{description || 'NA'}</TableCell>
+      </TableCell>
+
       <TableCell>
         <Label
           variant="soft"

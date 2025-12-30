@@ -13,6 +13,8 @@ export default function RHFCustomFileUploadBox({
 }) {
   const [uploadProgress, setUploadProgress] = useState(0);
   const { control, setValue } = useFormContext();
+  
+
 
   const handleFileDrop = async (fieldName, acceptedFiles) => {
     if (!acceptedFiles || acceptedFiles.length === 0) return;

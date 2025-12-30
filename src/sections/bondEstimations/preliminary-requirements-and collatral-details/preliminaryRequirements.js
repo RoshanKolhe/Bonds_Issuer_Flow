@@ -83,6 +83,7 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
                 enqueueSnackbar('Priliminary requirements saved', { variant: 'success' });
             }
         } catch (error) {
+            enqueueSnackbar(error?.error?.message ||'Error while filling priliminary requirements :', {variant: 'error'})
             console.error('Error while filling priliminary requirements :', error);
         }
     });
@@ -141,23 +142,12 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
                 >
                     <Grid container spacing={3}>
                         <Grid item xs={12} md={6}>
-                            <Typography variant="h5" sx={{ color: '#1976d2', fontWeight: 600, mb: 4 }}>
+                            <Typography variant="h5"  color='primary' fontWeight='bold' sx={{ mb: 3 }}>
                                 Preliminary Bond Requirements
                             </Typography>
 
                             {/* Issue Amount */}
                             <Box sx={{ mb: 3 }}>
-                                <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
-                                    Issue Amount (₹)
-                                    <Tooltip title="Whether the bond is backed by collateral or not" arrow>
-                                        <Icon
-                                            icon="mdi:information-outline"
-                                            width={18}
-                                            height={18}
-                                            style={{ cursor: 'pointer', marginLeft: 4, verticalAlign: 'middle' }}
-                                        />
-                                    </Tooltip>
-                                </Typography>
                                 <RHFTextField
                                     name="issueAmount"
                                     fullWidth
@@ -170,7 +160,7 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
                             </Box>
 
                             {/* Security */}
-                            <Box mt={3}>
+                            <Box mb={3}>
                                 <Typography mb={1}>Security</Typography>
                                 <Controller
                                     name="security"
@@ -191,19 +181,10 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
 
                             {/* Tenure */}
                             <Box sx={{ mb: 3 }}>
-                                <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
-                                    Tenure
-                                    <Tooltip title="Enter tenure for your bond (e.g., 5 for 5 years)" arrow>
-                                        <Icon
-                                            icon="mdi:information-outline"
-                                            width={18}
-                                            height={18}
-                                            style={{ cursor: 'pointer', marginLeft: 4, verticalAlign: 'middle' }}
-                                        />
-                                    </Tooltip>
-                                </Typography>
+                    
                                 <RHFTextField
                                     name="tenure"
+                                    label="Tenure"
                                     fullWidth
                                     size="small"
                                     type="number"
@@ -214,11 +195,9 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
 
                             {/* Preferred ROI */}
                             <Box sx={{ mb: 3 }}>
-                                <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
-                                    Preferred ROI (%)
-                                </Typography>
                                 <RHFTextField
                                     name="roi"
+                                    label="Preferred ROI (%)"
                                     fullWidth
                                     size="small"
                                     type="number"
@@ -229,18 +208,7 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
 
                             {/* Investor Category */}
                             <Box sx={{ mb: 3 }}>
-                                <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
-                                    Preferred Investor Category
-                                    <Tooltip title="Select the type of investors you need to target" arrow>
-                                        <Icon
-                                            icon="mdi:information-outline"
-                                            width={18}
-                                            height={18}
-                                            style={{ cursor: 'pointer', marginLeft: 4, verticalAlign: 'middle' }}
-                                        />
-                                    </Tooltip>
-                                </Typography>
-                                <RHFSelect name="preferedInvestorCategory" >
+                                <RHFSelect name="preferedInvestorCategory" label="Preferred Investor Category" >
                                     {investorCategoriesData?.length > 0 ? investorCategoriesData.map((cat) => (
                                         <MenuItem key={cat.id} value={cat.id}>{cat.label}</MenuItem>
                                     )) : (

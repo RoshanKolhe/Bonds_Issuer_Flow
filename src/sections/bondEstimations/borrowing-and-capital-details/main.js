@@ -18,17 +18,17 @@ export default function MainFile({ setActiveStepId, currentBorrowingDetails, cur
 
   const handleNextClick = () => {
     if (!isBorrowingDetailsCompleted) {
-      enqueueSnackbar('please complete Borrowing deta section');
+      enqueueSnackbar('please complete Borrowing details section', {variant: 'error'});
       return;
     }
 
     if (!isCapitalDetailsCompleted) {
-      enqueueSnackbar('please complete capital details section');
+      enqueueSnackbar('please complete capital details section', {variant: 'error'});
       return;
     }
 
     if (!isProfitabilityDetailsCompleted) {
-      enqueueSnackbar('please complete profitability details section');
+      enqueueSnackbar('please complete profitability details section', {variant: 'error'});
       return;
     }
 

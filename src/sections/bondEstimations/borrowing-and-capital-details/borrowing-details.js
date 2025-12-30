@@ -140,6 +140,7 @@ export default function BorrowingDetails({ currentBorrowingDetails, setPercent, 
                 setProgress(true);
             }
         } catch (error) {
+            enqueueSnackbar(error?.error?.message || 'Error while submitting borrowing details form :' , {variant: 'error'} )
             console.error('Error while submitting borrowing details form :', error);
         }
     });
@@ -201,10 +202,10 @@ export default function BorrowingDetails({ currentBorrowingDetails, setPercent, 
                             border: '1px solid #e0e0e0',
                         }}
                     >
-                        <Typography variant="h3" fontWeight={600} color="#1874ED" mb={1}>
+                        <Typography variant="h5" fontWeight='bold' color="primary" mb={1}>
                             Borrowing Details
                         </Typography>
-                        <Typography variant="body1" color="#5E5E5E" mb={3}>
+                        <Typography variant="body2" mb={3}>
                             Add and manage your borrowing information
                         </Typography>
 

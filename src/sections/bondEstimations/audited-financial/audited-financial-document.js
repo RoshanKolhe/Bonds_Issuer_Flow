@@ -49,11 +49,11 @@ export default function AuditedFinancialDocument({ setActiveStepId, percent }) {
   }, [selectedYear]);
 
   const handleNextClick = () => {
-    if (!isBaseYearDone) return enqueueSnackbar("Please select base year");
-    if (!financialDone) return enqueueSnackbar("Complete audited financial statement");
-    if (!itrDone) return enqueueSnackbar("Complete ITR section");
-    if (!gstr9Done) return enqueueSnackbar("Complete GSTR-9 section");
-    if (!gstr3bDone) return enqueueSnackbar("Complete GSTR-3B section");
+    if (!isBaseYearDone) return enqueueSnackbar("Please select base year" , {variant: 'error'});
+    if (!financialDone) return enqueueSnackbar("Complete audited financial statement", {variant: 'error'});
+    if (!itrDone) return enqueueSnackbar("Complete ITR section", {variant: 'error'});
+    if (!gstr9Done) return enqueueSnackbar("Complete GSTR-9 section", {variant: 'error'});
+    if (!gstr3bDone) return enqueueSnackbar("Complete GSTR-3B section", {variant: 'error'});
 
     setActiveStepId();
   };
@@ -79,10 +79,16 @@ export default function AuditedFinancialDocument({ setActiveStepId, percent }) {
 
   return (
     <Container>
-      <KYCTitle
+      {/* <KYCTitle
         title="Audited Financial"
         subtitle="Upload audited financial documents for assessment"
-      />
+      /> */}
+      <Typography color='primary' fontWeight='bold' variant='h5'>
+        Audited Financial
+      </Typography>
+       <Typography  variant='body2' mb={3}>
+       Upload audited financial documents for assessment
+      </Typography>
 
       <FormProvider methods={methods}>
         <Grid container sx={{ p: 4, borderRadius: 2, border: '1px solid #ddd', boxShadow: 2 }}>

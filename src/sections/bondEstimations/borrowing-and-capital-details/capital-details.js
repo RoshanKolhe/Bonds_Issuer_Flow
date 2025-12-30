@@ -69,6 +69,7 @@ export default function CapitalDetails({ currentCapitalDetails, setPercent, setP
         setProgress(true);
       }
     } catch (error) {
+      enqueueSnackbar(error?.error?.message || 'Error while submitting capital details form :', {variant: 'error'})
       console.error('Error while submitting capital details form :', error);
     }
   });
@@ -117,7 +118,7 @@ export default function CapitalDetails({ currentCapitalDetails, setPercent, setP
             border: '1px solid #e0e0e0',
           }}
         >
-          <Typography variant="h3" fontWeight={600} color="#1874ED" mb={2}>
+          <Typography variant="h5" fontWeight='bold' color="primary" mb={2}>
             Capital Details
           </Typography>
 
