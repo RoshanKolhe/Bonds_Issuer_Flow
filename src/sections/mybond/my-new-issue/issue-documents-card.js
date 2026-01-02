@@ -36,6 +36,8 @@ export default function IssueDocumentsCard({
     }));
   }, [documents]);
 
+  console.log('document', normalizedDocuments)
+
   const DocumentSchema = useMemo(() => {
     const shape = {};
     normalizedDocuments.forEach((doc) => {
@@ -59,6 +61,7 @@ export default function IssueDocumentsCard({
     defaultValues,
   });
 
+  
   const {
     watch,
     handleSubmit,
@@ -66,6 +69,8 @@ export default function IssueDocumentsCard({
   } = methods;
 
   const values = watch();
+
+  console.log('Values',values)
 
   const onSubmit = handleSubmit(async (data) => {
     try {
@@ -113,7 +118,7 @@ export default function IssueDocumentsCard({
       values[doc.code] = uploaded
         ? {
           id: uploaded.media.id,
-          name: uploaded.media.fileOriginalName,
+          fileOriginalName: uploaded.media.fileOriginalName,
           preview: uploaded.media.fileUrl,
           fileUrl: uploaded.media.fileUrl,
           isUploaded: true,

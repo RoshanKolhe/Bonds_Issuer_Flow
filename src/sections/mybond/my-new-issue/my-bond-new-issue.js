@@ -45,7 +45,7 @@ export default function MyBondNewIssue({
 
   // ---------- PERCENT ----------
   useEffect(() => {
-    const total = detailsPercent + docsPercent; // SAME AS FUND POSITION
+    const total = detailsPercent + docsPercent; 
     percent?.(total);
   }, [detailsPercent, docsPercent]);
 

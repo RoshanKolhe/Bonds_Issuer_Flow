@@ -26,6 +26,7 @@ import axiosInstance from 'src/utils/axios';
 import { useSnackbar } from 'notistack';
 import ValuerCardView from './valuer-card-view';
 import Iconify from 'src/components/iconify';
+import ValuerViewForm from '../valuer-view-form';
 
 // ------------------------------------------------------
 
@@ -49,6 +50,8 @@ export default function ValuerListView() {
   const [tab, setTab] = useState('debenture_trustee');
   const [filterName, setFilterName] = useState('');
   const [selected, setSelected] = useState([]);
+  const [openView, setOpenView] = useState(false);
+  const [currentValuer, setCurrentValuer] = useState(false);
 
   const filteredData = VALUERS.filter((item) =>
     item.legalEntityName.toLowerCase().includes(filterName.toLowerCase())
@@ -74,8 +77,14 @@ export default function ValuerListView() {
   const isSendDisabled = selected.length === 0;
 
   const handleView = (id) => {
-    console.log('View Valuer:', id);
+    const valuer = VALUERS.find((item) => item.id === id)
+    setCurrentValuer(valuer)
+    setOpenView(true)
   };
+
+  const handleCloseView = () => {
+    setOpenView(false)
+  }
 
   const handleSendRequest = async (id) => {
     try {
@@ -94,6 +103,7 @@ export default function ValuerListView() {
   };
 
   return (
+    <>
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
       <Stack direction="row" spacing={2} sx={{ p: 2 }} justifyContent="space-between">
         <Typography variant="h5"
@@ -168,5 +178,11 @@ export default function ValuerListView() {
         </TableContainer> */}
 
     </Container>
+    <ValuerViewForm
+    data={currentValuer}
+    open={openView}
+    onClose={handleCloseView}
+    />
+    </>
   );
 }

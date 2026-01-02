@@ -10,7 +10,7 @@ import {
   Grid,
   Typography,
 } from '@mui/material';
-
+import { Dialog, DialogTitle, DialogContent, IconButton } from '@mui/material';
 import Scrollbar from 'src/components/scrollbar';
 import { useSettingsContext } from 'src/components/settings';
 import { TableHeadCustom } from 'src/components/table';
@@ -23,6 +23,7 @@ import axiosInstance from 'src/utils/axios';
 import { useSnackbar } from 'notistack';
 import DebentureTrusteeCardView from './debenture-trustee-card';
 import Iconify from 'src/components/iconify';
+import DebentureTrusteeViewForm from '../debenture-trustee-view-form';
 
 // ------------------------------------------------------
 
@@ -45,6 +46,8 @@ export default function DebentureTrusteeListView() {
   const router = useRouter();
   const [filterName, setFilterName] = useState('');
   const [selected, setSelected] = useState([]);
+  const [openView, setOpenView] = useState(false);
+  const [currentTrustee, setCurrentTrustee] = useState(null);
 
   const filteredData = DEBENTURE_TRUSTEES.filter((item) =>
     item.legalEntityName.toLowerCase().includes(filterName.toLowerCase())
@@ -70,8 +73,15 @@ export default function DebentureTrusteeListView() {
   const isSendDisabled = selected.length === 0;
 
   const handleView = (id) => {
-    console.log('View Debenture Trustee:', id);
+    const trustee = DEBENTURE_TRUSTEES.find((item) => item.id === id);
+    setCurrentTrustee(trustee);
+    setOpenView(true);
   };
+  const handleCloseView = () => {
+    setOpenView(false);
+    setCurrentTrustee(null);
+  };
+
 
   const handleSendRequest = async (id) => {
     try {
@@ -90,50 +100,51 @@ export default function DebentureTrusteeListView() {
   };
 
   return (
-    <Container maxWidth={settings.themeStretch ? false : 'lg'}>
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="space-between"
-        sx={{ p: 2 }}
-      >
-
-        <Typography
-          variant="h5"
-          fontWeight="bold"
-          color="primary"
-          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+    <>
+      <Container maxWidth={settings.themeStretch ? false : 'lg'}>
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ p: 2 }}
         >
-          <Iconify icon="solar:shield-check-bold" width={22} />
-          Debenture Trustee's
-        </Typography>
-        <Stack direction="row" spacing={2}>
-          <Button
-            variant="contained"
-            disabled={selected.length < 2}
-            sx={{ textTransform: 'none' }}
-            onClick={handleCompare}
-          >
-            Compare
-          </Button>
 
-          <Button
-            variant="contained"
-            disabled={isSendDisabled}
-            onClick={() => console.log('Send Request:', selected)}
+          <Typography
+            variant="h5"
+            fontWeight="bold"
+            color="primary"
+            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
           >
-            Send Request
-          </Button>
+            <Iconify icon="solar:shield-check-bold" width={22} />
+            Debenture Trustee's
+          </Typography>
+          <Stack direction="row" spacing={2}>
+            <Button
+              variant="contained"
+              disabled={selected.length < 2}
+              sx={{ textTransform: 'none' }}
+              onClick={handleCompare}
+            >
+              Compare
+            </Button>
+
+            <Button
+              variant="contained"
+              disabled={isSendDisabled}
+              onClick={() => console.log('Send Request:', selected)}
+            >
+              Send Request
+            </Button>
+          </Stack>
         </Stack>
-      </Stack>
 
-      {/* <Card> */}
-      {/* Search */}
-      <Stack spacing={3}>
-        <DebentureTrusteeTableToolbar filterName={filterName} onFilterName={setFilterName} />
+        {/* <Card> */}
+        {/* Search */}
+        <Stack spacing={3}>
+          <DebentureTrusteeTableToolbar filterName={filterName} onFilterName={setFilterName} />
 
-        {/* Table */}
-        {/* <TableContainer>
+          {/* Table */}
+          {/* <TableContainer>
           <Scrollbar>
             <Table sx={{ minWidth: 960 }}>
               <TableHeadCustom
@@ -159,21 +170,28 @@ export default function DebentureTrusteeListView() {
             </Table>
           </Scrollbar>
         </TableContainer> */}
-        {/* </Card> */}
+          {/* </Card> */}
 
-        <Grid container spacing={3}>
-          {filteredData.map((row) => (
-            <DebentureTrusteeCardView
-              key={row.id}
-              row={row}
-              selected={selected.includes(row.id)}
-              onSelectRow={handleSelectRow}
-              onView={() => handleView(row.id)}
-              onSendRequest={() => handleSendRequest(row.id)}
-            />
-          ))}
-        </Grid>
-      </Stack>
-    </Container>
+          <Grid container spacing={3}>
+            {filteredData.map((row) => (
+              <DebentureTrusteeCardView
+                key={row.id}
+                row={row}
+                selected={selected.includes(row.id)}
+                onSelectRow={handleSelectRow}
+                onView={() => handleView(row.id)}
+                onSendRequest={() => handleSendRequest(row.id)}
+              />
+            ))}
+          </Grid>
+        </Stack>
+      </Container>
+
+      <DebentureTrusteeViewForm
+        open={openView}
+        data={currentTrustee}
+        onClose={handleCloseView}
+      />
+    </>
   );
 }

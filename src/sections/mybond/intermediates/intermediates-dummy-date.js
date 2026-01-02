@@ -6,6 +6,9 @@ export const DEBENTURE_TRUSTEES = [
     regulatory: 'SEBI Registered',
     fees: '₹3,50,000 / Issue',
     responseTime: '24 hrs',
+    pastIssue: '50+ secured issues',
+    techCapability:'Digital docs ',
+    rating: '4.8/5.0',
   },
   {
     id: 'dt-2',

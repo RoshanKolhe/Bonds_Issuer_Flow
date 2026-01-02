@@ -16,17 +16,18 @@ import LegalAdvisorListView from '../legal-advisor/view/legal-advisor-list-view'
 import ValuerListView from '../valuer/view/valuer-list-view';
 import AllIntermediariesView from '../all-intermediaries/all-intermediaries';
 import CreditRatingAgency from '../credit-rating-agency/credit-rating-agency';
+import { useRouter, useSearchParams } from 'src/routes/hook';
 
 // tabs pages
 
 // ----------------------------------------------------------------------
 
 const TABS = [
-  {
-    value: 'all',
-    label: 'Appointed',
-    icon: <Iconify icon="solar:layers-bold" width={22} />,
-  },
+  // {
+  //   value: 'all',
+  //   label: 'Appointed',
+  //   icon: <Iconify icon="solar:layers-bold" width={22} />,
+  // },
   {
     value: 'debenture_trustee',
     label: 'Debenture Trustee',
@@ -63,10 +64,19 @@ const TABS = [
 
 export default function IntermediariesView({ setActiveStepId, percent }) {
   const settings = useSettingsContext();
-  const [currentTab, setCurrentTab] = useState('all');
+
+
+
+     const router = useRouter();
+    const searchParams = useSearchParams();
+
+  const tab = searchParams.get('tab');
+
+  const [currentTab, setCurrentTab] = useState(tab || 'debenture_trustee' ) ;
 
   const handleChangeTab = useCallback((event, newValue) => {
     setCurrentTab(newValue);
+    router.push({search : '?tab='+newValue});
   }, []);
 
   return (
@@ -91,7 +101,7 @@ export default function IntermediariesView({ setActiveStepId, percent }) {
           />
         ))}
       </Tabs>
-      {currentTab === 'all' && <AllIntermediariesView setActiveStepId={setActiveStepId} setCurrentTab={setCurrentTab} percent={percent}/>}
+      {/* {currentTab === 'all' && <AllIntermediariesView setActiveStepId={setActiveStepId} setCurrentTab={setCurrentTab} percent={percent}/>} */}
       {currentTab === 'debenture_trustee' && <DebentureTrusteeListView />}
       {currentTab === 'rta' && <RtaListView />}
       {/* {currentTab === 'lead_manager' && <LeadManagerListView />}
