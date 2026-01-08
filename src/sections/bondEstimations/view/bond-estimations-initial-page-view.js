@@ -4,6 +4,7 @@ import BondsEstimationListView from "./bond-estimations-list-view";
 import { useState } from 'react';
 import { buildFilter } from 'src/utils/filters';
 import { useTable } from 'src/components/table';
+import BondIssuePage from "./bond-isue-page";
 
 
 const defaultFilters = {
@@ -55,6 +56,7 @@ export default function BondEstimationsInitialPageView() {
                     />
                 )
             }
+            {/* <BondIssuePage/> */}
         </>
     );
 }

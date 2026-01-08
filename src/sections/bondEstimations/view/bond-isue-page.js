@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Card,
   CardHeader,
@@ -16,7 +16,6 @@ import IssueInvestmentMatrics from '../bond-estimation-report/issue-investement-
 import ScenarioComparison from '../bond-estimation-report/scenario-comparison';
 import CostsBreakdown from '../bond-estimation-report/costs-breakdown';
 import MarketComparisons from '../bond-estimation-report/market-comparisons';
-import { m } from 'framer-motion';
 
 
 // ----------------------------------------------------------------------
@@ -79,51 +78,63 @@ const mockBonds = [
   },
 ];
 
+const estimationResponse = {
+  financial_metrics: {
+    dscr: 6.25,
+    dscr_rating: 'EXCELLENT',
+    debt_equity_ratio: 0.67,
+    leverage_rating: 'CONSERVATIVE',
+  },
+  recommendations: {
+    issue_size: 100000000,
+    coupon_rate: 8.5,
+    tenure_years: 10,
+    security_type: 'UNSECURED',
+  },
+  cost_breakdown: {
+    professional_advisory_fees: 500000,
+    regulatory_statutory_costs: 250000,
+    placement_distribution_costs: 525000,
+    documentation_printing: 102000,
+    security_creation_compliance: 50000,
+    ongoing_compliance_costs: 1000000,
+    miscellaneous_costs: 200000,
+  },
+  total_estimated_cost: 2627000,
+  cost_as_percentage: 2.63,
+};
+
 export default function BondIssuePage() {
-  // Example state values (you can replace with form or API data)
-  const [issueSize, setIssueSize] = React.useState(5000000);
-  const [couponRate, setCouponRate] = React.useState(7.5);
-  const [tenure, setTenure] = React.useState(10);
 
-  // Donut chart (total investment)
-  const totalAmountOptions = useChart({
-    labels: ['Investor A', 'Investor B', 'Investor C'],
-    legend: { position: 'bottom' },
-    tooltip: {
-      y: {
-        formatter: (val) => `₹${val.toLocaleString()}`,
-      },
-    },
-  });
+  const [estimationData, setEstimationData] = useState(null);
 
-  const totalAmountSeries = [1200000, 900000, 600000];
 
-  // Cost Breakdown chart
-  const costBreakdownOptions = useChart({
-    labels: [
-      'Underwriting Fees',
-      'Legal Fees',
-      'Advisory Fees',
-      'Listing Fees',
-      'Other Charges',
-    ],
-    legend: { position: 'right' },
-    tooltip: {
-      y: {
-        formatter: (val) => `₹${val.toLocaleString()}`,
-      },
-    },
-  });
+  useEffect(() => {
+    setEstimationData(estimationResponse);
+  }, []);
 
-  const costBreakdownSeries = [400000, 250000, 150000, 100000, 50000];
+  if (!estimationData) return null;
+
+  const {
+    recommendations,
+    financial_metrics,
+    cost_breakdown,
+    total_estimated_cost,
+    cost_as_percentage,
+  } = estimationData;
 
   return (
     <Box sx={{ p: 3 }} >
       <Stack spacing={3}>
-        <BondIssueParameters />
+        <BondIssueParameters
+          issueSize={recommendations.issue_size}
+          couponRate={recommendations.coupon_rate}
+          tenure={recommendations.tenure_years}
+        />
+
         <IssueInvestmentMatrics />
-        <ScenarioComparison />
-        <CostsBreakdown />
+        <ScenarioComparison comparison={recommendations} estTotalCost={total_estimated_cost} />
+        <CostsBreakdown  breakdown={cost_breakdown} />
         <MarketComparisons bonds={mockBonds} />
 
       </Stack>

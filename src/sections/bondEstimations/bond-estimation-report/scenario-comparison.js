@@ -16,50 +16,54 @@ import {
     Chip,
 } from "@mui/material";
 
-const metrics = [
-    { title: "User Requirement ", value: "₹ 500,000", img: "/assets/icons/scenario-comparison/user-requirment.png",label:"Projected issue amount" },
-    { title: "System Recommended Issue amount", value: "₹ 650,000",img: "/assets/icons/scenario-comparison/system-issue.png", label:"Optimal" },
 
-];
 
-const comparisonData = [
-    {
-        parameter: "Issue Size",
-        userInput: "₹ 5,00,000",
-        systemRec: "₹ 6,50,000",
-        better: false,
-    },
-    {
-        parameter: "Coupon Rate",
-        userInput: "11%",
-        systemRec: "8.5%",
-        better: true,
-        betterLabel: "Better",
-    },
-    {
-        parameter: "Tenure",
-        userInput: "11 Years",
-        systemRec: "10 Years",
-        better: true,
-        betterLabel: "Better",
-    },
-    {
-        parameter: "Security Type",
-        userInput: "Collateral",
-        systemRec: "Secured, collateral",
-        better: true,
-        betterLabel: "Better",
-    },
-    {
-        parameter: "Est. Total Cost",
-        userInput: "₹ 10.5 L",
-        systemRec: "₹ 8.25 L",
-        better: true,
-        betterLabel: "Save ₹2.25",
-    },
-];
 
-export default function ScenarioComparison() {
+export default function ScenarioComparison({comparison , estTotalCost}) {
+
+    const metrics = [
+        { title: "User Requirement ", value: "₹ 500,000", img: "/assets/icons/scenario-comparison/user-requirment.png", label: "Projected issue amount" },
+        { title: "System Recommended Issue amount", value: `₹ ${comparison.issue_size}` ,img: "/assets/icons/scenario-comparison/system-issue.png", label: "Optimal" },
+
+    ];
+
+
+    const comparisonData = [
+        {
+            parameter: "Issue Size",
+            userInput: "₹ 5,00,000",
+            systemRec: `₹ ${comparison.issue_size}`,
+            better: false,
+        },
+        {
+            parameter: "Coupon Rate",
+            userInput: "11%",
+            systemRec: `${comparison.coupon_rate}%`,
+            better: true,
+            betterLabel: "Better",
+        },
+        {
+            parameter: "Tenure",
+            userInput: "11 Years",
+            systemRec: `${comparison.tenure_years} Years`,
+            better: true,
+            betterLabel: "Better",
+        },
+        {
+            parameter: "Security Type",
+            userInput: "Collateral",
+            systemRec:` ${comparison.security_type}`,
+            better: true,
+            betterLabel: "Better",
+        },
+        {
+            parameter: "Est. Total Cost",
+            userInput: "₹ 10.5 L",
+            systemRec: `${estTotalCost}`,
+            better: true,
+            betterLabel: "Save ₹2.25",
+        },
+    ];
 
     return (
         <Box>
@@ -141,7 +145,7 @@ export default function ScenarioComparison() {
 
                                     <Chip
                                         label={item.label}
-                                     
+
                                         sx={{
                                             backgroundColor: "#B7D6FF",
                                             color: "#000",
@@ -150,14 +154,14 @@ export default function ScenarioComparison() {
                                             fontSize: "0.75rem",
                                             borderRadius: "6px",
                                             height: 24,
-                                            
+
                                         }}
                                     />
                                 </Stack>
                             </Paper>
                         </Grid>
                     ))}
-                </Grid> 
+                </Grid>
                 <TableContainer
                     component={Paper}
                     sx={{
