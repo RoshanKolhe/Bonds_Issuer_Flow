@@ -211,8 +211,8 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
           Credit Ratings Available
         </Typography>
 
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={4}>
+        <Grid container spacing={4}  mb={2}>
+          <Grid item xs={12} md={6}>
             <RHFAutocomplete
               name="selectedAgency"
               label="Credit Rating Agency"
@@ -227,8 +227,20 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
             />
           </Grid>
 
-          <Grid item xs={12} md={8}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
+          <Grid item xs={12} md={6}>
+             <RHFAutocomplete
+              name="selectedRating"
+              label="Credit Rating"
+              options={ratingsData || []}
+              getOptionLabel={(option) => option.name}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              renderOption={(props, option) => (
+                <li {...props} key={option.id}>
+                  {option.name}
+                </li>
+              )}
+            />
+            {/* <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
               Rating
             </Typography>
             <Grid container spacing={2}>
@@ -245,7 +257,7 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
                   />
                 </Grid>
               ))}
-            </Grid>
+            </Grid> */}
             <YupErrorMessage name="selectedRating" />
           </Grid>
         </Grid>

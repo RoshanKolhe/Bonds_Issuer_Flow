@@ -28,19 +28,23 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
         issueAmount: Yup.number()
             .typeError('Issue Amount is required')
             .positive('Must be positive')
-            .required('Issue Amount is required'),
+            .required('Issue Amount is required')
+            .min(10000000, 'Issue amount minimum 1 Cr')
+            .max(50000000000, 'Issue amount maximum 5000 Cr'),
+
         security: Yup.bool().required("Please select security type"),
         tenure: Yup.number()
             .typeError('Tenure must be a number')
-            .positive('Must be positive')
-            .required('Tenure is required'),
+            .required('Tenure is required')
+            .min(1, 'Minimum tenure is 1 year')
+            .max(30, 'Maximum tenure is 30 years'),
         preferedInvestorCategory: Yup.string().required("Please select category"),
         preferedPaymentCycle: Yup.number().required("Please select payment cycle"),
         roi: Yup.number()
             .typeError('ROI must be a number')
+            .required('ROI is required')
             .min(0, 'Must be at least 0%')
-            .max(100, 'Cannot exceed 100%')
-            .required('ROI is required'),
+            .max(25, 'Cannot exceed 25%'),
     });
 
     const defaultValues = useMemo(() => ({
@@ -83,7 +87,7 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
                 enqueueSnackbar('Priliminary requirements saved', { variant: 'success' });
             }
         } catch (error) {
-            enqueueSnackbar(error?.error?.message ||'Error while filling priliminary requirements :', {variant: 'error'})
+            enqueueSnackbar(error?.error?.message || 'Error while filling priliminary requirements :', { variant: 'error' })
             console.error('Error while filling priliminary requirements :', error);
         }
     });
@@ -99,7 +103,7 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
         if (values.roi) completed++;
 
 
-        const percentVal = (completed / 6) * 50; // 50% weight for this section
+        const percentVal = (completed / 6) * 100;
 
         setPercent?.(percentVal);
     };
@@ -142,7 +146,7 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
                 >
                     <Grid container spacing={3}>
                         <Grid item xs={12} md={6}>
-                            <Typography variant="h5"  color='primary' fontWeight='bold' sx={{ mb: 3 }}>
+                            <Typography variant="h5" color='primary' fontWeight='bold' sx={{ mb: 3 }}>
                                 Preliminary Bond Requirements
                             </Typography>
 
@@ -181,7 +185,7 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
 
                             {/* Tenure */}
                             <Box sx={{ mb: 3 }}>
-                    
+
                                 <RHFTextField
                                     name="tenure"
                                     label="Tenure"

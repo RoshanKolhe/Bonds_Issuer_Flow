@@ -5,31 +5,31 @@ import PreliminaryRequirements from "./preliminaryRequirements";
 import { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
 
-export default function PriliminaryAndCollateralView({ currentPrliminaryRequirements, currentCollateral, percent, setActiveStepId }) {
+export default function PriliminaryAndCollateralView({ currentPrliminaryRequirements, percent, setActiveStepId }) {
     const { enqueueSnackbar } = useSnackbar();
     const [priliminaryPercent, setPriliminaryPercent] = useState(0);
-    const [collateralPercent, setCollateralPercent] = useState(0);
+;
     const [priliminaryCompleted, setPriliminaryCompleted] = useState(0);
-    const [collateralCompleted, setCollateralCompleted] = useState(0);
+  
 
     const handleNextClick = () => {
-        if (!priliminaryCompleted) {
-            enqueueSnackbar('please complete priliminary requirements section', { variant: 'error' });
-            return;
-        }
+        // if (!priliminaryCompleted) {
+        //     enqueueSnackbar('please complete priliminary requirements section', { variant: 'error' });
+        //     return;
+        // }
 
-        if (!collateralCompleted) {
-            enqueueSnackbar('please complete collateral assets section', { variant: 'error' });
-            return;
-        }
+        // if (!collateralCompleted) {
+        //     enqueueSnackbar('please complete collateral assets section', { variant: 'error' });
+        //     return;
+        // }
 
         setActiveStepId();
     }
 
     useEffect(() => {
-        const total = priliminaryPercent + collateralPercent;
+        const total = priliminaryPercent;
         percent?.(total);
-    }, [priliminaryPercent, collateralPercent, percent]);
+    }, [priliminaryPercent, percent]);
 
     return (
         <Stack direction='column' spacing={2}>
@@ -38,11 +38,11 @@ export default function PriliminaryAndCollateralView({ currentPrliminaryRequirem
                 setPercent={setPriliminaryPercent}
                 setProgress={setPriliminaryCompleted}
             />
-            <CollateralAssets
+            {/* <CollateralAssets
                 currentCollateralAssets={currentCollateral}
                 setPercent={setCollateralPercent}
                 setProgress={setCollateralCompleted}
-            />
+            /> */}
             <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
                 <Button type="button" variant="contained" onClick={() => handleNextClick()}>
                     Next
@@ -54,7 +54,7 @@ export default function PriliminaryAndCollateralView({ currentPrliminaryRequirem
 
 PriliminaryAndCollateralView.propTypes = {
     currentPrliminaryRequirements: PropTypes.object,
-    currentCollateral: PropTypes.object,
+    // currentCollateral: PropTypes.object,
     percent: PropTypes.func,
     setActiveStepId: PropTypes.func
 }

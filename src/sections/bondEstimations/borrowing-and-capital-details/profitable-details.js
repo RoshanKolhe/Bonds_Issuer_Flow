@@ -24,6 +24,7 @@ export default function ProfitabilityDetails({ currentProfitabilityDetails, setP
       .required('Net Profit is required'),
     EBIDTA: Yup.number()
       .typeError('EBIDTA must be a number')
+      .min(1000000 ,'Minimum 10 lakh required')
       .required('EBIDTA amount is required'),
   });
 

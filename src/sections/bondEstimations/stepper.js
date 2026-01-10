@@ -11,6 +11,7 @@ import ProgressStepper from 'src/components/progress-stepper/ProgressStepper';
 import { AnimatePresence } from 'framer-motion';
 import { m } from 'framer-motion';
 import PriliminaryAndCollateralView from './preliminary-requirements-and collatral-details/priliminaryAndCollateralView';
+import CollateralAssets from './collatral-assets/collatralAssets';
 
 export default function Stepper() {
   const params = useParams()
@@ -42,9 +43,14 @@ export default function Stepper() {
       lines: ['Financial', 'Details'],
     },
     {
-      id: 'preliminary_bond_requirements',
+      id: 'bond_priliminary_requirements',
       number: 5,
       lines: ['Preliminary', 'Requirements'],
+    },
+    {
+      id: 'collateral_assets',
+      number: 6,
+      lines: ['Collatral', 'Assets'],
     },
   ];
 
@@ -53,7 +59,8 @@ export default function Stepper() {
     audited_financial: { percent: 0 },
     borrowing_details: { percent: 0 },
     financial_details: { percent: 0 },
-    preliminary_bond_requirements: { percent: 0 },
+    bond_priliminary_requirements: { percent: 0 },
+    collateral_assets: { percent: 0 }
   });
 
   const updateStepPercent = (stepId, percent) => {
@@ -110,18 +117,24 @@ export default function Stepper() {
         return (
           <FinancialDetails
             percent={(p) => updateStepPercent('financial_details', p)}
-            setActiveStepId={() => setActiveStepId('preliminary_bond_requirements')}
+            setActiveStepId={() => setActiveStepId('bond_priliminary_requirements')}
             currentFinancialRatios={estimationData ? estimationData?.financialRatios : null}
           />
         );
 
-      case 'preliminary_bond_requirements':
+      case 'bond_priliminary_requirements':
         return (
           <PriliminaryAndCollateralView
-            percent={(p) => updateStepPercent('preliminary_bond_requirements', p)}
-            setActiveStepId={() => setActiveStepId('preliminary_bond_requirements')}
+            percent={(p) => updateStepPercent('bond_priliminary_requirements', p)}
+            setActiveStepId={() => setActiveStepId('collateral_assets')}
             currentPrliminaryRequirements={estimationData ? estimationData?.estimationPriliminaryBondRequirements : null}
-            currentCollateral={estimationData ? estimationData?.currentCollateralAssets : null}
+          />
+        );
+      case 'collateral_assets':
+        return (
+          <CollateralAssets
+            percent={(p) => updateStepPercent('collateral_assets', p)}
+            currentCollateralAssets={estimationData ? estimationData?.bondEstimationCollateralAssets : null}
           />
         );
 
@@ -156,7 +169,11 @@ export default function Stepper() {
 
       if (bondEstimation.currentProgress.includes('financial_details')) {
         updateStepPercent('financial_details', 100);
-        currentStep = 'preliminary_bond_requirements';
+        currentStep = 'bond_priliminary_requirements';
+      }
+      if (bondEstimation.currentProgress.includes('bond_priliminary_requirements')) {
+        updateStepPercent('bond_priliminary_requirements', 100);
+        currentStep = 'collateral_assets';
       }
 
       setActiveStepId(currentStep);

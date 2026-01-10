@@ -163,7 +163,7 @@ export const dashboardRoutes = [
           { element: <ROIGuidancePage />, index: true },
           { path: 'roi', element: <ROIGuidancePage /> },
           { path: 'fund-position-form/:applicationId', element: <ROIFundFormPage /> },
-          {path:'view', element:<AfterCompleteRoiStagePage/>},
+          {path:':applicationId', element:<AfterCompleteRoiStagePage/>},
         ],
       },
       {

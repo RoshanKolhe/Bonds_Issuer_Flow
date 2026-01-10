@@ -19,11 +19,11 @@ import {
 
 
 
-export default function ScenarioComparison({comparison , estTotalCost}) {
+export default function ScenarioComparison({systemRecommendedInputs , userInputs}) {
 
     const metrics = [
-        { title: "User Requirement ", value: "₹ 500,000", img: "/assets/icons/scenario-comparison/user-requirment.png", label: "Projected issue amount" },
-        { title: "System Recommended Issue amount", value: `₹ ${comparison.issue_size}` ,img: "/assets/icons/scenario-comparison/system-issue.png", label: "Optimal" },
+        { title: "User Requirement ", value:  `₹ ${userInputs.issueAmount}`, img: "/assets/icons/scenario-comparison/user-requirment.png", label: "Projected issue amount" },
+        { title: "System Recommended Issue amount", value: `₹ ${systemRecommendedInputs.issueAmount}` ,img: "/assets/icons/scenario-comparison/system-issue.png", label: "Optimal" },
 
     ];
 
@@ -31,35 +31,35 @@ export default function ScenarioComparison({comparison , estTotalCost}) {
     const comparisonData = [
         {
             parameter: "Issue Size",
-            userInput: "₹ 5,00,000",
-            systemRec: `₹ ${comparison.issue_size}`,
+            userInput:  `₹ ${userInputs.issueAmount}`,
+            systemRec: `₹ ${systemRecommendedInputs.issueAmount}`,
             better: false,
         },
         {
             parameter: "Coupon Rate",
-            userInput: "11%",
-            systemRec: `${comparison.coupon_rate}%`,
+            userInput: `${userInputs.couponRate} %`,
+            systemRec: `${systemRecommendedInputs.couponRate} %`,
             better: true,
             betterLabel: "Better",
         },
         {
             parameter: "Tenure",
-            userInput: "11 Years",
-            systemRec: `${comparison.tenure_years} Years`,
+            userInput: `${userInputs.tenure} Years`,
+            systemRec: `${systemRecommendedInputs.tenure} Years`,
             better: true,
             betterLabel: "Better",
         },
         {
             parameter: "Security Type",
-            userInput: "Collateral",
-            systemRec:` ${comparison.security_type}`,
+            userInput: `${userInputs.securityType}`,
+            systemRec: `${systemRecommendedInputs.securityType}`,
             better: true,
             betterLabel: "Better",
         },
         {
             parameter: "Est. Total Cost",
-            userInput: "₹ 10.5 L",
-            systemRec: `${estTotalCost}`,
+            userInput: `${userInputs.estimatedTotalCost}`,
+            systemRec: `${systemRecommendedInputs.estimatedTotalCost}`,
             better: true,
             betterLabel: "Save ₹2.25",
         },

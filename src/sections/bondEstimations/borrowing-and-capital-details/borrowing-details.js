@@ -53,12 +53,11 @@ export default function BorrowingDetails({ currentBorrowingDetails, setPercent, 
                 interestPayment: Yup.number()
                     .typeError('Interest payment must be a number')
                     .required('Interest payment is required'),
-                monthlyPrincipal: Yup.number()
-                    .typeError('Monthly principal must be a number')
-                    .required('Monthly principal is required'),
-                monthlyInterest: Yup.number()
-                    .typeError('Monthly interest must be a number')
-                    .required('Monthly interest is required'),
+                tenure: Yup.number()
+                    .typeError('Tenure must be a number')
+                    .required('Tenure is required')
+                    .min(1, 'Minimum tenure is 1 year')
+                    .max(30, 'Maximum tenure is 30 years')
             })
         ),
     });
@@ -73,8 +72,8 @@ export default function BorrowingDetails({ currentBorrowingDetails, setPercent, 
                         repaymentTerms: (details?.repaymentTerms !== null && details?.repaymentTerms !== undefined) ? details?.repaymentTerms : '',
                         borrowingType: details?.borrowingType || '',
                         interestPayment: details?.interestPayment || '',
-                        monthlyPrincipal: details?.monthlyPrincipal || '',
-                        monthlyInterest: details?.monthlyInterest || '',
+                        tenure: details?.tenure || '',
+
                     }))
                     : [
                         {
@@ -83,8 +82,7 @@ export default function BorrowingDetails({ currentBorrowingDetails, setPercent, 
                             repaymentTerms: '',
                             borrowingType: '',
                             interestPayment: '',
-                            monthlyPrincipal: '',
-                            monthlyInterest: '',
+                            tenure: '',
                         },
                     ],
 
@@ -119,8 +117,7 @@ export default function BorrowingDetails({ currentBorrowingDetails, setPercent, 
             repaymentTerms: '',
             borrowingType: '',
             interestPayment: '',
-            monthlyPrincipal: '',
-            monthlyInterest: '',
+            tenure: '',
         });
     };
 
@@ -140,7 +137,7 @@ export default function BorrowingDetails({ currentBorrowingDetails, setPercent, 
                 setProgress(true);
             }
         } catch (error) {
-            enqueueSnackbar(error?.error?.message || 'Error while submitting borrowing details form :' , {variant: 'error'} )
+            enqueueSnackbar(error?.error?.message || 'Error while submitting borrowing details form :', { variant: 'error' })
             console.error('Error while submitting borrowing details form :', error);
         }
     });
@@ -163,8 +160,7 @@ export default function BorrowingDetails({ currentBorrowingDetails, setPercent, 
                 item.repaymentTerms !== '' &&
                 item.borrowingType &&
                 item.interestPayment &&
-                item.monthlyPrincipal &&
-                item.monthlyInterest;
+                item.tenure
 
             if (allFilled) validCount++;
         });
@@ -241,7 +237,7 @@ export default function BorrowingDetails({ currentBorrowingDetails, setPercent, 
                                 </RHFSelect>
                             </Grid>
 
-                            <Grid item xs={12} md={3}>
+                            <Grid item xs={12} md={4}>
                                 <RHFSelect
                                     name={`borrowings[${index}].borrowingType`}
                                     label="Borrowing Type"
@@ -255,7 +251,7 @@ export default function BorrowingDetails({ currentBorrowingDetails, setPercent, 
                                 </RHFSelect>
                             </Grid>
 
-                            <Grid item xs={12} md={3}>
+                            <Grid item xs={12} md={4}>
                                 <RHFTextField
                                     name={`borrowings[${index}].interestPayment`}
                                     label="Interest Payment (%)"
@@ -264,23 +260,15 @@ export default function BorrowingDetails({ currentBorrowingDetails, setPercent, 
                                 />
                             </Grid>
 
-                            <Grid item xs={12} md={3}>
+                            <Grid item xs={12} md={4}>
                                 <RHFTextField
-                                    name={`borrowings[${index}].monthlyPrincipal`}
-                                    label="Monthly Principal Payment"
+                                    name={`borrowings[${index}].tenure`}
+                                    label="Tenure"
                                     fullWidth
                                     type="number"
                                 />
                             </Grid>
 
-                            <Grid item xs={12} md={3}>
-                                <RHFTextField
-                                    name={`borrowings[${index}].monthlyInterest`}
-                                    label="Monthly Interest Payment"
-                                    fullWidth
-                                    type="number"
-                                />
-                            </Grid>
                         </Grid>
                     </Card>
                 ))}

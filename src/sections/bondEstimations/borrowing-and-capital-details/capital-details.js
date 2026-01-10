@@ -24,11 +24,11 @@ export default function CapitalDetails({ currentCapitalDetails, setPercent, setP
 
     reserveSurplus: Yup.number()
       .typeError('Reserve Surplus must be a number')
-      .min(0, 'Cannot be negative')
       .required('Reserve Surplus is required'),
 
     netWorth: Yup.number()
       .typeError('Net Worth must be a number')
+      .min(1000000,'Minimum 10 lakh required')
       .required('Net Worth is required'),
   });
 
@@ -69,7 +69,7 @@ export default function CapitalDetails({ currentCapitalDetails, setPercent, setP
         setProgress(true);
       }
     } catch (error) {
-      enqueueSnackbar(error?.error?.message || 'Error while submitting capital details form :', {variant: 'error'})
+      enqueueSnackbar(error?.error?.message || 'Error while submitting capital details form :', { variant: 'error' })
       console.error('Error while submitting capital details form :', error);
     }
   });

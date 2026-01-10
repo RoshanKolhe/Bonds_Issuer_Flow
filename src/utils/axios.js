@@ -89,6 +89,9 @@ export const endpoints = {
     details: (applicationId) => `/bond-applications/${applicationId}`,
     dataByStatus: (applicationId, statusValue) => `/bond-applications/${applicationId}/data-by-status/${statusValue}`
   },
+  bondReportGenrating:{
+    list: (applicationId) =>`/bond-estimations/generate-report/${applicationId}`
+  },
   creditRatingAgencies: {
     list: '/credit-rating-agencies',
   },

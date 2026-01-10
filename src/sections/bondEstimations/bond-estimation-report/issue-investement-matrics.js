@@ -9,13 +9,15 @@ import {
   Box,
 } from "@mui/material";
 
- const metrics = [
-    { title: "Total Subscription Target", value: "₹ 5,000,000" },
-    { title: "Proposed Total Investment", value: "₹ 3,500,000" },
+
+
+export default function IssueInvestmentMatrics({proposedTarget , subscriptionTarget}) {
+
+   const metrics = [
+    { title: "Total Subscription Target", value: `${subscriptionTarget}` },
+    { title: "Proposed Total Investment", value: `${proposedTarget}` },
     { title: "Estimated Returns", value: "₹ 800,000" },
   ];
-
-export default function IssueInvestmentMatrics() {
 
   return (
  <Box>

@@ -16,6 +16,8 @@ import IssueInvestmentMatrics from '../bond-estimation-report/issue-investement-
 import ScenarioComparison from '../bond-estimation-report/scenario-comparison';
 import CostsBreakdown from '../bond-estimation-report/costs-breakdown';
 import MarketComparisons from '../bond-estimation-report/market-comparisons';
+import { useParams } from 'src/routes/hook';
+import { useGetBondEstimationReport } from 'src/api/bondEstimationReport';
 
 
 // ----------------------------------------------------------------------
@@ -106,35 +108,43 @@ const estimationResponse = {
 
 export default function BondIssuePage() {
 
+  const params = useParams();
+
+  const { applicationId } = params;
+
   const [estimationData, setEstimationData] = useState(null);
 
+  const { bondEstimationReport } = useGetBondEstimationReport(applicationId)
+
+  console.log('BondsEstimation Data', bondEstimationReport)
 
   useEffect(() => {
-    setEstimationData(estimationResponse);
+    setEstimationData(bondEstimationReport);
   }, []);
 
   if (!estimationData) return null;
 
   const {
-    recommendations,
-    financial_metrics,
-    cost_breakdown,
-    total_estimated_cost,
-    cost_as_percentage,
+    userInputs,
+    systemRecommendedInputs,
+    costBreakdown,
+    subscriptionTarget,
+    proposedTarget,
   } = estimationData;
+
 
   return (
     <Box sx={{ p: 3 }} >
       <Stack spacing={3}>
         <BondIssueParameters
-          issueSize={recommendations.issue_size}
-          couponRate={recommendations.coupon_rate}
-          tenure={recommendations.tenure_years}
+          issueSize={systemRecommendedInputs?.issueAmount}
+          couponRate={systemRecommendedInputs?.couponRate}
+          tenure={systemRecommendedInputs?.tenure}
         />
 
-        <IssueInvestmentMatrics />
-        <ScenarioComparison comparison={recommendations} estTotalCost={total_estimated_cost} />
-        <CostsBreakdown  breakdown={cost_breakdown} />
+        <IssueInvestmentMatrics subscriptionTarget={subscriptionTarget} proposedTarget={proposedTarget} />
+        <ScenarioComparison systemRecommendedInputs={systemRecommendedInputs} userInputs={userInputs}  />
+        <CostsBreakdown breakdown={costBreakdown} />
         <MarketComparisons bonds={mockBonds} />
 
       </Stack>
