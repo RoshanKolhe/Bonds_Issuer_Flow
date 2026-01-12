@@ -89,14 +89,21 @@ export const endpoints = {
     details: (applicationId) => `/bond-applications/${applicationId}`,
     dataByStatus: (applicationId, statusValue) => `/bond-applications/${applicationId}/data-by-status/${statusValue}`
   },
-  bondReportGenrating:{
-    list: (applicationId) =>`/bond-estimations/generate-report/${applicationId}`
+  bondReportGenrating: {
+    list: (applicationId) => `/bond-estimations/generate-report/${applicationId}`
   },
   creditRatingAgencies: {
     list: '/credit-rating-agencies',
   },
   creditRatings: {
     list: '/credit-ratings',
+  },
+  trusteeProfiles: {
+    list: '/trustee-profiles',
+    // filterList: (filter) => `/trustee-profiles?filter=${filter}`,
+    // statusList: (status) => `/trustee-profiles?status=${status}`,
+    // filterStatusList: (filter, status) => `/trustee-profiles?filter=${filter}&status=${status}`,
+    // details: (id) => `/trustee-profiles/${id}`,
   },
   bankDetails: {
     list: '/company-profiles/bank-details',

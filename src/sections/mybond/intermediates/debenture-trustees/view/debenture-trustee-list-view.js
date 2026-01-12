@@ -95,6 +95,7 @@ export default function DebentureTrusteeListView() {
         enqueueSnackbar('Request send successfully', { variant: 'success' });
       }
     } catch (error) {
+      enqueueSnackbar( error?.error?.message || 'Failed to send request', { variant: 'error' });
       console.error('error while sending request to debenture trustee :', error);
     }
   };
