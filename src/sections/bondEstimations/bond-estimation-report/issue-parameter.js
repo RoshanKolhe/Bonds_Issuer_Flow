@@ -15,16 +15,18 @@ export default function BondIssueParameters({
     couponRate: couponRateProp,
     tenure: tenureProp,
 }) {
-    const [issueSize, setIssueSize] = useState(issueSizeProp);
-    const [couponRate, setCouponRate] = useState(couponRateProp);
-    const [tenure, setTenure] = useState(tenureProp);
+    const [issueSize, setIssueSize] = useState(issueSizeProp ?? 0);
+    const [couponRate, setCouponRate] = useState(couponRateProp ?? 0);
+    const [tenure, setTenure] = useState(tenureProp ?? 0);
+
 
 
     useEffect(() => {
-        if (issueSizeProp) setIssueSize(issueSizeProp);
-        if (couponRateProp) setCouponRate(couponRateProp);
-        if (tenureProp) setTenure(tenureProp);
+        if (issueSizeProp !== undefined) setIssueSize(issueSizeProp);
+        if (couponRateProp !== undefined) setCouponRate(couponRateProp);
+        if (tenureProp !== undefined) setTenure(tenureProp);
     }, [issueSizeProp, couponRateProp, tenureProp]);
+
 
     const totalReturn = issueSize * Math.pow(1 + couponRate / 100, tenure);
     const interestPayment = totalReturn - issueSize;
@@ -76,7 +78,7 @@ export default function BondIssueParameters({
                     {label}
                 </Typography>
                 <TextField
-                    value={unit === "%" ? `${value}${unit}` : value.toLocaleString()}
+                    value={unit === "%" ? `${value}${unit}` : value?.toLocaleString()}
                     size="small"
                     sx={{ width: 100 }}
                     inputProps={{
@@ -182,7 +184,7 @@ export default function BondIssueParameters({
                             color="primary"
                             sx={{ fontWeight: 600, mb: 2, color: "#1976d2" }}
                         >
-                            ₹ {totalReturn.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                            ₹ {totalReturn?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                         </Typography>
 
                         {/* Donut Chart */}
@@ -225,7 +227,7 @@ export default function BondIssueParameters({
                                     color="text.secondary"
                                     sx={{ fontWeight: 500 }}
                                 >
-                                    ₹ {totalInvestment.toLocaleString()}
+                                    ₹ {totalInvestment?.toLocaleString()}
                                 </Typography>
                             </Stack>
 
@@ -249,7 +251,7 @@ export default function BondIssueParameters({
                                     color="text.secondary"
                                     sx={{ fontWeight: 500 }}
                                 >
-                                    ₹ {interestPayment.toLocaleString()}
+                                    ₹ {interestPayment?.toLocaleString()}
                                 </Typography>
                             </Stack>
                         </Stack>

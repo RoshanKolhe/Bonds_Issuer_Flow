@@ -14,8 +14,8 @@ import {
 export default function IssueInvestmentMatrics({proposedTarget , subscriptionTarget}) {
 
    const metrics = [
-    { title: "Total Subscription Target", value: `${subscriptionTarget}` },
-    { title: "Proposed Total Investment", value: `${proposedTarget}` },
+    { title: "Total Subscription Target", value: `₹ ${subscriptionTarget}` },
+    { title: "Proposed Total Investment", value: `₹ ${proposedTarget}` },
     { title: "Estimated Returns", value: "₹ 800,000" },
   ];
 
