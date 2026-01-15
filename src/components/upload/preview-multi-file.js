@@ -90,7 +90,7 @@ export default function MultiFilePreview({ thumbnail, files, onRemove, sx }) {
               ...sx,
             }}
           >
-            <FileThumbnail file={file} />
+            <FileThumbnail file={file} tooltip/>
 
             <ListItemText
               primary={isNotFormatFile ? file : name}

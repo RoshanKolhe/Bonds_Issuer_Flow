@@ -23,6 +23,7 @@ import ApprovalCard from '../approval-card';
 import { useGetBondApplicationStepData } from 'src/api/bondApplications';
 import { useParams } from 'src/routes/hook';
 import ValuatorApprovalPendingNotice from './valuatorApprovalPending';
+import ValuatorApprovalCard from './valuatorApprovalCard';
 
 export default function CollateralAssets({
   percent,
@@ -55,6 +56,7 @@ export default function CollateralAssets({
   const [collateralTypesData, setCollateralTypesData] = useState([]);
   const [ownershipTypesData, setOwnershipTypesData] = useState([]);
   const [approvalScreen, setApprovalScreen] = useState(false);
+
   const newCollateralSchema = Yup.object().shape({
     collateralAssets: Yup.array()
       .of(
@@ -70,8 +72,8 @@ export default function CollateralAssets({
           trustName: Yup.string().required('Trust name is required'),
           securityDocRef: Yup.string().required('Security document ref is required'),
           securityDocument: Yup.mixed().required('Security document is required'),
-          assetCoverCertificate: Yup.mixed().required('Asset cover certificate is required'),
-          valuationReport: Yup.mixed().required('Valuation report is required'),
+          // assetCoverCertificate: Yup.mixed().required('Asset cover certificate is required'),
+          // valuationReport: Yup.mixed().required('Valuation report is required'),
           remark: Yup.string().nullable(),
         })
       )
@@ -97,19 +99,16 @@ export default function CollateralAssets({
   });
 
   const {
-    setValue,
     control,
     reset,
     watch,
     handleSubmit,
-    formState: { isSubmitting, errors },
+    formState: { isSubmitting },
   } = methods;
-
-  console.log('errors :', errors);
 
   const values = watch();
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append } = useFieldArray({
     control,
     name: 'collateralAssets',
   });
@@ -146,8 +145,8 @@ export default function CollateralAssets({
           isActive: true,
           isDeleted: false,
           securityDocumentId: asset.securityDocument.id,
-          assetCoverCertificateId: asset.assetCoverCertificate.id,
-          valuationReportId: asset.valuationReport.id,
+          // assetCoverCertificateId: asset.assetCoverCertificate.id,
+          // valuationReportId: asset.valuationReport.id,
           bondIssueApplicationId: applicationId
         }))
       };
@@ -176,10 +175,10 @@ export default function CollateralAssets({
     if (values.collateralAssets[0]?.trustName) completed++;
     if (values.collateralAssets[0]?.valuationDate) completed++;
     if (values.collateralAssets[0]?.securityDocument) completed++;
-    if (values.collateralAssets[0]?.assetCoverCertificate) completed++;
-    if (values.collateralAssets[0]?.valuationReport) completed++;
+    // if (values.collateralAssets[0]?.assetCoverCertificate) completed++;
+    // if (values.collateralAssets[0]?.valuationReport) completed++;
 
-    const TOTAL = 12;
+    const TOTAL = 10;
 
     const percentVal = (completed / TOTAL) * 100;
 
@@ -316,14 +315,10 @@ export default function CollateralAssets({
 
               {/* Security Document Ref */}
               <Grid item xs={12} md={4}>
-
-
                 <RHFTextField name={`collateralAssets.${index}.securityDocRef`} label="Security Document Ref" fullWidth />
-
               </Grid>
 
               {/* Valuation Date */}
-
 
               {/* Trust Name */}
               <Grid item xs={12} md={4}>
@@ -393,7 +388,7 @@ export default function CollateralAssets({
                   <YupErrorMessage name={`collateralAssets.${index}.securityDocument`} />
 
 
-                  <RHFCustomFileUploadBox
+                  {/* <RHFCustomFileUploadBox
                     name={`collateralAssets.${index}.assetCoverCertificate`}
                     label="Asset Cover Certificate"
                     accept={{
@@ -413,7 +408,7 @@ export default function CollateralAssets({
                       'image/jpeg': ['.jpg', '.jpeg'],
                     }}
                   />
-                  <YupErrorMessage name={`collateralAssets.${index}.valuationReport`} />
+                  <YupErrorMessage name={`collateralAssets.${index}.valuationReport`} /> */}
                 </Stack>
               </Grid>
             </Grid>
@@ -456,6 +451,7 @@ export default function CollateralAssets({
           </LoadingButton>
         </Box>
       </Box>
+      {/* <ValuatorApprovalCard /> */}
     </FormProvider>
   );
 }

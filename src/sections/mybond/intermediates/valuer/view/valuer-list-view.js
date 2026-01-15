@@ -104,7 +104,7 @@ export default function ValuerListView() {
 
   return (
     <>
-    <Container maxWidth={settings.themeStretch ? false : 'lg'}>
+    <Container maxWidth={settings.themeStretch ? false : 'lg'} disableGutters>
       <Stack direction="row" spacing={2} sx={{ p: 2 }} justifyContent="space-between">
         <Typography variant="h5"
           fontWeight="bold"

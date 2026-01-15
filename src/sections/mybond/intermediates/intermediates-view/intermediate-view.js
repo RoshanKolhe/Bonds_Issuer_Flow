@@ -17,6 +17,7 @@ import ValuerListView from '../valuer/view/valuer-list-view';
 import AllIntermediariesView from '../all-intermediaries/all-intermediaries';
 import CreditRatingAgency from '../credit-rating-agency/credit-rating-agency';
 import { useRouter, useSearchParams } from 'src/routes/hook';
+import { Box, Button } from '@mui/material';
 
 // tabs pages
 
@@ -67,16 +68,16 @@ export default function IntermediariesView({ setActiveStepId, percent }) {
 
 
 
-     const router = useRouter();
-    const searchParams = useSearchParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const tab = searchParams.get('tab');
 
-  const [currentTab, setCurrentTab] = useState(tab || 'debenture_trustee' ) ;
+  const [currentTab, setCurrentTab] = useState(tab || 'debenture_trustee');
 
   const handleChangeTab = useCallback((event, newValue) => {
     setCurrentTab(newValue);
-    router.push({search : '?tab='+newValue});
+    router.push({ search: '?tab=' + newValue });
   }, []);
 
   return (
@@ -108,6 +109,12 @@ export default function IntermediariesView({ setActiveStepId, percent }) {
       {currentTab === 'legal_advisor' && <LegalAdvisorListView />} */}
       {currentTab === 'valuer' && <ValuerListView />}
       {currentTab === 'credit_rating' && <CreditRatingAgency />}
+
+      <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+        <Button variant="contained" onClick={() => setActiveStepId('fund_position')}>
+          Next
+        </Button>
+      </Box>
     </Container>
   );
 }

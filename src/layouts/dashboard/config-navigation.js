@@ -101,15 +101,15 @@ export function useNavData() {
             ],
           },
 
-            {
-            title: t('intermediates'),
-            path: paths.dashboard.trustee.root,
-            icon: ICONS.intermediate,
-            children: [
-              { title: t('Debenture Trustees'), path: paths.dashboard.trustee.list },
-            ],
+          //   {
+          //   title: t('intermediates'),
+          //   path: paths.dashboard.trustee.root,
+          //   icon: ICONS.intermediate,
+          //   children: [
+          //     { title: t('Debenture Trustees'), path: paths.dashboard.trustee.list },
+          //   ],
 
-          },
+          // },
           {
             title: t('my bonds'),
             path: paths.dashboard.mybond.root,

@@ -9,6 +9,7 @@ import {
   Tooltip,
   Avatar,
   Alert,
+  Stack,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import Iconify from 'src/components/iconify';
@@ -51,25 +52,36 @@ export default function CreditRatingAgency() {
     });
 
     if (response?.data?.success) {
-      enqueueSnackbar('Request send successfully' , {variant: 'success'} );
+      enqueueSnackbar('Request send successfully', { variant: 'success' });
     }
   };
 
-  
+
   const fileUrl =
     'https://images.unsplash.com/photo-1575936123452-b67c3203c357?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
   return (
-      <>
-      <Typography
-        variant="h5"
-        fontWeight="bold"
-        color="primary"
-        sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}
-      >
-        <Iconify icon="solar:chart-bold" width={22} />
-        Credit Rating Agencies
-      </Typography>
+    <>
+      <Stack direction="row" spacing={2} sx={{ p: 2 }} justifyContent="space-between">
+        <Typography
+          variant="h5"
+          fontWeight="bold"
+          color="primary"
+          sx={{ display: 'flex', alignItems: 'center', gap: 1}}
+        >
+          <Iconify icon="solar:chart-bold" width={22} />
+          Credit Rating Agencies
+        </Typography>
+        <Stack direction={'row'} spacing={2}>
+          <Button
+            variant="contained"
+            disabled={selectedAgencyIds.length === 0}
+            onClick={onSubmit}
+          >
+            Send Request
+          </Button>
+        </Stack>
+      </Stack>
 
       {showError && (
         <Alert severity="error" sx={{ mb: 2 }}>
@@ -144,13 +156,6 @@ export default function CreditRatingAgency() {
           );
         })}
       </Grid>
-
-      {/* Save */}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
-        <Button variant="contained" onClick={onSubmit}>
-          Save
-        </Button>
-      </Box>
     </>
   );
 }

@@ -19,11 +19,12 @@ export default function CapitalDetails({ currentCapitalDetails, setPercent, setP
   const capitalSchema = Yup.object().shape({
     shareCapital: Yup.number()
       .typeError('Share Capital must be a number')
-      .min(0, 'Cannot be negative')
+      .min(1, 'Cannot be negative')
       .required('Share Capital is required'),
 
     reserveSurplus: Yup.number()
       .typeError('Reserve Surplus must be a number')
+      .min(1, 'Cannot be negative')
       .required('Reserve Surplus is required'),
 
     netWorth: Yup.number()

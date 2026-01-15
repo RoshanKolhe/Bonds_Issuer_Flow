@@ -9,7 +9,7 @@ import DownloadButton from './download-button';
 // ----------------------------------------------------------------------
 
 export default function FileThumbnail({ file, tooltip, imageView, onDownload, sx, imgSx }) {
-  const { fileOriginalName = '', path = '', fileUrl = '' } = fileData(file);
+  const { name = '', path = '', fileUrl = '' } = fileData(file);
 
   const format = fileFormat(path || fileUrl);
 
@@ -49,7 +49,7 @@ export default function FileThumbnail({ file, tooltip, imageView, onDownload, sx
 
   if (tooltip) {
     return (
-      <Tooltip title={fileOriginalName}>
+      <Tooltip title={name}>
         <Stack
           flexShrink={0}
           component="span"

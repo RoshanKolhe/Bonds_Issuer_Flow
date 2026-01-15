@@ -102,7 +102,7 @@ export default function DebentureTrusteeListView() {
 
   return (
     <>
-      <Container maxWidth={settings.themeStretch ? false : 'lg'}>
+      <Container maxWidth={settings.themeStretch ? false : 'lg'} disableGutters sx={{p: 0}}>
         <Stack
           direction="row"
           alignItems="center"
