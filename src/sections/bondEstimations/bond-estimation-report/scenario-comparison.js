@@ -22,8 +22,8 @@ import {
 export default function ScenarioComparison({systemRecommendedInputs , userInputs}) {
 
     const metrics = [
-        { title: "User Requirement ", value:  `₹ ${userInputs.issueAmount}`, img: "/assets/icons/scenario-comparison/user-requirment.png", label: "Projected issue amount" },
-        { title: "System Recommended Issue amount", value: `₹ ${systemRecommendedInputs.issueAmount}` ,img: "/assets/icons/scenario-comparison/system-issue.png", label: "Optimal" },
+        { title: "User Requirement ", value:`₹ ${userInputs?.issueAmount}`, img: "/assets/icons/scenario-comparison/user-requirment.png", label: "Projected issue amount" },
+        { title: "System Recommended Issue amount", value:`₹ ${systemRecommendedInputs?.issueAmount}` ,img: "/assets/icons/scenario-comparison/system-issue.png", label: "Optimal" },
 
     ];
 
@@ -31,35 +31,35 @@ export default function ScenarioComparison({systemRecommendedInputs , userInputs
     const comparisonData = [
         {
             parameter: "Issue Size",
-            userInput:  `₹ ${userInputs.issueAmount}`,
-            systemRec: `₹ ${systemRecommendedInputs.issueAmount}`,
+            userInput: `₹ ${userInputs?.issueAmount}`,
+            systemRec: `₹ ${systemRecommendedInputs?.issueAmount}`,
             better: false,
         },
         {
             parameter: "Coupon Rate",
-            userInput: `${userInputs.couponRate} %`,
-            systemRec: `${systemRecommendedInputs.couponRate} %`,
+            userInput: `${userInputs?.couponRate} %`,
+            systemRec: `${systemRecommendedInputs?.couponRate} %`,
             better: true,
             betterLabel: "Better",
         },
         {
             parameter: "Tenure",
-            userInput: `${userInputs.tenure} Years`,
-            systemRec: `${systemRecommendedInputs.tenure} Years`,
+            userInput: `${userInputs?.tenure} Years`,
+            systemRec: `${systemRecommendedInputs?.tenure} Years`,
             better: true,
             betterLabel: "Better",
         },
         {
             parameter: "Security Type",
-            userInput: `${userInputs.securityType}`,
-            systemRec: `${systemRecommendedInputs.securityType}`,
+            userInput: `${userInputs?.securityType}`,
+            systemRec: `${systemRecommendedInputs?.securityType}`,
             better: true,
             betterLabel: "Better",
         },
         {
             parameter: "Est. Total Cost",
-            userInput: `${userInputs.estimatedTotalCost}`,
-            systemRec: `${systemRecommendedInputs.estimatedTotalCost}`,
+            userInput: `${userInputs?.estimatedTotalCost}`,
+            systemRec: `${systemRecommendedInputs?.estimatedTotalCost}`,
             better: true,
             betterLabel: "Save ₹2.25",
         },

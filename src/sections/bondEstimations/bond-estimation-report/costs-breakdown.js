@@ -23,13 +23,13 @@ function getChartPercentages(costData) {
 // ------------------------------------------------------
 export default function CostsBreakdown({breakdown}) {
     const COST_DATA = [
-        { name: "Professional & Advisory Fees", value: `₹ ${breakdown.professionalAdvisoryFees}`, color: "#00A76F", img:"/assets/icons/costs-breakdown/professional-fees.svg" },
-        { name: "Regulatory & Statutory Costs", value: `₹ ${breakdown.regulatoryStatutoryCosts}`, color: "#FFAB00", img:"/assets/icons/costs-breakdown/regulatory-costs.svg"  },
-        { name: "Placement & Distribution Costs", value: `₹ ${breakdown.placementDistributionCosts}`, color: "#FF5630", img:"/assets/icons/costs-breakdown/placement-costs.svg"  },
-        { name: "Documentation & Printing", value: `₹ ${breakdown.documentationPrinting}`, color: "#00D5E8", img:"/assets/icons/costs-breakdown/documentation-costs.svg" },
-        { name: "Miscellaneous Costs", value: `₹ ${breakdown.miscellaneousCosts}`, color: "#C738FF", img:"/assets/icons/costs-breakdown/costs-miscall.svg"  },
-        { name: "Security Creation & Compliance Costs", value: `₹ ${breakdown.securityCreationCompliance}`, color: "#6D00D9", img:"/assets/icons/costs-breakdown/security-costs.svg" },
-        { name: "Marketing & Communication", value: `₹ ${breakdown.ongoingComplianceCosts}`, color: "#070297", img:"/assets/icons/costs-breakdown/marketing-costs.svg" },
+        { name: "Professional & Advisory Fees", value: `₹ ${breakdown?.professionalAdvisoryFees}`, color: "#00A76F", img:"/assets/icons/costs-breakdown/professional-fees.svg" },
+        { name: "Regulatory & Statutory Costs", value: `₹ ${breakdown?.regulatoryStatutoryCosts}`, color: "#FFAB00", img:"/assets/icons/costs-breakdown/regulatory-costs.svg"  },
+        { name: "Placement & Distribution Costs", value: `₹ ${breakdown?.placementDistributionCosts}`, color: "#FF5630", img:"/assets/icons/costs-breakdown/placement-costs.svg"  },
+        { name: "Documentation & Printing", value: `₹ ${breakdown?.documentationPrinting}`, color: "#00D5E8", img:"/assets/icons/costs-breakdown/documentation-costs.svg" },
+        { name: "Miscellaneous Costs", value: `₹ ${breakdown?.miscellaneousCosts}`, color: "#C738FF", img:"/assets/icons/costs-breakdown/costs-miscall.svg"  },
+        { name: "Security Creation & Compliance Costs", value: `₹ ${breakdown?.securityCreationCompliance}`, color: "#6D00D9", img:"/assets/icons/costs-breakdown/security-costs.svg" },
+        { name: "Marketing & Communication", value: `₹ ${breakdown?.ongoingComplianceCosts}`, color: "#070297", img:"/assets/icons/costs-breakdown/marketing-costs.svg" },
     ];
 
     const CHART_DATA = getChartPercentages(COST_DATA);

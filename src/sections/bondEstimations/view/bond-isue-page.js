@@ -119,8 +119,11 @@ export default function BondIssuePage() {
   console.log('BondsEstimation Data', bondEstimationReport)
 
   useEffect(() => {
-    setEstimationData(bondEstimationReport);
-  }, []);
+    if (bondEstimationReport) {
+      setEstimationData(bondEstimationReport);
+    }
+  }, [bondEstimationReport]);
+
 
   if (!estimationData) return null;
 
@@ -143,7 +146,7 @@ export default function BondIssuePage() {
         />
 
         <IssueInvestmentMatrics subscriptionTarget={subscriptionTarget} proposedTarget={proposedTarget} />
-        <ScenarioComparison systemRecommendedInputs={systemRecommendedInputs} userInputs={userInputs}  />
+        <ScenarioComparison systemRecommendedInputs={systemRecommendedInputs} userInputs={userInputs} />
         <CostsBreakdown breakdown={costBreakdown} />
         <MarketComparisons bonds={mockBonds} />
 
