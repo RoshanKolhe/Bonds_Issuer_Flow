@@ -60,7 +60,6 @@ export default function CompanyAccountGeneral() {
     country: Yup.string().required('Country is required'),
     entityType: Yup.string().required('Entity Type is required'),
     panNumber: Yup.string().required('Pan Number is required'),
-    dateOfBirth: Yup.date().nullable().required('Date of Birth is required'),
     panHoldersName: Yup.string().required('Pan Holders Name is required'),
     sector: Yup.string().required('Sector is required'),
     companyLogo: Yup.object().nullable(),
@@ -81,7 +80,6 @@ export default function CompanyAccountGeneral() {
       companyAbout: '',
       entityType: '',
       panNumber: '',
-      dateOfBirth: null,
       panHoldersName: '',
       sector: '',
       companyLogo: null,
@@ -129,9 +127,6 @@ export default function CompanyAccountGeneral() {
             sector: companyData.companySectorType?.value || '',
 
             panNumber: companyData.companyPanCards?.submittedPanNumber || '',
-            dateOfBirth: companyData.companyPanCards?.submittedDateOfBirth
-              ? dayjs(companyData.companyPanCards.submittedDateOfBirth).toDate()
-              : null,
             panHoldersName: companyData.companyPanCards?.submittedCompanyName || '',
 
             companyAbout: companyData.companyAbout || '',
@@ -229,7 +224,7 @@ export default function CompanyAccountGeneral() {
       if (response?.data?.success) {
         enqueueSnackbar('Company profile updated successfully!', { variant: 'success' });
       } else {
-        enqueueSnackbar(response?.data?.message || 'Update failed', { variant: 'error' });
+        enqueueSnackbar(response?.error?.error?.message || 'Update failed', { variant: 'error' });
       }
     } catch (error) {
       console.error('Update error:', error);
@@ -292,9 +287,11 @@ export default function CompanyAccountGeneral() {
                   <Grid xs={12} md={6}>
                     <Controller
                       name="dateOfIncorporation"
+                    
                       control={control}
                       render={({ field, fieldState: { error } }) => (
                         <DatePicker
+                          label="Date of incorporation"
                           disabled
                           value={field.value}
                           onChange={(newValue) => field.onChange(newValue)}
@@ -318,12 +315,16 @@ export default function CompanyAccountGeneral() {
                       disabled
                     />
                   </Grid>
-
                   <Grid xs={12} md={6}>
+                   <RHFTextField name="city" label="City of incorporation" placeholder="City" disabled sx={{ flex: 1 }} />
+                   </Grid>
+
+                  <Grid xs={12} md={12}>
                     <Stack spacing={2} direction={{ xs: 'column', sm: 'row' }}>
-                      <RHFTextField name="city" placeholder="City" disabled sx={{ flex: 1 }} />
+                     
                       <RHFSelect
                         name="state"
+                        label="State of incorporation"
                         disabled
                         sx={{ flex: 1 }}
                         SelectProps={{ displayEmpty: true }}
@@ -332,6 +333,7 @@ export default function CompanyAccountGeneral() {
                       </RHFSelect>
                       <RHFAutocomplete
                         name="country"
+                        label="Country of incorporation"
                         disabled
                         placeholder="Country"
                         sx={{ flex: 1 }}
@@ -355,26 +357,26 @@ export default function CompanyAccountGeneral() {
                     </Stack>
                   </Grid>
 
-                  <Grid xs={12} md={6}>
+                  <Grid xs={12} md={12}>
                     <Stack spacing={2} direction={{ xs: 'column', sm: 'row' }}>
-                      <Box sx={{ flex: 1 }}>
-                        <RHFSelect name="entityType" disabled>
+                    
+                        <RHFSelect name="entityType" label="Entity type" disabled>
                           <MenuItem value="sole_proprietorship">Sole Proprietorship</MenuItem>
                           <MenuItem value="private_limited">Private Limited</MenuItem>
                           <MenuItem value="public_limited">Public Limited</MenuItem>
                           <MenuItem value="llp">LLP</MenuItem>
                           <MenuItem value="opc">OPC</MenuItem>
                         </RHFSelect>
-                      </Box>
+                 
 
-                      <Box sx={{ flex: 1 }}>
-                        <RHFSelect name="sector" disabled>
+                    
+                        <RHFSelect name="sector" label="Sector type" disabled>
                           <MenuItem value="it">IT</MenuItem>
                           <MenuItem value="banking">Banking</MenuItem>
                           <MenuItem value="infrastructure">Infrastructure</MenuItem>
                           <MenuItem value="others">Others</MenuItem>
                         </RHFSelect>
-                      </Box>
+                  
                     </Stack>
                   </Grid>
                 </Grid>
@@ -393,36 +395,14 @@ export default function CompanyAccountGeneral() {
               />
             </Grid>
 
-            {/* -------------------- DATE OF BIRTH -------------------- */}
-            <Grid item xs={12} md={6}>
-              <Controller
-                name="dateOfBirth"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <DatePicker
-                    value={field.value}
-                    disabled
-                    onChange={(newValue) => field.onChange(newValue)}
-                    format="dd-MM-yyyy"
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        placeholder: 'DD-MM-YYYY',
-                        error: !!error,
-                        helperText: error?.message,
-                      },
-                    }}
-                  />
-                )}
-              />
-            </Grid>
+        
             <Grid item xs={12} md={6}>
               <RHFTextField name="panHoldersName" disabled placeholder="Enter Name as per PAN" />
             </Grid>
             <Grid item xs={12} md={12}>
               <RHFTextField
                 name="companyAbout"
-                placeholder="Enter abount company"
+                placeholder="Enter about company"
                 multiline
                 rows={4}
               />

@@ -69,8 +69,8 @@ export default function SignatoriesDetails({ currentUser, isViewMode, isEditMode
             customDesignation:
                 currentUser?.designationType === 'CUSTOM' ? currentUser.designationValue : '',
 
-            panCard: currentUser?.panCardFileId || null,
-            boardResolution: currentUser?.boardResolutionFileId || null,
+            panCard: currentUser?.panCardFile || null,
+            boardResolution: currentUser?.boardResolutionFile || null,
 
             submittedPanFullName: currentUser?.submittedPanFullName || '',
             submittedPanNumber: currentUser?.submittedPanNumber || '',
@@ -79,6 +79,8 @@ export default function SignatoriesDetails({ currentUser, isViewMode, isEditMode
         }),
         [currentUser]
     );
+
+    console.log('View Defaulr Values', defaultValues)
 
 
     const methods = useForm({
@@ -202,8 +204,8 @@ export default function SignatoriesDetails({ currentUser, isViewMode, isEditMode
                                 panFile
                                     ? {
                                         id: panFile.id,
-                                        name: panFile.fileOriginalName,
-                                        url: panFile.fileUrl,
+                                        fileOriginalName: panFile.fileOriginalName,
+                                        fileUrl: panFile.fileUrl,
                                     }
                                     : null
                             }
@@ -244,8 +246,8 @@ export default function SignatoriesDetails({ currentUser, isViewMode, isEditMode
                                 boardFile
                                     ? {
                                         id: boardFile.id,
-                                        name: boardFile.fileOriginalName,
-                                        url: boardFile.fileUrl,
+                                        fileOriginalName: boardFile.fileOriginalName,
+                                        fileUrl: boardFile.fileUrl,
                                     }
                                     : null
                             }

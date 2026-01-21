@@ -103,16 +103,16 @@ export default function SignatoriesNewEditForm({
       panCard: currentUser?.panCardFile
         ? {
           id: currentUser.panCardFile.id,
-          name: currentUser.panCardFile.fileOriginalName,
-          url: currentUser.panCardFile.fileUrl,
+          fileOriginalName: currentUser.panCardFile.fileOriginalName,
+          fileUrl: currentUser.panCardFile.fileUrl,
         }
         : null,
 
       boardResolution: currentUser?.boardResolutionFile
         ? {
           id: currentUser.boardResolutionFile.id,
-          name: currentUser.boardResolutionFile.fileOriginalName,
-          url: currentUser.boardResolutionFile.fileUrl,
+          fileOriginalName: currentUser.boardResolutionFile.fileOriginalName,
+          fileUrl: currentUser.boardResolutionFile.fileUrl,
         }
         : null,
 
@@ -125,8 +125,12 @@ export default function SignatoriesNewEditForm({
       submittedPanFullName:
         currentUser?.submittedPanFullName || currentUser?.extractedPanFullName || '',
       submittedPanNumber: currentUser?.submittedPanNumber || currentUser?.extractedPanNumber || '',
-      submittedDateOfBirth:
-        currentUser?.submittedDateOfBirth || currentUser?.extractedDateOfBirth || '',
+      submittedDateOfBirth: currentUser?.submittedDateOfBirth
+        ? new Date(currentUser.submittedDateOfBirth)
+        : currentUser?.extractedDateOfBirth
+          ? new Date(currentUser.extractedDateOfBirth)
+          : null,
+
     };
   }, [currentUser]);
 
@@ -135,10 +139,18 @@ export default function SignatoriesNewEditForm({
     defaultValues,
   });
 
+  console.log('Default Values', defaultValues)
+
+
   const panCard = useWatch({
     control: methods.control,
     name: 'panCard',
   });
+
+  useEffect(() => {
+    setIsPanUploaded(!!panCard?.id);
+  }, [panCard?.id]);
+
   const {
     reset,
     handleSubmit,
@@ -181,9 +193,10 @@ export default function SignatoriesNewEditForm({
         const formData = new FormData();
         formData.append('fileId', panCard.id);
         const extractRes = await axiosInstance.post('/extract/pan-info', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },})
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
 
         const panData = extractRes?.data?.data || extractRes?.data;
 
@@ -242,41 +255,45 @@ export default function SignatoriesNewEditForm({
       const isCustom = data.role === 'OTHER';
       const signatoryId = currentUser?.id;
 
-      const payload = {
-        signatory: {
-          fullName: data.name,
-          email: data.email,
-          phone: data.phoneNumber,
+      const signatoryData = {
+        fullName: data.name,
+        email: data.email,
+        phone: data.phoneNumber,
 
-          // Extracted PAN details (from OCR)
-          extractedPanFullName: extractedPan?.extractedPanFullName || '',
-          extractedPanNumber: extractedPan?.extractedPanNumber || '',
-          extractedDateOfBirth: extractedPan?.extractedDateOfBirth || '',
+        extractedPanFullName: extractedPan?.extractedPanFullName || '',
+        extractedPanNumber: extractedPan?.extractedPanNumber || '',
+        ...(extractedPan?.extractedDateOfBirth && {
+          extractedDateOfBirth: new Date(extractedPan.extractedDateOfBirth)
+            .toISOString()
+            .split('T')[0],
+        }),
 
-          // Submitted PAN details (after human check / edit)
-          submittedPanFullName: data.submittedPanFullName,
-          submittedPanNumber: data.submittedPanNumber,
-          submittedDateOfBirth: data.submittedDateOfBirth,
+        submittedPanFullName: data.submittedPanFullName,
+        submittedPanNumber: data.submittedPanNumber,
+        submittedDateOfBirth: data.submittedDateOfBirth
+          ? new Date(data.submittedDateOfBirth).toISOString().split('T')[0]
+          : '',
 
-          panCardFileId: data.panCard?.id ? String(data.panCard.id) : null,
-          boardResolutionFileId: data.boardResolution?.id
-            ? String(data.boardResolution.id)
-            : null,
-          designationType: isCustom ? 'custom' : 'dropdown',
-          designationValue: isCustom
-            ? data.customDesignation
-            : ROLES.find((r) => r.value === data.role)?.label || data.role,
-        },
+        panCardFileId: data.panCard?.id ? String(data.panCard.id) : null,
+        boardResolutionFileId: data.boardResolution?.id
+          ? String(data.boardResolution.id)
+          : null,
+
+        designationType: isCustom ? 'custom' : 'dropdown',
+        designationValue: isCustom
+          ? data.customDesignation
+          : ROLES.find((r) => r.value === data.role)?.label || data.role,
       };
-
       let res;
-
       if (!currentUser?.id) {
-        res = await axiosInstance.post('/company-profiles/authorize-signatory', payload);
+        res = await axiosInstance.post(
+          '/company-profiles/authorize-signatory',
+          { signatory: signatoryData }
+        );
       } else {
         res = await axiosInstance.patch(
           `/company-profiles/authorize-signatory/${signatoryId}`,
-          payload
+          signatoryData
         );
       }
 
@@ -363,7 +380,12 @@ export default function SignatoriesNewEditForm({
             <RHFCustomFileUploadBox
               name="panCard"
               label="Upload PAN*"
-              disabled= ""
+              disabled={isViewMode}
+              accept={{
+                'application/pdf': ['.pdf'],
+              }}
+
+
             // accept="application/pdf,image/*"
             // fileType="pan"
             // required={!isEditMode}
@@ -384,6 +406,7 @@ export default function SignatoriesNewEditForm({
               label="PAN Holder Full Name*"
               disabled={!isPanUploaded || isViewMode}
               InputLabelProps={{ shrink: true }}
+              inputProps={{ style: { textTransform: 'uppercase' } }}
             />
           </Grid>
 
@@ -420,6 +443,9 @@ export default function SignatoriesNewEditForm({
             <RHFCustomFileUploadBox
               name="boardResolution"
               label="Board Resolution*"
+              accept={{
+                'application/pdf': ['.pdf'],
+              }}
             />
             {getErrorMessage('boardResolution')}
           </Grid>

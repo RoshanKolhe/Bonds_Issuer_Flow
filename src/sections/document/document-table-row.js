@@ -60,9 +60,10 @@ export default function DocumentTableRow({ row, selected, onSelectRow, onViewRow
               <Iconify icon="carbon:view-filled" />
             </IconButton>
           </Tooltip> */}
-        <Tooltip title="Edit" placement="top">
+        <Tooltip title="Draft" placement="top">
           <IconButton onClick={onEditRow}>
-            <Iconify icon="solar:pen-bold" />
+            <Iconify icon="solar:document-text-bold" />
+
           </IconButton>
         </Tooltip>
       </TableCell>

@@ -195,7 +195,7 @@ export default function DocumentFormPreview({
     return (
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
             <Typography variant="h5" sx={{ mb: 3 }}>
-                Document Form Preview
+                Document Form
             </Typography>
 
             {sections.length === 0 ? (

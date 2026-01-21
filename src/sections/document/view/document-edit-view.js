@@ -40,7 +40,7 @@ export default function DocumentEditView() {
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
       <CustomBreadcrumbs
-        heading="Preview Document"
+        heading="Draft Document"
         links={[
           { name: 'Dashboard', href: paths.dashboard.root },
           { name: 'Documents', href: paths.dashboard.documentDrafting.list },
