@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useParams } from 'react-router';
 import { useGetInvestorCategories } from 'src/api/investorCategories';
-import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
+import FormProvider, { RHFPriceField, RHFSelect, RHFTextField } from 'src/components/hook-form';
 import axiosInstance from 'src/utils/axios';
 import * as Yup from 'yup';
 
@@ -152,11 +152,10 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
 
                             {/* Issue Amount */}
                             <Box sx={{ mb: 3 }}>
-                                <RHFTextField
+                                <RHFPriceField
                                     name="issueAmount"
                                     fullWidth
                                     size="small"
-                                    type="number"
                                     placeholder="₹ 500,00,000"
                                     variant="outlined"
                                     label="Issue Amount"

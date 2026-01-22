@@ -14,6 +14,7 @@ import {
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
 import FormProvider, {
     RHFCustomFileUploadBox,
+    RHFPriceField,
     RHFSelect,
     RHFTextField,
 } from 'src/components/hook-form';
@@ -341,7 +342,7 @@ export default function CollateralAssets({
 
                             {/* Estimated Value */}
                             <Grid item xs={12} md={4}>
-                                <RHFTextField name={`collateralAssets.${index}.estimatedValue`} label="Estimated Value" fullWidth />
+                                <RHFPriceField name={`collateralAssets.${index}.estimatedValue`} label="Estimated Value" fullWidth />
                             </Grid>
 
                             {/* Security Document Ref */}

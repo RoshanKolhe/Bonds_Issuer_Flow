@@ -9,7 +9,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
+import FormProvider, { RHFPriceField, RHFSelect, RHFTextField } from 'src/components/hook-form';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -330,11 +330,9 @@ export default function IssueDetailsCard({
               />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <RHFTextField
+              <RHFPriceField
                 name="issueSize"
                 label="Issue Size*"
-                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-                onInput={(e) => (e.target.value = e.target.value.replace(/[^0-9.]/g, ''))}
               />
             </Grid>
             <Grid item xs={12} sm={4}>
@@ -357,7 +355,7 @@ export default function IssueDetailsCard({
               />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <RHFTextField name="minimumInvestmentPrice" label="Minimum Investment Price" placeholder="Auto calculated" disabled />
+              <RHFPriceField name="minimumInvestmentPrice" label="Minimum Investment Price" placeholder="Auto calculated" disabled />
             </Grid>
           </Grid>
           <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>

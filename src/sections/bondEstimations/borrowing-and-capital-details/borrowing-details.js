@@ -11,6 +11,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import FormProvider, {
+    RHFPriceField,
     RHFSelect,
     RHFTextField,
 } from 'src/components/hook-form';
@@ -215,11 +216,11 @@ export default function BorrowingDetails({ currentBorrowingDetails, setPercent, 
                             </Grid>
 
                             <Grid item xs={12} md={3}>
-                                <RHFTextField
+                                <RHFPriceField
                                     name={`borrowings[${index}].lenderAmount`}
                                     label="Lender Amount"
                                     fullWidth
-                                    type="number"
+                                    // type="number"
                                 />
                             </Grid>
 

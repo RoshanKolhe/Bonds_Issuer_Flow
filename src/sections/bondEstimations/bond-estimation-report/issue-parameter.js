@@ -128,34 +128,34 @@ export default function BondIssueParameters({
                             "Issue Size (₹)",
                             issueSize,
                             setIssueSize,
-                            10000,
-                            100000,
-                            1000,
+                            10000000,
+                            5000000000,
+                            10000000,
                             "",
-                            "Min ₹10k",
-                            "Max ₹1 Lakh"
+                            "Min ₹1 Cr",
+                            "Max ₹500 Cr"
                         )}
                         {renderSlider(
                             "Coupon rate (%)",
                             couponRate,
                             setCouponRate,
-                            8,
-                            15,
-                            0.5,
+                            1,
+                            25,
+                            1,
                             "%",
-                            "Min 8%",
-                            "Max 15%"
+                            "Min 1%",
+                            "Max 25%"
                         )}
                         {renderSlider(
                             "Tenure (Year)",
                             tenure,
                             setTenure,
                             1,
-                            15,
+                            30,
                             1,
                             "",
                             "Min 1 year",
-                            "Max 15 Years"
+                            "Max 30 Years"
                         )}
                     </Stack>
                 </Grid>

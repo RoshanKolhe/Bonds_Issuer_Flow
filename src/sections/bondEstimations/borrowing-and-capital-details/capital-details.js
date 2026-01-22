@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { Box, Grid, Card, Typography } from '@mui/material';
 
-import FormProvider, { RHFTextField } from 'src/components/hook-form';
+import FormProvider, { RHFPriceField, RHFTextField } from 'src/components/hook-form';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import PropTypes from 'prop-types';
@@ -24,7 +24,6 @@ export default function CapitalDetails({ currentCapitalDetails, setPercent, setP
 
     reserveSurplus: Yup.number()
       .typeError('Reserve Surplus must be a number')
-      .min(1, 'Cannot be negative')
       .required('Reserve Surplus is required'),
 
     netWorth: Yup.number()
@@ -126,11 +125,10 @@ export default function CapitalDetails({ currentCapitalDetails, setPercent, setP
           <Grid container spacing={1} alignItems="center">
             {/* Share Capital */}
             <Grid item xs={12} md={3}>
-              <RHFTextField
+              <RHFPriceField
                 name="shareCapital"
                 label="Share Capital"
                 fullWidth
-                type="number"
               />
             </Grid>
 
@@ -143,11 +141,10 @@ export default function CapitalDetails({ currentCapitalDetails, setPercent, setP
 
             {/* Reserve Surplus */}
             <Grid item xs={12} md={3}>
-              <RHFTextField
+              <RHFPriceField
                 name="reserveSurplus"
                 label="Reserve Surplus"
                 fullWidth
-                type="number"
               />
             </Grid>
 
@@ -160,11 +157,10 @@ export default function CapitalDetails({ currentCapitalDetails, setPercent, setP
 
             {/* Net Worth (auto-calculated) */}
             <Grid item xs={12} md={4}>
-              <RHFTextField
+              <RHFPriceField
                 name="netWorth"
                 label="Net Worth"
                 fullWidth
-                type="number"
                 InputProps={{ readOnly: true }}
               />
             </Grid>

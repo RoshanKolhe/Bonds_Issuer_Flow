@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { Box, Grid, Card, Typography } from '@mui/material';
 
-import FormProvider, { RHFTextField } from 'src/components/hook-form';
+import FormProvider, { RHFPriceField, RHFTextField } from 'src/components/hook-form';
 import { useForm, useFieldArray, useFormContext } from 'react-hook-form';
 import * as Yup from 'yup';
 import PropTypes from 'prop-types';
@@ -100,11 +100,11 @@ export default function ProfitabilityDetails({
 
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} md={6}>
-              <RHFTextField name="netProfit" label="Net Profit" fullWidth type="number" />
+              <RHFPriceField name="netProfit" label="Net Profit" fullWidth  />
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <RHFTextField name="ebidta" label="Enter EBIDTA Amount" fullWidth type="number" />
+              <RHFPriceField name="ebidta" label="Enter EBIDTA Amount" fullWidth />
             </Grid>
           </Grid>
 

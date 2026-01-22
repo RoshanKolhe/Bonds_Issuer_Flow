@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { Box, Grid, Card, Typography } from '@mui/material';
 
-import FormProvider, { RHFTextField } from 'src/components/hook-form';
+import FormProvider, { RHFPriceField, RHFTextField } from 'src/components/hook-form';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import PropTypes from 'prop-types';
@@ -20,11 +20,12 @@ export default function ProfitabilityDetails({ currentProfitabilityDetails, setP
 
   const profitableSchema = Yup.object().shape({
     netProfit: Yup.number()
+      .required('Net Profit is required')
       .typeError('Net Profit must be a number')
-      .required('Net Profit is required'),
+    ,
     EBIDTA: Yup.number()
       .typeError('EBIDTA must be a number')
-      .min(1000000 ,'Minimum 10 lakh required')
+      .min(1000000, 'Minimum 10 lakh required')
       .required('EBIDTA amount is required'),
   });
 
@@ -58,7 +59,7 @@ export default function ProfitabilityDetails({ currentProfitabilityDetails, setP
     } catch (error) {
       enqueueSnackbar(
         error?.error?.message ||
-        'Error while submitting profitability details form :', {variant:'error'}
+        'Error while submitting profitability details form :', { variant: 'error' }
       )
       console.error('Error while submitting profitability details form :', error);
     }
@@ -109,20 +110,18 @@ export default function ProfitabilityDetails({ currentProfitabilityDetails, setP
           <Grid container spacing={2} alignItems="center">
 
             <Grid item xs={12} md={6}>
-              <RHFTextField
+              <RHFPriceField
                 name="netProfit"
                 label="Net Profit"
                 fullWidth
-                type="number"
               />
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <RHFTextField
+              <RHFPriceField
                 name="EBIDTA"
                 label="Enter EBIDTA Amount"
                 fullWidth
-                type="number"
               />
             </Grid>
           </Grid>

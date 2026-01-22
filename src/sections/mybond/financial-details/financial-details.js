@@ -4,7 +4,7 @@ import { Box, Grid, Card, Typography } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import FormProvider, { RHFTextField } from 'src/components/hook-form';
+import FormProvider, { RHFPriceField, RHFTextField } from 'src/components/hook-form';
 import PropTypes from 'prop-types';
 
 export default function FinancialDetails({
@@ -106,7 +106,7 @@ export default function FinancialDetails({
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <RHFTextField name="netWorth" label="Net Worth" fullWidth />
+              <RHFPriceField name="netWorth" label="Net Worth" fullWidth />
             </Grid>
 
             <Grid item xs={12} md={6}>

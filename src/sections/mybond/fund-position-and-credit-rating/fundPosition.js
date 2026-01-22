@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useGetBondApplicationStepData } from 'src/api/bondApplications';
-import FormProvider, { RHFTextField } from 'src/components/hook-form';
+import FormProvider, { RHFPriceField, RHFTextField } from 'src/components/hook-form';
 import { useParams } from 'src/routes/hook';
 import axiosInstance from 'src/utils/axios';
 import * as Yup from 'yup';
@@ -123,7 +123,7 @@ export default function FundPosition({
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={3}>
-            <RHFTextField name="cashBalance" label="Cash Balance as on Date" fullWidth />
+            <RHFPriceField name="cashBalance" label="Cash Balance as on Date" fullWidth />
           </Grid>
           <Grid item xs={12} md={3}>
             <Controller
@@ -154,7 +154,7 @@ export default function FundPosition({
             />
           </Grid>
           <Grid item xs={12} md={3}>
-            <RHFTextField name="bankBalance" label="Bank Balance as on Date" fullWidth />
+            <RHFPriceField name="bankBalance" label="Bank Balance as on Date" fullWidth />
           </Grid>
           <Grid item xs={12} md={3}>
             <Controller
