@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Grid,
   Typography,
@@ -21,10 +21,24 @@ export default function CreditRatingAgency() {
   const { enqueueSnackbar } = useSnackbar();
   const params = useParams();
   const { applicationId } = params;
-  const { creditRatingAgencies = [], creditRatingAgenciesLoading } = useGetCreditRatingAgencies();
+  const { creditRatingAgencies = [], creditRatingAgenciesLoading } =
+    useGetCreditRatingAgencies();
 
   const [selectedAgencyIds, setSelectedAgencyIds] = useState([]);
   const [showError, setShowError] = useState(false);
+  const [requestSent, setRequestSent] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(
+      `credit_rating_trustee_request_${applicationId}`
+    );
+
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      setRequestSent(parsed.requestSent);
+      setSelectedAgencyIds(parsed.selectedAgencyIds || []);
+    }
+  }, [applicationId]);
 
   const handleToggle = (id) => {
     setShowError(false);
@@ -46,19 +60,29 @@ export default function CreditRatingAgency() {
       selectedAgencyIds.includes(agency.id)
     );
 
-
-    const response = await axiosInstance.post(`/bonds-pre-issue/save-intermediaries/${applicationId}`, {
-      creditRatingAgency: selectedAgencies
-    });
+    const response = await axiosInstance.post(
+      `/bonds-pre-issue/save-intermediaries/${applicationId}`,
+      {
+        creditRatingAgency: selectedAgencies,
+      }
+    );
 
     if (response?.data?.success) {
       enqueueSnackbar('Request send successfully', { variant: 'success' });
+      setRequestSent(true);
+
+      localStorage.setItem(
+        `credit_rating_trustee_request_${applicationId}`,
+        JSON.stringify({
+          requestSent: true,
+          selectedAgencyIds,
+        })
+      );
     }
   };
 
-
   const fileUrl =
-    'https://images.unsplash.com/photo-1575936123452-b67c3203c357?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+    'https://images.unsplash.com/photo-1575936123452-b67c3203c357?q=80&w=1170&auto=format&fit=crop';
 
   return (
     <>
@@ -67,20 +91,19 @@ export default function CreditRatingAgency() {
           variant="h5"
           fontWeight="bold"
           color="primary"
-          sx={{ display: 'flex', alignItems: 'center', gap: 1}}
+          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
         >
           <Iconify icon="solar:chart-bold" width={22} />
           Credit Rating Agencies
         </Typography>
-        <Stack direction={'row'} spacing={2}>
-          <Button
-            variant="contained"
-            disabled={selectedAgencyIds.length === 0}
-            onClick={onSubmit}
-          >
-            Send Request
-          </Button>
-        </Stack>
+
+        <Button
+          variant="contained"
+          disabled={selectedAgencyIds.length === 0 || requestSent}
+          onClick={onSubmit}
+        >
+          Send Request
+        </Button>
       </Stack>
 
       {showError && (
@@ -100,42 +123,34 @@ export default function CreditRatingAgency() {
                   p: 2.5,
                   height: '100%',
                   position: 'relative',
-                  border: checked ? '2px solid #1877F2' : '1px solid #e0e0e0',
+                  border: checked
+                    ? '2px solid #1877F2'
+                    : '1px solid #e0e0e0',
+                  pointerEvents: requestSent ? 'none' : 'auto',
+                  opacity: requestSent ? 0.6 : 1,
                   transition: '0.2s',
                 }}
               >
                 <Checkbox
                   checked={checked}
+                  disabled={requestSent}
                   onChange={() => handleToggle(agency.id)}
                   sx={{ position: 'absolute', top: 8, right: 8 }}
                 />
-                <Box
-                  sx={{
-                    width: '100%',
-                    height: 60,
-                    mb: 1.5,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                  }}
-                >
+
+                <Box sx={{ height: 60, mb: 1.5 }}>
                   <Box
                     component="img"
                     src={agency.logo?.fileUrl || fileUrl}
                     alt={agency.name}
-                    sx={{
-                      maxHeight: 50,
-                      objectFit: 'contain',
-                    }}
+                    sx={{ maxHeight: 50, objectFit: 'contain' }}
                   />
                 </Box>
 
-                {/* Name */}
                 <Typography fontWeight={600} variant="subtitle1">
                   {agency.name}
                 </Typography>
 
-                {/* Description */}
                 <Tooltip title={agency.description || ''} arrow>
                   <Typography
                     variant="body2"

@@ -25,18 +25,20 @@ export default function CapitalDetails({
   const capitalSchema = Yup.object().shape({
     shareCapital: Yup.number()
       .typeError('Share Capital must be a number')
-      .min(0, 'Cannot be negative')
+      .min(1, 'Cannot be negative')
       .required('Share Capital is required'),
 
     reserveSurplus: Yup.number()
       .typeError('Reserve Surplus must be a number')
-      .min(0, 'Cannot be negative')
       .required('Reserve Surplus is required'),
 
     netWorth: Yup.number()
       .typeError('Net Worth must be a number')
+      .min(1000000, 'Minimum 10 lakh required')
       .required('Net Worth is required'),
   });
+
+
 
   const defaultValues = useMemo(
     () => ({
@@ -119,14 +121,14 @@ export default function CapitalDetails({
             border: '1px solid #e0e0e0',
           }}
         >
-        <Typography variant="h5"  fontWeight="bold" color="primary" mb={2}>
+          <Typography variant="h5" fontWeight="bold" color="primary" mb={2}>
             Capital Details
           </Typography>
 
           <Grid container spacing={1} alignItems="center">
             {/* Share Capital */}
             <Grid item xs={12} md={3}>
-              <RHFPriceField name="shareCapital" label="Share Capital" fullWidth  />
+              <RHFPriceField name="shareCapital" label="Share Capital" fullWidth />
             </Grid>
 
             {/* + symbol */}
@@ -138,7 +140,7 @@ export default function CapitalDetails({
 
             {/* Reserve Surplus */}
             <Grid item xs={12} md={3}>
-              <RHFPriceField name="reserveSurplus" label="Reserve Surplus" fullWidth  />
+              <RHFPriceField name="reserveSurplus" label="Reserve Surplus" fullWidth />
             </Grid>
 
             {/* = symbol */}
@@ -154,7 +156,7 @@ export default function CapitalDetails({
                 name="netWorth"
                 label="Net Worth"
                 fullWidth
-                
+
                 InputProps={{ readOnly: true }}
               />
             </Grid>

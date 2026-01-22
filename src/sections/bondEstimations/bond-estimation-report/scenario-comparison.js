@@ -15,6 +15,7 @@ import {
     TableRow,
     Chip,
 } from "@mui/material";
+import { formatNumberIN } from "src/utils/change-case";
 
 
 
@@ -22,8 +23,8 @@ import {
 export default function ScenarioComparison({systemRecommendedInputs , userInputs}) {
 
     const metrics = [
-        { title: "User Requirement ", value:`₹ ${userInputs?.issueAmount}`, img: "/assets/icons/scenario-comparison/user-requirment.png", label: "Projected issue amount" },
-        { title: "System Recommended Issue amount", value:`₹ ${systemRecommendedInputs?.issueAmount}` ,img: "/assets/icons/scenario-comparison/system-issue.png", label: "Optimal" },
+        { title: "User Requirement ", value:`₹ ${formatNumberIN(userInputs?.issueAmount)}`, img: "/assets/icons/scenario-comparison/user-requirment.png", label: "Projected issue amount" },
+        { title: "System Recommended Issue amount", value:`₹ ${formatNumberIN(systemRecommendedInputs?.issueAmount)}` ,img: "/assets/icons/scenario-comparison/system-issue.png", label: "Optimal" },
 
     ];
 
@@ -31,8 +32,8 @@ export default function ScenarioComparison({systemRecommendedInputs , userInputs
     const comparisonData = [
         {
             parameter: "Issue Size",
-            userInput: `₹ ${userInputs?.issueAmount}`,
-            systemRec: `₹ ${systemRecommendedInputs?.issueAmount}`,
+            userInput: `₹ ${formatNumberIN(userInputs?.issueAmount)}`,
+            systemRec: `₹ ${formatNumberIN(systemRecommendedInputs?.issueAmount)}`,
             better: false,
         },
         {
@@ -58,8 +59,8 @@ export default function ScenarioComparison({systemRecommendedInputs , userInputs
         },
         {
             parameter: "Est. Total Cost",
-            userInput: `${userInputs?.estimatedTotalCost}`,
-            systemRec: `${systemRecommendedInputs?.estimatedTotalCost}`,
+            userInput: `${formatNumberIN(userInputs?.estimatedTotalCost)}`,
+            systemRec: `${formatNumberIN(systemRecommendedInputs?.estimatedTotalCost)}`,
             better: true,
             betterLabel: "Save ₹2.25",
         },

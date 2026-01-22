@@ -44,15 +44,28 @@ export default function IssueDetailsCard({
   const Schema = Yup.object().shape({
     issueType: Yup.string().required('Issure type is required'),
     securityType: Yup.string().required('Please select security type'),
-    issueSize: Yup.string().required('Required'),
-    tenureYears: Yup.string().required('Required'),
+    issueSize: Yup.number()
+      .typeError('Issue size is required')
+      .positive('Must be positive')
+      .required('Issue size is required')
+      .min(10000000, 'Issue size minimum 1 Cr')
+      .max(50000000000, 'Issue size maximum 5000 Cr'),
+    tenureYears: Yup.number()
+      .typeError('Tenure must be a number')
+      .required('Tenure is required')
+      .min(1, 'Minimum tenure is 1 year')
+      .max(30, 'Maximum tenure is 30 years'),
     preferedInvestorCategory: Yup.string().when('issueType', {
       is: 'private',
       then: (schema) => schema.required('Investor category is required'),
       otherwise: (schema) => schema.notRequired(),
     }),
     preferedPaymentCycle: Yup.string().required('Payment cycle is required'),
-    couponRate: Yup.string().required('Required'),
+    couponRate: Yup.number()
+      .typeError('Coupon rate must be a number')
+      .required('Coupon rate is required')
+      .min(1, 'Minimum coupon rate is 1 %')
+      .max(30, 'Maximum coupon rate is 25 %'),
     minimumInvestmentPrice: Yup.string().required('Required'),
     redemptionType: Yup.string().required('Required'),
     minimumPurchaseUnit: Yup.string().required('Required'),

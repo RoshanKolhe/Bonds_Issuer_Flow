@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Card,
   Container,
@@ -48,6 +48,18 @@ export default function DebentureTrusteeListView() {
   const [selected, setSelected] = useState([]);
   const [openView, setOpenView] = useState(false);
   const [currentTrustee, setCurrentTrustee] = useState(null);
+  const [requestSent, setRequestSent] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(`debenturee_trustee_request_${applicationId}`);
+
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      setRequestSent(parsed.requestSent);
+      setSelected(parsed.selected || []);
+    }
+  }, [applicationId]);
+
 
   const filteredData = DEBENTURE_TRUSTEES.filter((item) =>
     item.legalEntityName.toLowerCase().includes(filterName.toLowerCase())
@@ -93,16 +105,24 @@ export default function DebentureTrusteeListView() {
 
       if (response?.data?.success) {
         enqueueSnackbar('Request send successfully', { variant: 'success' });
+        setRequestSent(true);
+        localStorage.setItem(
+          `debenturee_trustee_request_${applicationId}`,
+          JSON.stringify({
+            requestSent: true,
+            selected,
+          })
+        );
       }
     } catch (error) {
-      enqueueSnackbar( error?.error?.message || 'Failed to send request', { variant: 'error' });
+      enqueueSnackbar(error?.error?.message || 'Failed to send request', { variant: 'error' });
       console.error('error while sending request to debenture trustee :', error);
     }
   };
 
   return (
     <>
-      <Container maxWidth={settings.themeStretch ? false : 'lg'} disableGutters sx={{p: 0}}>
+      <Container maxWidth={settings.themeStretch ? false : 'lg'} disableGutters sx={{ p: 0 }}>
         <Stack
           direction="row"
           alignItems="center"
@@ -131,8 +151,8 @@ export default function DebentureTrusteeListView() {
 
             <Button
               variant="contained"
-              disabled={isSendDisabled}
-              onClick={() => console.log('Send Request:', selected)}
+              disabled={requestSent}
+              onClick={() => handleSendRequest(selected[0])}
             >
               Send Request
             </Button>
@@ -182,6 +202,7 @@ export default function DebentureTrusteeListView() {
                 onSelectRow={handleSelectRow}
                 onView={() => handleView(row.id)}
                 onSendRequest={() => handleSendRequest(row.id)}
+                requestSent={requestSent}
               />
             ))}
           </Grid>

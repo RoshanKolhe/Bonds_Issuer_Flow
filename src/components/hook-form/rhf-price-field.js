@@ -43,8 +43,14 @@ export default function RHFPriceField({ name, helperText, ...other }) {
                 return;
               }
 
-              // only numbers
-              if (/^\d+$/.test(raw)) {
+              // allow "-" while typing
+              if (raw === '-') {
+                field.onChange(raw);
+                return;
+              }
+
+              // allow positive & negative numbers
+              if (/^-?\d+$/.test(raw)) {
                 field.onChange(Number(raw));
               }
             }}

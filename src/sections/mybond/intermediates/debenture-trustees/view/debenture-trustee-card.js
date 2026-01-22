@@ -16,6 +16,8 @@ export default function DebentureTrusteeCardView({
   onSelectRow,
   onView,
   onSendRequest,
+  requestSent
+
 }) {
   return (
     <Grid item xs={12} md={6} lg={4}>
@@ -25,6 +27,8 @@ export default function DebentureTrusteeCardView({
           mb: 2,
           border: selected ? '2px solid #1877F2' : '1px solid #e0e0e0',
           transition: '0.2s',
+          pointerEvents: requestSent ? 'none' : 'auto', 
+          opacity: requestSent ? 0.6 : 1,
         }}
       >
         {/* ACTION BAR */}
@@ -34,15 +38,16 @@ export default function DebentureTrusteeCardView({
           justifyContent="space-between"
           sx={{
             mb: 1,
-            px: 0.5, 
+            px: 0.5,
           }}
         >
-        
+
           <Checkbox
-            checked={selected}
+            checked={selected}      
+            disabled={requestSent} 
             onChange={() => onSelectRow(row.id)}
             sx={{
-              p: 0.5,   
+              p: 0.5,
             }}
           />
 

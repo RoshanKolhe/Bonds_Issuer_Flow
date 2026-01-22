@@ -80,7 +80,7 @@ export default function BondIssueParameters({
                 <TextField
                     value={unit === "%" ? `${value}${unit}` : value?.toLocaleString()}
                     size="small"
-                    sx={{ width: 100 }}
+                    sx={{ width: 130 }}
                     inputProps={{
                         readOnly: true,
                         style: { textAlign: "center" },

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Card, Container, Grid, Stack, Table, TableBody, TableContainer, Typography } from '@mui/material';
 
 import Scrollbar from 'src/components/scrollbar';
@@ -38,10 +38,20 @@ export default function RtaListView() {
   const [selected, setSelected] = useState([]);
   const [openView, setOpenView] = useState(false);
   const [currentRTA, setCurrentRTA] = useState(null);
-
+  const [requestSent, setRequestSent] = useState(false);
   const filteredData = RTAS.filter((item) =>
     item.legalEntityName.toLowerCase().includes(filterName.toLowerCase())
   );
+
+   useEffect(() => {
+      const stored = localStorage.getItem(`rta_trustee_request_${applicationId}`);
+  
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setRequestSent(parsed.requestSent);
+        setSelected(parsed.selected || []);
+      }
+    }, [applicationId]);
 
   const handleSelectRow = (id) => {
     setSelected((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
@@ -68,7 +78,7 @@ export default function RtaListView() {
     setOpenView(true);
   };
 
-    const handleCloseView = () => {
+  const handleCloseView = () => {
     setOpenView(false);
     setCurrentRTA(null);
   };
@@ -84,6 +94,14 @@ export default function RtaListView() {
 
       if (response?.data?.success) {
         enqueueSnackbar('Request send successfully', { variant: 'success' });
+        setRequestSent(true);
+        localStorage.setItem(
+          `rta_trustee_request_${applicationId}`,
+          JSON.stringify({
+            requestSent: true,
+            selected,
+          })
+        );
       }
     } catch (error) {
       console.error('error while sending request to debenture trustee :', error);
@@ -92,55 +110,56 @@ export default function RtaListView() {
 
   return (
     <>
-    <Container maxWidth={settings.themeStretch ? false : 'lg'} disableGutters>
-      <Stack direction="row" spacing={2} sx={{ p: 2 }} justifyContent="space-between">
-        <Typography variant="h5"
-          fontWeight="bold"
-          color="primary"
-          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Iconify icon="solar:document-text-bold" width={20} />
-          RTA'S
-        </Typography>
-        <Stack direction={'row'} spacing={2}>
-          <Button
-            variant="contained"
-            disabled={selected.length < 2}
-            sx={{ textTransform: 'none' }}
-            onClick={handleCompare}
-          >
-            Compare
-          </Button>
+      <Container maxWidth={settings.themeStretch ? false : 'lg'} disableGutters>
+        <Stack direction="row" spacing={2} sx={{ p: 2 }} justifyContent="space-between">
+          <Typography variant="h5"
+            fontWeight="bold"
+            color="primary"
+            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Iconify icon="solar:document-text-bold" width={20} />
+            RTA'S
+          </Typography>
+          <Stack direction={'row'} spacing={2}>
+            <Button
+              variant="contained"
+              disabled={selected.length < 2}
+              sx={{ textTransform: 'none' }}
+              onClick={handleCompare}
+            >
+              Compare
+            </Button>
 
-          <Button
-            variant="contained"
-            disabled={isSendDisabled}
-            onClick={() => console.log('Send Request:', selected)}
-          >
-            Send Request
-          </Button>
+            <Button
+              variant="contained"
+              disabled={requestSent}
+              onClick={() => handleSendRequest(selected[0])}
+            >
+              Send Request
+            </Button>
+          </Stack>
         </Stack>
-      </Stack>
 
-      {/* Search */}
-      <Stack spacing={3}>
-        <RtaTableToolbar filterName={filterName} onFilterName={setFilterName} />
+        {/* Search */}
+        <Stack spacing={3}>
+          <RtaTableToolbar filterName={filterName} onFilterName={setFilterName} />
 
-        <Grid container spacing={3}>
-          {filteredData.map((row) => (
-            <RtaCardView
-              key={row.id}
-              row={row}
-              selected={selected.includes(row.id)}
-              onSelectRow={handleSelectRow}
-              onView={() => handleView(row.id)}
-              onSendRequest={() => handleSendRequest(row.id)}
-            />
-          ))}
-        </Grid>
-      </Stack>
+          <Grid container spacing={3}>
+            {filteredData.map((row) => (
+              <RtaCardView
+                key={row.id}
+                row={row}
+                selected={selected.includes(row.id)}
+                onSelectRow={handleSelectRow}
+                onView={() => handleView(row.id)}
+                onSendRequest={() => handleSendRequest(row.id)}
+                requestSent={requestSent}
+              />
+            ))}
+          </Grid>
+        </Stack>
 
-      {/* Table */}
-      {/* <TableContainer>
+        {/* Table */}
+        {/* <TableContainer>
           <Scrollbar>
             <Table sx={{ minWidth: 960 }}>
               <TableHeadCustom
@@ -167,12 +186,12 @@ export default function RtaListView() {
           </Scrollbar>
         </TableContainer> */}
 
-    </Container>
+      </Container>
 
-    <RtaViewForm data={currentRTA}
-    open={openView}
-    onClose={handleCloseView}
-    />
+      <RtaViewForm data={currentRTA}
+        open={openView}
+        onClose={handleCloseView}
+      />
     </>
   );
 }

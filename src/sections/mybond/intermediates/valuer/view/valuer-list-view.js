@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Card,
   Container,
@@ -52,10 +52,20 @@ export default function ValuerListView() {
   const [selected, setSelected] = useState([]);
   const [openView, setOpenView] = useState(false);
   const [currentValuer, setCurrentValuer] = useState(false);
-
+  const [requestSent, setRequestSent] = useState(false)
   const filteredData = VALUERS.filter((item) =>
     item.legalEntityName.toLowerCase().includes(filterName.toLowerCase())
   );
+
+  useEffect(() => {
+    const stored = localStorage.getItem(`valuer_trustee_request_${applicationId}`);
+
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      setRequestSent(parsed.requestSent);
+      setSelected(parsed.selected || []);
+    }
+  }, [applicationId]);
 
   const handleSelectRow = (id) => {
     setSelected((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
@@ -96,6 +106,14 @@ export default function ValuerListView() {
 
       if (response?.data?.success) {
         enqueueSnackbar('Request send successfully', { variant: 'success' });
+        setRequestSent(true);
+        localStorage.setItem(
+          `valuer_trustee_request_${applicationId}`,
+          JSON.stringify({
+            requestSent: true,
+            selected,
+          })
+        )
       }
     } catch (error) {
       console.error('error while sending request to debenture trustee :', error);
@@ -104,53 +122,54 @@ export default function ValuerListView() {
 
   return (
     <>
-    <Container maxWidth={settings.themeStretch ? false : 'lg'} disableGutters>
-      <Stack direction="row" spacing={2} sx={{ p: 2 }} justifyContent="space-between">
-        <Typography variant="h5"
-          fontWeight="bold"
-          color="primary"
-          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Iconify icon="solar:calculator-bold" width={22} />
-          Valuer's
-        </Typography>
-        <Stack direction={'row'} spacing={2}>
-          <Button
-            variant="contained"
-            disabled={selected.length < 2}
-            sx={{ textTransform: 'none' }}
-            onClick={handleCompare}
-          >
-            Compare
-          </Button>
+      <Container maxWidth={settings.themeStretch ? false : 'lg'} disableGutters>
+        <Stack direction="row" spacing={2} sx={{ p: 2 }} justifyContent="space-between">
+          <Typography variant="h5"
+            fontWeight="bold"
+            color="primary"
+            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Iconify icon="solar:calculator-bold" width={22} />
+            Valuer's
+          </Typography>
+          <Stack direction={'row'} spacing={2}>
+            <Button
+              variant="contained"
+              disabled={selected.length < 2}
+              sx={{ textTransform: 'none' }}
+              onClick={handleCompare}
+            >
+              Compare
+            </Button>
 
-          <Button
-            variant="contained"
-            disabled={isSendDisabled}
-            onClick={() => console.log('Send Request:', selected)}
-          >
-            Send Request
-          </Button>
+            <Button
+              variant="contained"
+              disabled={requestSent}
+              onClick={() => handleSendRequest(selected[0])}
+            >
+              Send Request
+            </Button>
+          </Stack>
         </Stack>
-      </Stack>
-      {/* Search */}
-      <Stack spacing={3}>
-        <ValuerTableToolbar filterName={filterName} onFilterName={setFilterName} />
-        <Grid container spacing={2}>
-          {filteredData.map((row) => (
-            <ValuerCardView
-              key={row.id}
-              row={row}
-              selected={selected.includes(row.id)}
-              onSelectRow={handleSelectRow}
-              onView={() => handleView(row.id)}
-              onSendRequest={() => handleSendRequest(row.id)}
-            />
-          ))}
-        </Grid>
-      </Stack>
+        {/* Search */}
+        <Stack spacing={3}>
+          <ValuerTableToolbar filterName={filterName} onFilterName={setFilterName} />
+          <Grid container spacing={2}>
+            {filteredData.map((row) => (
+              <ValuerCardView
+                key={row.id}
+                row={row}
+                selected={selected.includes(row.id)}
+                onSelectRow={handleSelectRow}
+                onView={() => handleView(row.id)}
+                onSendRequest={() => handleSendRequest(row.id)}
+                requestSent={requestSent}
+              />
+            ))}
+          </Grid>
+        </Stack>
 
-      {/* Table */}
-      {/* <TableContainer>
+        {/* Table */}
+        {/* <TableContainer>
           <Scrollbar>
             <Table sx={{ minWidth: 960 }}>
               <TableHeadCustom
@@ -177,12 +196,12 @@ export default function ValuerListView() {
           </Scrollbar>
         </TableContainer> */}
 
-    </Container>
-    <ValuerViewForm
-    data={currentValuer}
-    open={openView}
-    onClose={handleCloseView}
-    />
+      </Container>
+      <ValuerViewForm
+        data={currentValuer}
+        open={openView}
+        onClose={handleCloseView}
+      />
     </>
   );
 }

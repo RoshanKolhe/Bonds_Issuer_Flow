@@ -8,19 +8,20 @@ import {
   Divider,
   Box,
 } from "@mui/material";
+import { formatNumberIN } from "src/utils/change-case";
 
 
 
-export default function IssueInvestmentMatrics({proposedTarget , subscriptionTarget}) {
+export default function IssueInvestmentMatrics({ proposedTarget, subscriptionTarget }) {
 
-   const metrics = [
-    { title: "Total Subscription Target", value: `₹ ${subscriptionTarget}` },
-    { title: "Proposed Total Investment", value: `₹ ${proposedTarget}` },
-    { title: "Estimated Returns", value: "₹ 800,000" },
+  const metrics = [
+    { title: "Total Subscription Target", value: `₹ ${formatNumberIN(subscriptionTarget)}` },
+    { title: "Proposed Total Investment", value: `₹ ${formatNumberIN(proposedTarget)}` },
+    { title: "Estimated Returns", value: `₹ ${formatNumberIN(800000)}` },
   ];
 
   return (
- <Box>
+    <Box>
       <Typography
         variant="h3"
         sx={{
@@ -51,8 +52,8 @@ export default function IssueInvestmentMatrics({proposedTarget , subscriptionTar
               <Stack spacing={0.5}>
                 <Typography
                   variant="subtitle2"
-                 
-                  sx={{  color: "#000000", fontWeight: 500  }}
+
+                  sx={{ color: "#000000", fontWeight: 500 }}
                 >
                   {item.title}
                 </Typography>
@@ -61,7 +62,7 @@ export default function IssueInvestmentMatrics({proposedTarget , subscriptionTar
                   variant="h6"
                   sx={{
                     fontWeight: 600,
-                     color: "#000000",
+                    color: "#000000",
                   }}
                 >
                   {item.value}
@@ -71,6 +72,6 @@ export default function IssueInvestmentMatrics({proposedTarget , subscriptionTar
           </Grid>
         ))}
       </Grid>
-</Box>
+    </Box>
   );
 }
