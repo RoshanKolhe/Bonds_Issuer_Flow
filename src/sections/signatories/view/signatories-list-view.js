@@ -254,7 +254,7 @@ console.log(Signatories);
 
                   <TableEmptyRows
                     height={denseHeight}
-                    emptyRows={emptyRows(table.page, table.rowsPerPage, Signatories.length)}
+                    emptyRows={emptyRows(table.page, table.rowsPerPage)}
                   />
 
                   <TableNoData notFound={notFound} />

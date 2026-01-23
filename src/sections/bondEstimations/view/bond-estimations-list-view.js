@@ -325,7 +325,7 @@ export default function BondsEstimationListView({ bondEstimations,
                   ))}
                   <TableEmptyRows
                     height={denseHeight}
-                    emptyRows={emptyRows(table.page, table.rowsPerPage, tableData.length)}
+                    emptyRows={emptyRows(table.page, table.rowsPerPage)}
                   />
                   <TableNoData notFound={notFound} />
                 </TableBody>

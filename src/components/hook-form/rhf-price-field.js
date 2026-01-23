@@ -6,13 +6,19 @@ import TextField from '@mui/material/TextField';
 
 function formatPrice(value) {
   if (value === null || value === undefined || value === '') return '';
+  if (typeof value === 'string' && isNaN(Number(value))) {
+    return value;
+  }
+
   return new Intl.NumberFormat('en-IN').format(value);
 }
 
+
 function parsePrice(value) {
   if (!value) return '';
-  return value.replace(/,/g, '');
+  return value.replace(/,/g, '').trim();
 }
+
 
 // ----------------------------------
 
@@ -34,26 +40,29 @@ export default function RHFPriceField({ name, helperText, ...other }) {
             {...other}
             fullWidth
             value={displayValue}
-            onChange={(event) => {
-              const raw = parsePrice(event.target.value);
+           onChange={(event) => {
+  const raw = parsePrice(event.target.value);
 
-              // allow empty
-              if (raw === '') {
-                field.onChange('');
-                return;
-              }
+  // empty
+  if (raw === '') {
+    field.onChange('');
+    return;
+  }
 
-              // allow "-" while typing
-              if (raw === '-') {
-                field.onChange(raw);
-                return;
-              }
+  const typingRegex = /^[+-]?(\d+)?(\.)?(\d+)?$/;
 
-              // allow positive & negative numbers
-              if (/^-?\d+$/.test(raw)) {
-                field.onChange(Number(raw));
-              }
-            }}
+  if (!typingRegex.test(raw)) {
+    return; 
+  }
+
+  
+  if (!isNaN(Number(raw)) && raw !== '+' && raw !== '-' && raw !== '.' && raw !== '+.' && raw !== '-.') {
+    field.onChange(Number(raw));
+  } else {
+    
+    field.onChange(raw);
+  }
+}}
             error={!!error}
             helperText={error?.message || helperText}
             inputProps={{

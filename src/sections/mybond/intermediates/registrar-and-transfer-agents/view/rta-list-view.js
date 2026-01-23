@@ -28,7 +28,7 @@ const TABLE_HEAD = [
 
 // ------------------------------------------------------
 
-export default function RtaListView() {
+export default function RtaListView({ isLocked, stepData }) {
   const params = useParams();
   const { applicationId } = params;
   const { enqueueSnackbar } = useSnackbar();
@@ -38,20 +38,16 @@ export default function RtaListView() {
   const [selected, setSelected] = useState([]);
   const [openView, setOpenView] = useState(false);
   const [currentRTA, setCurrentRTA] = useState(null);
-  const [requestSent, setRequestSent] = useState(false);
+
   const filteredData = RTAS.filter((item) =>
     item.legalEntityName.toLowerCase().includes(filterName.toLowerCase())
   );
 
-   useEffect(() => {
-      const stored = localStorage.getItem(`rta_trustee_request_${applicationId}`);
-  
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        setRequestSent(parsed.requestSent);
-        setSelected(parsed.selected || []);
-      }
-    }, [applicationId]);
+  useEffect(() => {
+    if (isLocked && stepData?.registrarAndTransferAgent) {
+      setSelected([stepData.registrarAndTransferAgent.id]);
+    }
+  }, [isLocked, stepData?.registrarAndTransferAgent]);
 
   const handleSelectRow = (id) => {
     setSelected((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
@@ -94,14 +90,6 @@ export default function RtaListView() {
 
       if (response?.data?.success) {
         enqueueSnackbar('Request send successfully', { variant: 'success' });
-        setRequestSent(true);
-        localStorage.setItem(
-          `rta_trustee_request_${applicationId}`,
-          JSON.stringify({
-            requestSent: true,
-            selected,
-          })
-        );
       }
     } catch (error) {
       console.error('error while sending request to debenture trustee :', error);
@@ -131,7 +119,7 @@ export default function RtaListView() {
 
             <Button
               variant="contained"
-              disabled={requestSent}
+              disabled={isLocked}
               onClick={() => handleSendRequest(selected[0])}
             >
               Send Request
@@ -152,7 +140,7 @@ export default function RtaListView() {
                 onSelectRow={handleSelectRow}
                 onView={() => handleView(row.id)}
                 onSendRequest={() => handleSendRequest(row.id)}
-                requestSent={requestSent}
+                disabled={isLocked}
               />
             ))}
           </Grid>

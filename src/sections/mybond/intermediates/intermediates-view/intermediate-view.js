@@ -16,8 +16,9 @@ import LegalAdvisorListView from '../legal-advisor/view/legal-advisor-list-view'
 import ValuerListView from '../valuer/view/valuer-list-view';
 import AllIntermediariesView from '../all-intermediaries/all-intermediaries';
 import CreditRatingAgency from '../credit-rating-agency/credit-rating-agency';
-import { useRouter, useSearchParams } from 'src/routes/hook';
+import { useParams, useRouter, useSearchParams } from 'src/routes/hook';
 import { Box, Button } from '@mui/material';
+import { useGetBondApplicationStepData } from 'src/api/bondApplications';
 
 // tabs pages
 
@@ -63,9 +64,11 @@ const TABS = [
 
 // ----------------------------------------------------------------------
 
+
 export default function IntermediariesView({ setActiveStepId, percent }) {
   const settings = useSettingsContext();
-
+  const param = useParams();
+  const { applicationId } = param;
 
 
   const router = useRouter();
@@ -74,6 +77,32 @@ export default function IntermediariesView({ setActiveStepId, percent }) {
   const tab = searchParams.get('tab');
 
   const [currentTab, setCurrentTab] = useState(tab || 'debenture_trustee');
+  const { stepData, stepDataLoading } =
+    useGetBondApplicationStepData(applicationId, 'intermediary_appointments_pending');
+
+// console.log('stepDATAAAAA', stepData)
+
+  function isIntermediaryLocked(stepData, type) {
+    if (!stepData) return false;
+
+    switch (type) {
+      case 'debenture_trustee':
+        return !!stepData.debentureTrustee;
+
+      case 'rta':
+        return !!stepData.registrarAndTransferAgent;
+
+      case 'valuer':
+        return !!stepData.valuer;
+
+      case 'credit_rating':
+        return (stepData.creditRatingAgency?.length ?? 0) > 0;
+
+      default:
+        return false;
+    }
+  }
+
 
   const handleChangeTab = useCallback((event, newValue) => {
     setCurrentTab(newValue);
@@ -103,12 +132,34 @@ export default function IntermediariesView({ setActiveStepId, percent }) {
         ))}
       </Tabs>
       {/* {currentTab === 'all' && <AllIntermediariesView setActiveStepId={setActiveStepId} setCurrentTab={setCurrentTab} percent={percent}/>} */}
-      {currentTab === 'debenture_trustee' && <DebentureTrusteeListView />}
-      {currentTab === 'rta' && <RtaListView />}
-      {/* {currentTab === 'lead_manager' && <LeadManagerListView />}
-      {currentTab === 'legal_advisor' && <LegalAdvisorListView />} */}
-      {currentTab === 'valuer' && <ValuerListView />}
-      {currentTab === 'credit_rating' && <CreditRatingAgency />}
+      {currentTab === 'debenture_trustee' && (
+        <DebentureTrusteeListView
+          isLocked={isIntermediaryLocked(stepData, 'debenture_trustee')}
+          stepData={stepData}
+        />
+      )}
+
+      {currentTab === 'rta' && (
+        <RtaListView
+          isLocked={isIntermediaryLocked(stepData, 'rta')}
+          stepData={stepData}
+        />
+      )}
+
+      {currentTab === 'valuer' && (
+        <ValuerListView
+          isLocked={isIntermediaryLocked(stepData, 'valuer')}
+          stepData={stepData}
+        />
+      )}
+
+      {currentTab === 'credit_rating' && (
+        <CreditRatingAgency
+          isLocked={isIntermediaryLocked(stepData, 'credit_rating')}
+          stepData={stepData}
+        />
+      )}
+
 
       <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
         <Button variant="contained" onClick={() => setActiveStepId('fund_position')}>

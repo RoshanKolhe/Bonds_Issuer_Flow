@@ -38,7 +38,7 @@ const TABLE_HEAD = [
 
 // ------------------------------------------------------
 
-export default function DebentureTrusteeListView() {
+export default function DebentureTrusteeListView({ isLocked, stepData }) {
   const params = useParams();
   const { applicationId } = params;
   const { enqueueSnackbar } = useSnackbar();
@@ -48,17 +48,12 @@ export default function DebentureTrusteeListView() {
   const [selected, setSelected] = useState([]);
   const [openView, setOpenView] = useState(false);
   const [currentTrustee, setCurrentTrustee] = useState(null);
-  const [requestSent, setRequestSent] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem(`debenturee_trustee_request_${applicationId}`);
-
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      setRequestSent(parsed.requestSent);
-      setSelected(parsed.selected || []);
+    if (isLocked && stepData?.debentureTrustee) {
+      setSelected([stepData.debentureTrustee.id]);
     }
-  }, [applicationId]);
+  }, [isLocked, stepData?.debentureTrustee]);
 
 
   const filteredData = DEBENTURE_TRUSTEES.filter((item) =>
@@ -105,14 +100,6 @@ export default function DebentureTrusteeListView() {
 
       if (response?.data?.success) {
         enqueueSnackbar('Request send successfully', { variant: 'success' });
-        setRequestSent(true);
-        localStorage.setItem(
-          `debenturee_trustee_request_${applicationId}`,
-          JSON.stringify({
-            requestSent: true,
-            selected,
-          })
-        );
       }
     } catch (error) {
       enqueueSnackbar(error?.error?.message || 'Failed to send request', { variant: 'error' });
@@ -151,11 +138,12 @@ export default function DebentureTrusteeListView() {
 
             <Button
               variant="contained"
-              disabled={requestSent}
+              disabled={isLocked || selected.length === 0}
               onClick={() => handleSendRequest(selected[0])}
             >
               Send Request
             </Button>
+
           </Stack>
         </Stack>
 
@@ -202,7 +190,7 @@ export default function DebentureTrusteeListView() {
                 onSelectRow={handleSelectRow}
                 onView={() => handleView(row.id)}
                 onSendRequest={() => handleSendRequest(row.id)}
-                requestSent={requestSent}
+                disabled={isLocked}
               />
             ))}
           </Grid>

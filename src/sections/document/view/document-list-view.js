@@ -270,7 +270,7 @@ export default function DocumentListView() {
 
                   <TableEmptyRows
                     height={denseHeight}
-                    emptyRows={emptyRows(table.page, table.rowsPerPage, filteredDocumentTypes.length)}
+                    emptyRows={emptyRows(table.page, table.rowsPerPage)}
                   />
 
                   <TableNoData notFound={notFound} />

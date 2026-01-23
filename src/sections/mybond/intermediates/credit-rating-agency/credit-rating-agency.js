@@ -7,7 +7,6 @@ import {
   Card,
   Checkbox,
   Tooltip,
-  Avatar,
   Alert,
   Stack,
 } from '@mui/material';
@@ -17,30 +16,27 @@ import { useGetCreditRatingAgencies } from 'src/api/creditRatingsAndAgencies';
 import axiosInstance from 'src/utils/axios';
 import { useParams } from 'react-router';
 
-export default function CreditRatingAgency() {
+export default function CreditRatingAgency({ isLocked, stepData }) {
   const { enqueueSnackbar } = useSnackbar();
-  const params = useParams();
-  const { applicationId } = params;
-  const { creditRatingAgencies = [], creditRatingAgenciesLoading } =
-    useGetCreditRatingAgencies();
+  const { applicationId } = useParams();
+
+  const { creditRatingAgencies = [] } = useGetCreditRatingAgencies();
 
   const [selectedAgencyIds, setSelectedAgencyIds] = useState([]);
   const [showError, setShowError] = useState(false);
-  const [requestSent, setRequestSent] = useState(false);
 
+ 
   useEffect(() => {
-    const stored = localStorage.getItem(
-      `credit_rating_trustee_request_${applicationId}`
-    );
-
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      setRequestSent(parsed.requestSent);
-      setSelectedAgencyIds(parsed.selectedAgencyIds || []);
+    if (stepData?.creditRatingAgency?.length) {
+      setSelectedAgencyIds(
+        stepData.creditRatingAgency.map((agency) => agency.id)
+      );
     }
-  }, [applicationId]);
+  }, [stepData?.creditRatingAgency]);
 
   const handleToggle = (id) => {
+    if (isLocked) return;
+
     setShowError(false);
     setSelectedAgencyIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
@@ -60,33 +56,35 @@ export default function CreditRatingAgency() {
       selectedAgencyIds.includes(agency.id)
     );
 
-    const response = await axiosInstance.post(
-      `/bonds-pre-issue/save-intermediaries/${applicationId}`,
-      {
-        creditRatingAgency: selectedAgencies,
-      }
-    );
-
-    if (response?.data?.success) {
-      enqueueSnackbar('Request send successfully', { variant: 'success' });
-      setRequestSent(true);
-
-      localStorage.setItem(
-        `credit_rating_trustee_request_${applicationId}`,
-        JSON.stringify({
-          requestSent: true,
-          selectedAgencyIds,
-        })
+    try {
+      const response = await axiosInstance.post(
+        `/bonds-pre-issue/save-intermediaries/${applicationId}`,
+        {
+          creditRatingAgency: selectedAgencies,
+        }
       );
+
+      if (response?.data?.success) {
+        enqueueSnackbar('Request sent successfully', { variant: 'success' });
+       
+      }
+    } catch (error) {
+      enqueueSnackbar('Failed to send request', { variant: 'error' });
     }
   };
 
   const fileUrl =
-    'https://images.unsplash.com/photo-1575936123452-b67c3203c357?q=80&w=1170&auto=format&fit=crop';
+    'https://images.unsplash.com/photo-1575936123452-b67c3203c357?q=80&w=400&auto=format&fit=crop';
 
   return (
     <>
-      <Stack direction="row" spacing={2} sx={{ p: 2 }} justifyContent="space-between">
+      {/* HEADER */}
+      <Stack
+        direction="row"
+        spacing={2}
+        sx={{ p: 2 }}
+        justifyContent="space-between"
+      >
         <Typography
           variant="h5"
           fontWeight="bold"
@@ -99,7 +97,7 @@ export default function CreditRatingAgency() {
 
         <Button
           variant="contained"
-          disabled={selectedAgencyIds.length === 0 || requestSent}
+          disabled={isLocked || selectedAgencyIds.length === 0}
           onClick={onSubmit}
         >
           Send Request
@@ -112,6 +110,7 @@ export default function CreditRatingAgency() {
         </Alert>
       )}
 
+      {/* LIST */}
       <Grid container spacing={3}>
         {creditRatingAgencies.map((agency) => {
           const checked = selectedAgencyIds.includes(agency.id);
@@ -126,14 +125,14 @@ export default function CreditRatingAgency() {
                   border: checked
                     ? '2px solid #1877F2'
                     : '1px solid #e0e0e0',
-                  pointerEvents: requestSent ? 'none' : 'auto',
-                  opacity: requestSent ? 0.6 : 1,
+                  pointerEvents: isLocked ? 'none' : 'auto',
+                  opacity: isLocked ? 0.6 : 1,
                   transition: '0.2s',
                 }}
               >
                 <Checkbox
                   checked={checked}
-                  disabled={requestSent}
+                  disabled={isLocked}
                   onChange={() => handleToggle(agency.id)}
                   sx={{ position: 'absolute', top: 8, right: 8 }}
                 />
@@ -166,6 +165,7 @@ export default function CreditRatingAgency() {
                     {agency.description || 'No description available'}
                   </Typography>
                 </Tooltip>
+
               </Card>
             </Grid>
           );

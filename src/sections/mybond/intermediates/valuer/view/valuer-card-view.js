@@ -16,7 +16,7 @@ export default function ValuerCardView({
   onSelectRow,
   onView,
   onSendRequest,
-  requestSent
+  isLocked
 }) {
   return (
     <Grid item xs={12} md={6} lg={4}>
@@ -26,8 +26,8 @@ export default function ValuerCardView({
           mb: 2,
           border: selected ? '2px solid #1877F2' : '1px solid #e0e0e0',
           transition: '0.2s',
-          pointerEvents: requestSent ? 'none' : 'auto',
-          opacity: requestSent ? 0.6 : 1,
+          pointerEvents: isLocked ? 'none' : 'auto',
+          opacity: isLocked ? 0.6 : 1,
         }}
       >
         {/* ACTION BAR */}
@@ -43,12 +43,15 @@ export default function ValuerCardView({
 
           <Checkbox
             checked={selected}
-            onChange={() => onSelectRow(row.id)}
+            disabled={isLocked}
+            onChange={() => {
+              if(isLocked) return;
+              onSelectRow(row.id)
+            }}
             sx={{
               p: 0.5,
             }}
           />
-
           {/* RIGHT → Actions */}
           <Stack direction="row" spacing={0.5}>
             <Tooltip title="View">

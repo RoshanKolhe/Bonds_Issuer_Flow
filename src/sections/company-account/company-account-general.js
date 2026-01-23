@@ -291,7 +291,7 @@ export default function CompanyAccountGeneral() {
                       control={control}
                       render={({ field, fieldState: { error } }) => (
                         <DatePicker
-                          label="Date of incorporation"
+                          label="Date Of Incorporation"
                           disabled
                           value={field.value}
                           onChange={(newValue) => field.onChange(newValue)}
@@ -316,7 +316,7 @@ export default function CompanyAccountGeneral() {
                     />
                   </Grid>
                   <Grid xs={12} md={6}>
-                   <RHFTextField name="city" label="City of incorporation" placeholder="City" disabled sx={{ flex: 1 }} />
+                   <RHFTextField name="city" label="City Of Incorporation" placeholder="City" disabled sx={{ flex: 1 }} />
                    </Grid>
 
                   <Grid xs={12} md={12}>
@@ -324,7 +324,7 @@ export default function CompanyAccountGeneral() {
                      
                       <RHFSelect
                         name="state"
-                        label="State of incorporation"
+                        label="State Of Incorporation"
                         disabled
                         sx={{ flex: 1 }}
                         SelectProps={{ displayEmpty: true }}
@@ -333,7 +333,7 @@ export default function CompanyAccountGeneral() {
                       </RHFSelect>
                       <RHFAutocomplete
                         name="country"
-                        label="Country of incorporation"
+                        label="Country Of Incorporation"
                         disabled
                         placeholder="Country"
                         sx={{ flex: 1 }}
@@ -360,7 +360,7 @@ export default function CompanyAccountGeneral() {
                   <Grid xs={12} md={12}>
                     <Stack spacing={2} direction={{ xs: 'column', sm: 'row' }}>
                     
-                        <RHFSelect name="entityType" label="Entity type" disabled>
+                        <RHFSelect name="entityType" label="Entity Type" disabled>
                           <MenuItem value="sole_proprietorship">Sole Proprietorship</MenuItem>
                           <MenuItem value="private_limited">Private Limited</MenuItem>
                           <MenuItem value="public_limited">Public Limited</MenuItem>
@@ -370,7 +370,7 @@ export default function CompanyAccountGeneral() {
                  
 
                     
-                        <RHFSelect name="sector" label="Sector type" disabled>
+                        <RHFSelect name="sector" label="Sector Type" disabled>
                           <MenuItem value="it">IT</MenuItem>
                           <MenuItem value="banking">Banking</MenuItem>
                           <MenuItem value="infrastructure">Infrastructure</MenuItem>
@@ -397,11 +397,12 @@ export default function CompanyAccountGeneral() {
 
         
             <Grid item xs={12} md={6}>
-              <RHFTextField name="panHoldersName" disabled placeholder="Enter Name as per PAN" />
+              <RHFTextField name="panHoldersName" label="Pan Holder Name" disabled placeholder="Enter name s per PAN" />
             </Grid>
             <Grid item xs={12} md={12}>
               <RHFTextField
                 name="companyAbout"
+                label="About Company"
                 placeholder="Enter about company"
                 multiline
                 rows={4}
