@@ -110,6 +110,7 @@ export const endpoints = {
     filterList: (filter) => `/company-profiles/bank-details?filter=${filter}`,
     details: (accountId) => `/company-profiles/bank-details/${accountId}`,
   },
+  addressDetails: '/company-profiles/address-details',
   redemptionTypes: {
     list: '/redemption-types',
     filterList: (filter) => `/redemption-types?filter=${filter}`,
