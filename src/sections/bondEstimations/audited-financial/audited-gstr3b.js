@@ -22,7 +22,9 @@ import { RouterLink } from 'src/routes/components';
 import axiosInstance from 'src/utils/axios';
 import dayjs from 'dayjs';
 import { fDate } from 'src/utils/format-time';
-import { RadioGroup, FormControlLabel, Radio, FormControl, FormLabel, Button } from '@mui/material';
+import { RadioGroup, FormControlLabel, Radio, FormControl, FormLabel, Button, Select, MenuItem } from '@mui/material';
+import { useParams } from 'src/routes/hook';
+import { useSnackbar } from 'notistack';
 
 // ----------------------------------------------------------------------
 
@@ -43,50 +45,99 @@ const StyledDropZone = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function AuditedGST3B({ setPercent, setProgress }) {
+export default function AuditedGST3B({ currentBaseYear, currentData, setPercent, setProgress }) {
+  const params = useParams();
+  const { applicationId } = params;
+  const { enqueueSnackbar } = useSnackbar();
   const [auditorName, setAuditorName] = useState('');
-  const [selectedMonth, setSelectedMonth] = useState('');
+  const [documents, setDocuments] = useState([]);
 
   const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
+    { value: 'jan', label: 'January' },
+    { value: 'feb', label: 'February' },
+    { value: 'mar', label: 'March' },
+    { value: 'apr', label: 'April' },
+    { value: 'may', label: 'May' },
+    { value: 'jun', label: 'June' },
+    { value: 'jul', label: 'July' },
+    { value: 'aug', label: 'August' },
+    { value: 'sep', label: 'September' },
+    { value: 'oct', label: 'October' },
+    { value: 'nov', label: 'November' },
+    { value: 'dec', label: 'December' },
   ];
 
-  const handleAddMonth = () => {
-    if (selectedMonth) {
+  const monthOrder = months.map((m) => m.value);
+
+  const handleAddRow = () => {
+    setDocuments((prev) => {
+      let nextMonth = 'jan';
+
+      if (prev.length > 0) {
+        const lastMonth = prev[prev.length - 1].month;
+        const lastIndex = monthOrder.indexOf(lastMonth);
+
+        if (lastIndex === -1) {
+          nextMonth = 'jan';
+        } else if (lastIndex === monthOrder.length - 1) {
+          enqueueSnackbar('All months are already added', { variant: 'warning' });
+          return prev;
+        } else {
+          nextMonth = monthOrder[lastIndex + 1];
+        }
+      }
+
       const newDocument = {
-        id: `month-${Date.now()}`,
-        month: selectedMonth,
+        id: `gst3b-${Date.now()}`, // ✅ unique ID
+        month: nextMonth,         // ✅ auto assigned
         file: null,
         status: 'Pending',
         reportDate: null,
-        documentType: 'gst3b',
+        auditedType: 'audited',
       };
 
-      setDocuments((prev) => [...prev, newDocument]);
-      setSelectedMonth('');
-    }
+      return [...prev, newDocument];
+    });
   };
 
-  const handleFileUpload = (event, id) => {
-    const file = event.target.files[0];
-    if (file) {
-      setDocuments((prevDocs) =>
-        prevDocs.map((doc) =>
-          doc.id === id ? { ...doc, file, status: 'Uploaded', reportDate: new Date() } : doc
+  const handleFileUpload = async (e, id) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await axiosInstance.post('/files', formData);
+
+      const uploadedFile = res?.data?.files?.[0];
+
+      if (!uploadedFile?.id) {
+        enqueueSnackbar('File upload failed', { variant: 'error' });
+        return;
+      }
+
+      // ✅ update ONLY the clicked row
+      setDocuments((prev) =>
+        prev.map((doc) =>
+          doc.id === id
+            ? {
+              ...doc,
+              file: uploadedFile,
+              status: 'Uploaded',
+              reportDate: new Date(),
+            }
+            : doc
         )
       );
-      event.target.value = null;
+
+      enqueueSnackbar('File uploaded successfully', { variant: 'success' });
+    } catch (error) {
+      console.error('File upload error:', error);
+      enqueueSnackbar(
+        error?.response?.data?.error?.message || 'File upload failed',
+        { variant: 'error' }
+      );
     }
   };
 
@@ -105,7 +156,12 @@ export default function AuditedGST3B({ setPercent, setProgress }) {
     }
   };
 
-  const [documents, setDocuments] = useState([]);
+  const toValidDate = (value) => {
+    if (!value) return null;
+
+    const date = value instanceof Date ? value : new Date(value);
+    return isNaN(date.getTime()) ? null : date;
+  };
 
   const handleDateChange = (date, id) => {
     setDocuments((docs) => docs.map((doc) => (doc.id === id ? { ...doc, reportDate: date } : doc)));
@@ -120,8 +176,8 @@ export default function AuditedGST3B({ setPercent, setProgress }) {
     const totalDocs = documents.length;
 
     if (totalDocs > 0) {
-      const uploadCount = documents.filter(doc => !!doc.file).length;
-      const dateCount = documents.filter(doc => !!doc.reportDate).length;
+      const uploadCount = documents.filter((doc) => !!doc.file).length;
+      const dateCount = documents.filter((doc) => !!doc.reportDate).length;
 
       // Files max 7.5%
       score += Math.min(uploadCount * (7.5 / totalDocs), 7.5);
@@ -135,9 +191,135 @@ export default function AuditedGST3B({ setPercent, setProgress }) {
     setProgress(percent === 20);
   };
 
+  const validateBeforeSubmit = () => {
+    if (!auditorName?.trim()) {
+      enqueueSnackbar('Auditor name is required', { variant: 'error' });
+      return false;
+    }
+
+    if (!documents.length) {
+      enqueueSnackbar('No financial records found', { variant: 'error' });
+      return false;
+    }
+
+    for (let i = 0; i < documents.length; i++) {
+      const doc = documents[i];
+      const yearLabel = `${doc.periodStartYear}-${doc.periodEndYear}`;
+
+      if (!doc.file) {
+        enqueueSnackbar(`File missing for FY ${yearLabel}`, { variant: 'error' });
+        return false;
+      }
+
+      if (!doc.file?.id) {
+        enqueueSnackbar(`Invalid uploaded file for FY ${yearLabel}`, { variant: 'error' });
+        return false;
+      }
+
+      if (!doc.reportDate) {
+        enqueueSnackbar(`Report date required for FY ${yearLabel}`, { variant: 'error' });
+        return false;
+      }
+
+      if (!doc.auditedType) {
+        enqueueSnackbar(`Audited/Provisional type required for FY ${yearLabel}`, {
+          variant: 'error',
+        });
+        return false;
+      }
+
+      if (!doc.month) {
+        enqueueSnackbar(`Invalid month`, {
+          variant: 'error',
+        });
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const handleSave = async () => {
+    if (!validateBeforeSubmit()) return;
+
+    try {
+      const financialsData = documents.map((doc) => ({
+        category: 'gst_3b',
+        type: 'month_wise',
+        baseFinancialStartYear: Number(currentBaseYear) - 1,
+        baseFinancialEndYear: Number(currentBaseYear),
+        month: doc.month,
+        auditedType: doc.auditedType,
+        auditorName: auditorName.trim(),
+        reportDate: doc.reportDate,
+        fileId: doc.file.id,
+        isActive: true,
+        isDeleted: false,
+      }));
+
+      const payloadData = {
+        auditedFinancials: financialsData,
+      };
+
+      const response = await axiosInstance.patch(
+        `/bond-estimations/audited-financials/${applicationId}`,
+        payloadData
+      );
+
+      if (response?.data?.success) {
+        enqueueSnackbar(
+          response.data.message || 'Audited financials saved successfully',
+          { variant: 'success' }
+        );
+        setProgress(true);
+      } else {
+        enqueueSnackbar('Failed to save audited financials', { variant: 'error' });
+      }
+    } catch (error) {
+      console.error('Error while uploading financials:', error);
+
+      enqueueSnackbar(
+        error?.response?.data?.error?.message ||
+        'Something went wrong while saving audited financials',
+        { variant: 'error' }
+      );
+    }
+  };
+
   useEffect(() => {
     calculateCompletion();
   }, [auditorName, documents]);
+
+  useEffect(() => {
+    if (currentData?.length) {
+      setAuditorName(currentData[0]?.auditorName);
+      setDocuments(
+        currentData.map((doc) => ({
+          id: `gst3b-${doc.month}`,
+          month: doc.month,
+          file: doc.file ?? null,
+          status: 'Uploaded',
+          reportDate: doc.reportDate ? new Date(doc.reportDate) : null,
+          auditedType: doc.auditedType,
+        }))
+      );
+      return;
+    }
+
+    if (documents.length === 0) {
+      setDocuments([
+        {
+          id: `gst3b`,
+          month: 'jan',
+          file: null,
+          status: 'Pending',
+          reportDate: null,
+          auditedType: 'audited',
+        }]
+      );
+    }
+  }, [currentData]);
+
   return (
     <Container disableGutters>
       <Grid
@@ -176,40 +358,8 @@ export default function AuditedGST3B({ setPercent, setProgress }) {
           >
             <Box sx={{ flex: 1 }}>
               <Typography variant="h6" gutterBottom>
-                Year 2024-2025
+                Year {`${Number(currentBaseYear) - 1}-${currentBaseYear}`}
               </Typography>
-            </Box>
-
-            <Box sx={{ maxWidth: { xs: '100%', sm: '40%' } }}>
-              <Typography variant="subtitle2" gutterBottom>
-                Select Month
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                <RHFSelect
-                  name="month"
-                  value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(e.target.value)}
-                  native
-                  fullWidth
-                >
-                  <option value="">Select Month</option>
-                  {months
-                    .filter((month) => !documents.some((doc) => doc.month === month))
-                    .map((month) => (
-                      <option key={month} value={month}>
-                        {month}
-                      </option>
-                    ))}
-                </RHFSelect>
-                <Button
-                  variant="contained"
-                  onClick={handleAddMonth}
-                  disabled={!selectedMonth}
-                  sx={{ whiteSpace: 'nowrap' }}
-                >
-                  Add
-                </Button>
-              </Box>
             </Box>
           </Box>
 
@@ -271,27 +421,48 @@ export default function AuditedGST3B({ setPercent, setProgress }) {
                   },
                 }}
               >
-                <Typography variant="body2">{doc.month || '-'}</Typography>
+                <Select
+                  readOnly
+                  variant='standard'
+                  value={doc.month || ''}
+                  onChange={(e) => {
+                    const { value } = e.target;
+
+                    setDocuments((prev) =>
+                      prev.map((docItem) =>
+                        docItem.id === doc.id
+                          ? { ...docItem, month: value }
+                          : docItem
+                      )
+                    );
+                  }}
+                >
+                  {months.map((month) => (
+                    <MenuItem key={month.value} value={month.value}>
+                      {month.label}
+                    </MenuItem>
+                  ))}
+                </Select>
 
                 <Box>
                   <RadioGroup
                     row
-                    value={doc.statementType}
+                    value={doc.auditedType}
                     onChange={(e) => {
                       const newDocuments = documents.map((d) =>
-                        d.id === doc.id ? { ...d, statementType: e.target.value } : d
+                        d.id === doc.id ? { ...d, auditedType: e.target.value } : d
                       );
                       setDocuments(newDocuments);
                     }}
                   >
                     <FormControlLabel
-                      value="Audited"
+                      value="audited"
                       control={<Radio size="small" />}
                       label="Audited"
                       sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.875rem' } }}
                     />
                     <FormControlLabel
-                      value="Provisional"
+                      value="provisional"
                       control={<Radio size="small" />}
                       label="Provisional"
                       sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.875rem' } }}
@@ -304,7 +475,7 @@ export default function AuditedGST3B({ setPercent, setProgress }) {
                       Not Uploaded
                     </Typography>
                   ) : (
-                    <Typography variant="body2">{doc.file.name}</Typography>
+                    <Typography variant="body2">{doc.file.fileName || doc.file.fileOriginalName}</Typography>
                   )}
                 </Box>
 
@@ -327,7 +498,7 @@ export default function AuditedGST3B({ setPercent, setProgress }) {
                 <Box>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <DatePicker
-                      value={doc.reportDate}
+                      value={toValidDate(doc.reportDate)}
                       onChange={(newValue) => handleDateChange(newValue, doc.id)}
                       renderInput={({ inputRef, inputProps, InputProps }) => (
                         <Box
@@ -433,12 +604,12 @@ export default function AuditedGST3B({ setPercent, setProgress }) {
                     sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.875rem' } }}
                   >
                     <FormControlLabel
-                      value="Audited"
+                      value="audited"
                       control={<Radio size="small" />}
                       label="Audited"
                     />
                     <FormControlLabel
-                      value="Provisional"
+                      value="provisional"
                       control={<Radio size="small" />}
                       label="Provisional"
                     />
@@ -481,7 +652,7 @@ export default function AuditedGST3B({ setPercent, setProgress }) {
                   <Typography variant="subtitle2">Report Date:</Typography>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <DatePicker
-                      value={doc.reportDate}
+                      value={toValidDate(doc.reportDate)}
                       onChange={(newValue) => handleDateChange(newValue, doc.id)}
                       renderInput={({ inputRef, inputProps, InputProps }) => (
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -538,7 +709,7 @@ export default function AuditedGST3B({ setPercent, setProgress }) {
                     </label>
                   ) : (
                     <Typography variant="body2" sx={{ flexGrow: 1, mr: 1 }}>
-                      {doc.file.name}
+                      {doc.file.fileName || doc.file.fileOriginalName}
                     </Typography>
                   )}
                   <Box sx={{ display: 'flex', gap: 1 }}>
@@ -566,6 +737,32 @@ export default function AuditedGST3B({ setPercent, setProgress }) {
             ))}
           </Box>
         </Grid>
+
+        <Box
+          sx={{
+            mt: 3,
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: 2,
+            width: '100%',
+          }}
+        >
+          <Button
+            variant="contained"
+            sx={{ color: '#fff' }}
+            onClick={() => handleAddRow()}
+          >
+            + Add row
+          </Button>
+
+          <Button
+            variant="contained"
+            sx={{ color: '#fff' }}
+            onClick={() => handleSave()}
+          >
+            Save
+          </Button>
+        </Box>
       </Grid>
     </Container>
   );

@@ -8,14 +8,17 @@ import AuditedIncomeTaxReturn from './audited-income-tax-return';
 import AuditedGSTR9 from './audited-gstr9';
 import AuditedGST3B from './audited-gstr3b';
 import { Box, Button, Container } from '@mui/material';
-import KYCTitle from 'src/sections/kyc/kyc-title';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { useSnackbar } from 'notistack';
 
-export default function AuditedFinancialDocument({ setActiveStepId, percent }) {
+export default function AuditedFinancialDocument({
+  setActiveStepId,
+  percent,
+  currentAuditedFinancials
+}) {
   const { enqueueSnackbar } = useSnackbar();
-
+  const [currentData, setCurrentData] = useState(null);
   const [isBaseYearDone, setBaseYearDone] = useState(false);
   const [baseYearPercent, setBaseYearPercent] = useState(20);
 
@@ -35,25 +38,27 @@ export default function AuditedFinancialDocument({ setActiveStepId, percent }) {
     return { value: year.toString(), label: `${year - 1} - ${year}` };
   });
 
+  const year = new Date().getFullYear();
+
   const methods = useForm({
     defaultValues: {
-      baseYear: '2025',
+      baseYear: year,
     },
   });
 
   const { watch, control } = methods;
-  const selectedYear = watch("baseYear");
+  const selectedYear = watch('baseYear');
 
   useEffect(() => {
-    setBaseYearDone(!!selectedYear); // TRUE when year is selected
+    setBaseYearDone(!!selectedYear);
   }, [selectedYear]);
 
   const handleNextClick = () => {
-    if (!isBaseYearDone) return enqueueSnackbar("Please select base year" , {variant: 'error'});
-    if (!financialDone) return enqueueSnackbar("Complete audited financial statement", {variant: 'error'});
-    if (!itrDone) return enqueueSnackbar("Complete ITR section", {variant: 'error'});
-    if (!gstr9Done) return enqueueSnackbar("Complete GSTR-9 section", {variant: 'error'});
-    if (!gstr3bDone) return enqueueSnackbar("Complete GSTR-3B section", {variant: 'error'});
+    if (!isBaseYearDone) return enqueueSnackbar('Please select base year', {variant: 'error'});
+    if (!financialDone) return enqueueSnackbar('Complete audited financial statement', {variant: 'error'});
+    if (!itrDone) return enqueueSnackbar('Complete ITR section', {variant: 'error'});
+    if (!gstr9Done) return enqueueSnackbar('Complete GSTR-9 section', {variant: 'error'});
+    if (!gstr3bDone) return enqueueSnackbar('Complete GSTR-3B section', {variant: 'error'});
 
     setActiveStepId();
   };
@@ -74,22 +79,36 @@ export default function AuditedFinancialDocument({ setActiveStepId, percent }) {
     gstr9Percent,
     gstr3bPercent,
     isBaseYearDone,
-    percent
+    percent,
   ]);
+
+  useEffect(() => {
+    if (currentAuditedFinancials) {
+      setCurrentData({
+        financialStatements: currentAuditedFinancials?.financialStatements,
+        incomeTaxReturns: currentAuditedFinancials?.incomeTaxReturns,
+        gstr9: currentAuditedFinancials?.gstr9,
+        gst3b: currentAuditedFinancials?.gst3b
+      })
+    } else {
+      setCurrentData({
+        financialStatements: [],
+        incomeTaxReturns: [],
+        gstr9: [],
+        gst3b: []
+      })
+    }
+  }, [currentAuditedFinancials]);
 
   return (
     <Container>
-      {/* <KYCTitle
-        title="Audited Financial"
-        subtitle="Upload audited financial documents for assessment"
-      /> */}
-      <Typography color='primary' fontWeight='bold' variant='h5'>
+  
+      <Typography variant="h5" fontWeight="bold" color="primary">
         Audited Financial
       </Typography>
-       <Typography  variant='body2' mb={3}>
-       Upload audited financial documents for assessment
+      <Typography variant="body2" mb={2} >
+        Upload audited financial documents for assessment
       </Typography>
-
       <FormProvider methods={methods}>
         <Grid container sx={{ p: 4, borderRadius: 2, border: '1px solid #ddd', boxShadow: 2 }}>
           <Grid xs={12}>
@@ -97,8 +116,11 @@ export default function AuditedFinancialDocument({ setActiveStepId, percent }) {
               Base Year (Latest Financial Year)
             </Typography>
 
-            <RHFSelect name="baseYear" sx={{ maxWidth: 260 }}
-              placeholder="Select Base Financial Year">
+            <RHFSelect
+              name="baseYear"
+              sx={{ maxWidth: 260 }}
+              placeholder="Select Base Financial Year"
+            >
               <MenuItem value="">Select Base Year</MenuItem>
               {years.map((yearData) => (
                 <MenuItem key={yearData.value} value={yearData.value}>
@@ -116,21 +138,29 @@ export default function AuditedFinancialDocument({ setActiveStepId, percent }) {
         <AuditedFinancialStatement
           setPercent={setFinancialPercent}
           setProgress={setFinancialDone}
+          currentBaseYear={selectedYear}
+          currentData={currentData?.financialStatements}
         />
 
         <AuditedIncomeTaxReturn
           setPercent={setItrPercent}
           setProgress={setItrDone}
+          currentBaseYear={selectedYear}
+          currentData={currentData?.incomeTaxReturns}
         />
 
         <AuditedGSTR9
           setPercent={setGstr9Percent}
           setProgress={setGstr9Done}
+          currentBaseYear={selectedYear}
+          currentData={currentData?.gstr9}
         />
 
         <AuditedGST3B
           setPercent={setGstr3bPercent}
           setProgress={setGstr3bDone}
+          currentBaseYear={selectedYear}
+          currentData={currentData?.gst3b}
         />
       </FormProvider>
 
@@ -145,5 +175,6 @@ export default function AuditedFinancialDocument({ setActiveStepId, percent }) {
 
 AuditedFinancialDocument.propTypes = {
   setActiveStepId: PropTypes.func,
-  percent: PropTypes.func
+  percent: PropTypes.func,
+  currentAuditedFinancials: PropTypes.object
 };

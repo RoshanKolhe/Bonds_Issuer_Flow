@@ -18,7 +18,7 @@ export default function Stepper() {
   const { applicationId } = params;
   const [activeStepId, setActiveStepId] = useState('fund_position_and_credit_ratings');
   const [estimationData, setEstimationData] = useState(null);
-  const { bondEstimation, bondEstimationLoading } = useGetBondEstimation(applicationId);
+  const { bondEstimation, bondEstimationLoading, auditedFinancials } = useGetBondEstimation(applicationId);
   const [dataInitialized, setDataInitialized] = useState(false);
 
   const steps = [
@@ -98,7 +98,7 @@ export default function Stepper() {
           <AuditedFinancialDocument
             percent={(p) => updateStepPercent('audited_financial', p)}
             setActiveStepId={() => setActiveStepId('borrowing_details')}
-            currentAuditedFinancials={estimationData ? estimationData?.fundPosition : null}
+            currentAuditedFinancials={estimationData ? estimationData?.auditedFinancials : null}
           />
         );
 
@@ -146,7 +146,7 @@ export default function Stepper() {
   useEffect(() => {
     if (bondEstimation && !bondEstimationLoading && !dataInitialized) {
 
-      setEstimationData(bondEstimation);
+      setEstimationData({ ...bondEstimation, auditedFinancials });
       let currentStep = 'fund_position_and_credit_ratings';
 
       if (
@@ -154,6 +154,11 @@ export default function Stepper() {
         bondEstimation.currentProgress.includes('credit_ratings')
       ) {
         updateStepPercent('fund_position_and_credit_ratings', 100);
+        currentStep = 'audited_financial';
+      }
+
+      if (bondEstimation.currentProgress.includes('audited_financials')) {
+        updateStepPercent('audited_financial', 100);
         currentStep = 'borrowing_details';
       }
 
@@ -162,7 +167,6 @@ export default function Stepper() {
         bondEstimation.currentProgress.includes('capital_details') &&
         bondEstimation.currentProgress.includes('borrowing_details')
       ) {
-        updateStepPercent('audited_financial', 100);
         updateStepPercent('borrowing_details', 100);
         currentStep = 'financial_details';
       }

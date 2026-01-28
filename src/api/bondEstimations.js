@@ -39,11 +39,12 @@ export function useGetBondEstimation(applicationId) {
     const memoizedValue = useMemo(
         () => ({
             bondEstimation: data?.estimation,
+            auditedFinancials: data?.auditedFinancials,
             bondEstimationLoading: isLoading,
             bondEstimationError: error,
             bondEstimationValidating: isValidating,
         }),
-        [data?.estimation, error, isLoading, isValidating]
+        [data?.estimation, error, isLoading, isValidating, data?.auditedFinancials]
     );
 
     return memoizedValue;

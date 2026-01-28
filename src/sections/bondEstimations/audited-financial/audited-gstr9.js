@@ -1,140 +1,262 @@
 import PropTypes from 'prop-types';
-import * as Yup from 'yup';
 import { useEffect, useState } from 'react';
-import { alpha, styled } from '@mui/material/styles';
-import Container from '@mui/material/Container';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import {
+  Container,
+  Box,
+  Grid,
+  Typography,
+  IconButton,
+  Button,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  alpha,
+} from '@mui/material';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
-// assets
-import { countries } from 'src/assets/data';
-// components
 import Iconify from 'src/components/iconify';
 import { RHFTextField } from 'src/components/hook-form';
-import { paths } from 'src/routes/paths';
-import { RouterLink } from 'src/routes/components';
+import { useParams } from 'src/routes/hook';
 import axiosInstance from 'src/utils/axios';
-import dayjs from 'dayjs';
-import { fDate } from 'src/utils/format-time';
-import { RadioGroup, FormControlLabel, Radio, FormControl, FormLabel, Button } from '@mui/material';
+import { useSnackbar } from 'notistack';
 
-// ----------------------------------------------------------------------
-
-const StyledDropZone = styled('div')(({ theme }) => ({
-  width: '100%',
-  height: '40px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: 8,
-  borderRadius: 1,
-  border: `1px dashed ${theme.palette.divider}`,
-  cursor: 'pointer',
-  '&:hover': {
-    opacity: 0.72,
-  },
-}));
-
-// ----------------------------------------------------------------------
-
-export default function AuditedGSTR9({ setPercent, setProgress }) {
+export default function AuditedGSTR9({
+  currentBaseYear,
+  setPercent,
+  setProgress,
+  currentData
+}) {
+  const params = useParams();
+  const { applicationId } = params;
+  const { enqueueSnackbar } = useSnackbar();
   const [auditorName, setAuditorName] = useState('');
-  const [documents, setDocuments] = useState([
-    {
-      id: 'gstr9-1',
-      year: '2022-23',
-      file: null,
-      status: 'Pending',
-      reportDate: null,
-      statementType: 'Audited',
-      documentType: 'gstr9', // Document type identifier for GSTR9
-    },
-    {
-      id: 'gstr9-2',
-      year: '2023-24',
-      file: null,
-      status: 'Pending',
-      reportDate: null,
-      statementType: 'Audited',
-      documentType: 'gstr9',
-    },
-    {
-      id: 'gstr9-3',
-      year: '2024-25',
-      file: null,
-      status: 'Pending',
-      reportDate: null,
-      statementType: 'Audited',
-      documentType: 'gstr9',
-    },
-  ]);
+  const [documents, setDocuments] = useState([]);
 
-  const handleFileUpload = (event, id) => {
-    const file = event.target.files[0];
-    if (file) {
-      setDocuments((docs) =>
-        docs.map((doc) =>
-          doc.id === id ? { ...doc, file: file, status: 'Uploaded', reportDate: new Date() } : doc
-        )
-      );
-      // Reset the file input to allow re-uploading the same file
-      event.target.value = null;
-    }
+  // -----------------------------
+  // Helpers
+  // -----------------------------
+  const getStatusColor = (status) =>
+    status === 'Uploaded' ? 'success' : 'warning';
+
+  const toValidDate = (value) => {
+    if (!value) return null;
+
+    const date = value instanceof Date ? value : new Date(value);
+    return isNaN(date.getTime()) ? null : date;
   };
 
   const handleDateChange = (date, id) => {
     setDocuments((docs) => docs.map((doc) => (doc.id === id ? { ...doc, reportDate: date } : doc)));
   };
 
-  const handleDelete = (id) => {
-    setDocuments((docs) =>
-      docs.map((doc) =>
-        doc.id === id ? { ...doc, file: null, status: 'Pending', reportDate: null } : doc
-      )
-    );
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Uploaded':
-        return 'success';
-      case 'Invalid':
-        return 'error';
-      default:
-        return 'warning';
-    }
-  };
-
   const calculateCompletion = () => {
     let score = 0;
 
-    // Auditor Name (max: 6%)
-    if (auditorName?.trim()) score += 6;
+    if (auditorName.trim()) score += 6;
+    score += documents.filter(d => d.file).length * (7 / 3);
+    score += documents.filter(d => d.reportDate).length * (7 / 3);
 
-    // 3 Files (max: 7%)
-    const uploadedCount = documents.filter(doc => !!doc.file).length;
-    score += (uploadedCount * (7 / 3));
-
-    // 3 Dates (max: 7%)
-    const dateCount = documents.filter(doc => !!doc.reportDate).length;
-    score += (dateCount * (7 / 3));
-
-    const percentValue = Math.min(20, Math.round(score));
-
-    setPercent(percentValue);
-    setProgress(percentValue === 20);
+    const percent = Math.min(20, Math.round(score));
+    setPercent(percent);
+    setProgress(percent === 20);
   };
 
-
+  // -----------------------------
+  // Effects
+  // -----------------------------
   useEffect(() => {
     calculateCompletion();
   }, [auditorName, documents]);
 
+  useEffect(() => {
+    if (currentData?.length) {
+      setAuditorName(currentData[0]?.auditorName);
+      setDocuments(
+        currentData.map((doc, index) => ({
+          id: `fs-${index}`,
+          periodStartYear: doc.periodStartYear,
+          periodEndYear: doc.periodEndYear,
+          file: doc.file ?? null,
+          status: 'Uploaded',
+          reportDate: doc.reportDate ? new Date(doc.reportDate) : null,
+          auditedType: doc.auditedType, // audited | provisional
+        }))
+      );
+      return;
+    }
+
+    if (documents.length === 0) {
+      // default last 3 years
+      const baseYear = Number(currentBaseYear);
+      setDocuments(
+        Array.from({ length: 3 }).map((_, i) => ({
+          id: `gstr9-${i}`,
+          periodStartYear: baseYear - (3 - i),
+          periodEndYear: baseYear - (2 - i),
+          file: null,
+          status: 'Pending',
+          reportDate: null,
+          auditedType: 'audited',
+        }))
+      );
+    }
+  }, [currentData, currentBaseYear]);
+
+  // -----------------------------
+  // Handlers
+  // -----------------------------
+  const handleFileUpload = async (e, id) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await axiosInstance.post('/files', formData);
+
+      const uploadedFile = res?.data?.files?.[0];
+
+      if (!uploadedFile?.id) {
+        enqueueSnackbar('File upload failed', { variant: 'error' });
+        return;
+      }
+
+      // ✅ update ONLY the clicked row
+      setDocuments((prev) =>
+        prev.map((doc) =>
+          doc.id === id
+            ? {
+              ...doc,
+              file: uploadedFile,
+              status: 'Uploaded',
+              reportDate: new Date(),
+            }
+            : doc
+        )
+      );
+
+      enqueueSnackbar('File uploaded successfully', { variant: 'success' });
+    } catch (error) {
+      console.error('File upload error:', error);
+      enqueueSnackbar(
+        error?.response?.data?.error?.message || 'File upload failed',
+        { variant: 'error' }
+      );
+    }
+  };
+
+
+  const handleDelete = (id) => {
+    setDocuments(docs =>
+      docs.map(d =>
+        d.id === id
+          ? { ...d, file: null, status: 'Pending', reportDate: null }
+          : d
+      )
+    );
+  };
+
+  const validateBeforeSubmit = () => {
+    if (!auditorName?.trim()) {
+      enqueueSnackbar('Auditor name is required', { variant: 'error' });
+      return false;
+    }
+
+    if (!documents.length) {
+      enqueueSnackbar('No financial records found', { variant: 'error' });
+      return false;
+    }
+
+    for (let i = 0; i < documents.length; i++) {
+      const doc = documents[i];
+      const yearLabel = `${doc.periodStartYear}-${doc.periodEndYear}`;
+
+      if (!doc.file) {
+        enqueueSnackbar(`File missing for FY ${yearLabel}`, { variant: 'error' });
+        return false;
+      }
+
+      if (!doc.file?.id) {
+        enqueueSnackbar(`Invalid uploaded file for FY ${yearLabel}`, { variant: 'error' });
+        return false;
+      }
+
+      if (!doc.reportDate) {
+        enqueueSnackbar(`Report date required for FY ${yearLabel}`, { variant: 'error' });
+        return false;
+      }
+
+      if (!doc.auditedType) {
+        enqueueSnackbar(`Audited/Provisional type required for FY ${yearLabel}`, {
+          variant: 'error',
+        });
+        return false;
+      }
+
+      if (!doc.periodStartYear || !doc.periodEndYear) {
+        enqueueSnackbar(`Invalid financial year for FY ${yearLabel}`, {
+          variant: 'error',
+        });
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const handleSave = async () => {
+    if (!validateBeforeSubmit()) return;
+
+    try {
+      const financialsData = documents.map((doc) => ({
+        category: 'gstr_9',
+        type: 'year_wise',
+        baseFinancialStartYear: Number(currentBaseYear) - 1,
+        baseFinancialEndYear: Number(currentBaseYear),
+        periodStartYear: doc.periodStartYear,
+        periodEndYear: doc.periodEndYear,
+        auditedType: doc.auditedType,
+        auditorName: auditorName.trim(),
+        reportDate: doc.reportDate,
+        fileId: doc.file.id,
+        isActive: true,
+        isDeleted: false,
+      }));
+
+      const payloadData = {
+        auditedFinancials: financialsData,
+      };
+
+      const response = await axiosInstance.patch(
+        `/bond-estimations/audited-financials/${applicationId}`,
+        payloadData
+      );
+
+      if (response?.data?.success) {
+        enqueueSnackbar(
+          response.data.message || 'Audited financials saved successfully',
+          { variant: 'success' }
+        );
+        setProgress(true);
+      } else {
+        enqueueSnackbar('Failed to save audited financials', { variant: 'error' });
+      }
+    } catch (error) {
+      console.error('Error while uploading financials:', error);
+
+      enqueueSnackbar(
+        error?.response?.data?.error?.message ||
+        'Something went wrong while saving audited financials',
+        { variant: 'error' }
+      );
+    }
+  };
+
+  // -----------------------------
+  // Render
+  // -----------------------------
   return (
     <Container disableGutters>
       <Grid
@@ -231,27 +353,27 @@ export default function AuditedGSTR9({ setPercent, setProgress }) {
                   },
                 }}
               >
-                <Typography variant="body2">{doc.year}</Typography>
+                <Typography variant="body2">{`${doc.periodStartYear}-${doc.periodEndYear}`}</Typography>
 
                 <Box>
                   <RadioGroup
                     row
-                    value={doc.statementType}
+                    value={doc.auditedType}
                     onChange={(e) => {
                       const newDocuments = documents.map((d) =>
-                        d.id === doc.id ? { ...d, statementType: e.target.value } : d
+                        d.id === doc.id ? { ...d, auditedType: e.target.value } : d
                       );
                       setDocuments(newDocuments);
                     }}
                   >
                     <FormControlLabel
-                      value="Audited"
+                      value="audited"
                       control={<Radio size="small" />}
                       label="Audited"
                       sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.875rem' } }}
                     />
                     <FormControlLabel
-                      value="Provisional"
+                      value="provisional"
                       control={<Radio size="small" />}
                       label="Provisional"
                       sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.875rem' } }}
@@ -264,7 +386,7 @@ export default function AuditedGSTR9({ setPercent, setProgress }) {
                       Not Uploaded
                     </Typography>
                   ) : (
-                    <Typography variant="body2">{doc.file.name}</Typography>
+                    <Typography variant="body2">{doc.file.fileOriginalName || doc.file.fileName}</Typography>
                   )}
                 </Box>
 
@@ -287,7 +409,7 @@ export default function AuditedGSTR9({ setPercent, setProgress }) {
                 <Box>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <DatePicker
-                      value={doc.reportDate}
+                      value={toValidDate(doc.reportDate)}
                       onChange={(newValue) => handleDateChange(newValue, doc.id)}
                       renderInput={({ inputRef, inputProps, InputProps }) => (
                         <Box
@@ -393,12 +515,12 @@ export default function AuditedGSTR9({ setPercent, setProgress }) {
                     sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.875rem' } }}
                   >
                     <FormControlLabel
-                      value="Audited"
+                      value="audited"
                       control={<Radio size="small" />}
                       label="Audited"
                     />
                     <FormControlLabel
-                      value="Provisional"
+                      value="provisional"
                       control={<Radio size="small" />}
                       label="Provisional"
                     />
@@ -441,7 +563,7 @@ export default function AuditedGSTR9({ setPercent, setProgress }) {
                   <Typography variant="subtitle2">Report Date:</Typography>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <DatePicker
-                      value={doc.reportDate}
+                      value={toValidDate(doc.reportDate)}
                       onChange={(newValue) => handleDateChange(newValue, doc.id)}
                       renderInput={({ inputRef, inputProps, InputProps }) => (
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -498,7 +620,7 @@ export default function AuditedGSTR9({ setPercent, setProgress }) {
                     </label>
                   ) : (
                     <Typography variant="body2" sx={{ flexGrow: 1, mr: 1 }}>
-                      {doc.file.name}
+                      {doc.file.fileName || doc.file.fileOriginalName}
                     </Typography>
                   )}
                   <Box sx={{ display: 'flex', gap: 1 }}>
@@ -526,7 +648,32 @@ export default function AuditedGSTR9({ setPercent, setProgress }) {
             ))}
           </Box>
         </Grid>
+        <Box
+          sx={{
+            mt: 3,
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: 2,
+            width: '100%',
+          }}
+        >
+          <Button
+            variant="contained"
+            sx={{ color: '#fff' }}
+            onClick={() => handleSave()}
+          >
+            Save
+          </Button>
+        </Box>
       </Grid>
     </Container>
   );
 }
+
+AuditedGSTR9.propTypes = {
+  currentBaseYear: PropTypes.string.isRequired,
+  setPercent: PropTypes.func.isRequired,
+  setProgress: PropTypes.func.isRequired,
+  currentData: PropTypes.array
+};
+
