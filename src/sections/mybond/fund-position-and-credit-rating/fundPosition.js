@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
-import { Box, Card, Grid, Typography } from '@mui/material';
+import { Box, Button, Card, Grid, Typography } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
@@ -8,6 +8,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useGetBondApplicationStepData } from 'src/api/bondApplications';
 import FormProvider, { RHFPriceField, RHFTextField } from 'src/components/hook-form';
+import { AutoFill } from 'src/forms-autofilled-script/autofill';
+import { NewFundPosition } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
 import { useParams } from 'src/routes/hook';
 import axiosInstance from 'src/utils/axios';
 import * as Yup from 'yup';
@@ -59,6 +61,7 @@ export default function FundPosition({
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { isSubmitting },
   } = methods;
 
@@ -72,7 +75,7 @@ export default function FundPosition({
         enqueueSnackbar('Fund position saved', { variant: 'success' });
       }
     } catch (error) {
-       const message =
+      const message =
         error?.error?.message || 'Error while updating fund position in bond estimations :';
       enqueueSnackbar(message, { variant: 'error' });
       console.error(error);
@@ -91,6 +94,12 @@ export default function FundPosition({
 
     setPercent?.(percentVal);
   };
+
+
+  const handleAutoFill = () => {
+    const data = NewFundPosition();
+    AutoFill({ setValue, fields: data });
+  }
 
   useEffect(() => {
     calculatePercent();
@@ -114,7 +123,7 @@ export default function FundPosition({
     <FormProvider methods={methods} onSubmit={onSubmit}>
       <Card sx={{ p: 4, borderRadius: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', mb: 4 }}>
 
-        <Typography variant="h5"  fontWeight="bold" color="primary">
+        <Typography variant="h5" fontWeight="bold" color="primary">
           Fund Position
         </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
@@ -193,6 +202,7 @@ export default function FundPosition({
             gap: 2,
           }}
         >
+          <Button variant='contained' onClick={() => handleAutoFill()}>Autofill</Button>
           <LoadingButton
             type="submit"
             loading={isSubmitting}

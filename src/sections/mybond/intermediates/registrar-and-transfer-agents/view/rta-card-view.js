@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 
 import Iconify from 'src/components/iconify';
+import Label from 'src/components/label';
 
 export default function RtaCardView({
   row,
@@ -20,12 +21,11 @@ export default function RtaCardView({
 }) {
   return (
     <Grid item xs={12} md={6} lg={4}>
-       <Card
+      <Card
         sx={{
           p: 2,
           mb: 2,
           border: selected ? '2px solid #1877F2' : '1px solid #e0e0e0',
-          opacity: disabled ? 0.6 : 1,
           transition: '0.2s',
         }}
       >
@@ -40,15 +40,17 @@ export default function RtaCardView({
           }}
         >
 
-         <Checkbox
+          {selected ? (
+            <Label variant='soft' color='success'>Appointed</Label>
+          ) : (<Checkbox
             checked={selected}
             disabled={disabled}
-            onChange={() => {
-              if (disabled) return;
-              onSelectRow(row.id);
-            }}
-          />
-
+            onChange={
+              () => {
+                if (disabled) return;
+                onSelectRow(row.id);
+              }}
+          />)}
 
           {/* RIGHT → Actions */}
           <Stack direction="row" spacing={0.5}>
@@ -58,7 +60,7 @@ export default function RtaCardView({
               </IconButton>
             </Tooltip>
 
-            <Tooltip title="Send Request">
+            {!disabled && <Tooltip title="Send Request">
               <IconButton
                 size="small"
                 sx={{ p: 0.5 }}
@@ -67,7 +69,7 @@ export default function RtaCardView({
               >
                 <Iconify icon="mdi:email-send" />
               </IconButton>
-            </Tooltip>
+            </Tooltip>}
           </Stack>
         </Stack>
 

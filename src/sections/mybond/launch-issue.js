@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   Box,
   Button,
@@ -20,6 +20,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import FormProvider, { RHFSelect } from 'src/components/hook-form';
 import RHFDateTimePicker from 'src/components/custom-date-range-picker/rhf-date-time-picker';
 import { DatePicker } from '@mui/x-date-pickers';
+import { NewLaunchIssue } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
+import { AutoFill } from 'src/forms-autofilled-script/autofill';
 import { Icon } from '@iconify/react';
 import { LoadingButton } from '@mui/lab';
 import { enqueueSnackbar } from 'notistack';
@@ -41,16 +43,35 @@ export default function LaunchIssue({
     issueClosingDate: Yup.date().nullable().required('Issue closing date is required'),
   });
 
-  const defaultValues = {
-    listingExchange: 'nse',
-    subscriptionStartDateTime: null,
-    subscriptionEndDateTime: null,
-    dateOfAllotment: null,
-    dateOfMaturity: null,
-    depository: '',
-    issueOpeningDate: null,
-    issueClosingDate: null,
-  };
+  const defaultValues = useMemo(() => ({
+    listingExchange: currentLaunchIssue?.listingExchange || 'nse',
+
+    subscriptionStartDateTime: currentLaunchIssue?.subscriptionStartDateTime
+      ? new Date(currentLaunchIssue.subscriptionStartDateTime)
+      : null,
+
+    subscriptionEndDateTime: currentLaunchIssue?.subscriptionEndDateTime
+      ? new Date(currentLaunchIssue.subscriptionEndDateTime)
+      : null,
+
+    dateOfAllotment: currentLaunchIssue?.dateOfAllotment
+      ? new Date(currentLaunchIssue.dateOfAllotment)
+      : null,
+
+    dateOfMaturity: currentLaunchIssue?.dateOfMaturity
+      ? new Date(currentLaunchIssue.dateOfMaturity)
+      : null,
+
+    depository: currentLaunchIssue?.depository || '',
+
+    issueOpeningDate: currentLaunchIssue?.issueOpeningDate
+      ? new Date(currentLaunchIssue.issueOpeningDate)
+      : null,
+
+    issueClosingDate: currentLaunchIssue?.issueClosingDate
+      ? new Date(currentLaunchIssue.issueClosingDate)
+      : null,
+  }), [currentLaunchIssue]);
 
   const methods = useForm({
     resolver: yupResolver(LaunchIssueSchema),
@@ -64,6 +85,11 @@ export default function LaunchIssue({
     control,
     formState: { errors = {} },
   } = methods;
+
+  const handleAutoFill = () => {
+    const data = NewLaunchIssue();
+    AutoFill({ setValue, fields: data });
+  };
 
   const currentAction = watch('listingExchange');
 
@@ -97,6 +123,8 @@ export default function LaunchIssue({
     }
   };
 
+  console.log('defaultvalues', currentLaunchIssue);
+
   // auto recalc when values or errors change
   useEffect(() => {
     calculatePercentUsingYup();
@@ -111,13 +139,10 @@ export default function LaunchIssue({
   useEffect(() => {
     if (!currentLaunchIssue || Object.keys(currentLaunchIssue).length === 0) return;
 
-    methods.reset({
-      ...defaultValues,
-      ...currentLaunchIssue,
-    });
+    methods.reset(defaultValues);
 
     percent?.(100);
-  }, [currentLaunchIssue]);
+  }, [currentLaunchIssue, methods.reset, defaultValues]);
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
@@ -125,7 +150,7 @@ export default function LaunchIssue({
         <Card sx={{ p: 3 }}>
           <Grid container spacing={4}>
             <Grid item xs={12}>
-              <Typography variant="h5" color='primary'  fontWeight= 'bold'>
+              <Typography variant="h5" color='primary' fontWeight='bold'>
                 Launch Issue
               </Typography>
             </Grid>
@@ -433,6 +458,9 @@ export default function LaunchIssue({
             {/* <Button variant="outlined" sx={{ color: '#000000' }}>
               Cancel
             </Button> */}
+            <Button variant="contained" onClick={() => handleAutoFill()} sx={{ color: '#fff' }}>
+              Autofill
+            </Button>
             <LoadingButton variant="contained" type="submit" sx={{ color: '#fff' }}>
               Launch Issue
             </LoadingButton>

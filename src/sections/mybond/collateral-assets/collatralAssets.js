@@ -25,6 +25,8 @@ import { useGetBondApplicationStepData } from 'src/api/bondApplications';
 import { useParams } from 'src/routes/hook';
 import ValuatorApprovalPendingNotice from './valuatorApprovalPending';
 import ValuatorApprovalCard from './valuatorApprovalCard';
+import { NewCollateralAsset } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
+import { AutoFill } from 'src/forms-autofilled-script/autofill';
 
 export default function CollateralAssets({
   percent,
@@ -104,12 +106,13 @@ export default function CollateralAssets({
     reset,
     watch,
     handleSubmit,
+    setValue,
     formState: { isSubmitting },
   } = methods;
 
   const values = watch();
 
-  const { fields, append } = useFieldArray({
+  const { fields, append, replace } = useFieldArray({
     control,
     name: 'collateralAssets',
   });
@@ -129,6 +132,14 @@ export default function CollateralAssets({
       valuationReport: null,
       remark: '',
     });
+  };
+
+  const handleAutoFill = () => {
+    replace([
+      {
+        ...NewCollateralAsset(),
+      },
+    ]);
   };
 
   const onSubmit = handleSubmit(async (data) => {
@@ -382,8 +393,8 @@ export default function CollateralAssets({
                     label="Security Document"
                     accept={{
                       'application/pdf': ['.pdf'],
-                      'image/png': ['.png'],
-                      'image/jpeg': ['.jpg', '.jpeg'],
+                      'application/msword': ['.doc'],
+                      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
                     }}
                   />
                   <YupErrorMessage name={`collateralAssets.${index}.securityDocument`} />
@@ -424,6 +435,14 @@ export default function CollateralAssets({
             gap: 2,
           }}
         >
+          <Button
+            type='button'
+            variant="contained"
+            onClick={() => handleAutoFill()}
+            sx={{ color: '#fff' }}
+          >
+            Autofill
+          </Button>
           <Button
             type='button'
             variant="contained"

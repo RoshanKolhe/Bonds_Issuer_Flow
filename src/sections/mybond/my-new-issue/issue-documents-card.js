@@ -61,7 +61,7 @@ export default function IssueDocumentsCard({
     defaultValues,
   });
 
-  
+
   const {
     watch,
     handleSubmit,
@@ -70,7 +70,7 @@ export default function IssueDocumentsCard({
 
   const values = watch();
 
-  console.log('Values',values)
+  console.log('Values', values)
 
   const onSubmit = handleSubmit(async (data) => {
     try {
@@ -169,7 +169,7 @@ export default function IssueDocumentsCard({
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
       <Card sx={{ p: 2 }}>
-          <Typography variant="h5" mb={2} fontWeight="bold" color="primary">
+        <Typography variant="h5" mb={2} fontWeight="bold" color="primary">
           Upload Documents
         </Typography>
 
@@ -181,8 +181,8 @@ export default function IssueDocumentsCard({
                 label={doc.label}
                 accept={{
                   'application/pdf': ['.pdf'],
-                  'image/png': ['.png'],
-                  'image/jpeg': ['.jpg', '.jpeg'],
+                  'application/msword': ['.doc'],
+                  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
                 }}
               />
             </Grid>

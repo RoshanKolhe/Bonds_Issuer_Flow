@@ -143,7 +143,9 @@ export default function MybondStepper() {
     const savedProgress = localStorage.getItem('stepsProgress');
 
     if (savedStep) setActiveStepId(savedStep);
-    if (savedForm) setFormData(JSON.parse(savedForm));
+    if (savedForm) {
+      setFormData(JSON.parse(savedForm))
+    };
     if (savedProgress) setStepsProgress(JSON.parse(savedProgress));
   }, []);
 
@@ -356,6 +358,8 @@ export default function MybondStepper() {
             currentPAS4Regulatory={formData.regulatory_filing?.pas4}
             currentTermSheetRegulatory={formData.regulatory_filing?.sebiApprovals}
             currentInformationMemorandumRegulatory={formData.regulatory_filing?.memorandum}
+            currentGIDRegulatory={formData.regulatory_filing?.gid}
+            currentPAS5Regulatory={formData.regulatory_filing?.pas5}
             percent={(p) => updateStepPercent('regulatory_filing', p)}
             setActiveStepId={setActiveStepId}
             saveStepData={(data) => saveStepData('regulatory_filing', data)}

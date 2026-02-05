@@ -15,6 +15,7 @@ import Iconify from 'src/components/iconify';
 import { useGetCreditRatingAgencies } from 'src/api/creditRatingsAndAgencies';
 import axiosInstance from 'src/utils/axios';
 import { useParams } from 'react-router';
+import Label from 'src/components/label';
 
 export default function CreditRatingAgency({ isLocked, stepData }) {
   const { enqueueSnackbar } = useSnackbar();
@@ -25,7 +26,7 @@ export default function CreditRatingAgency({ isLocked, stepData }) {
   const [selectedAgencyIds, setSelectedAgencyIds] = useState([]);
   const [showError, setShowError] = useState(false);
 
- 
+
   useEffect(() => {
     if (stepData?.creditRatingAgency?.length) {
       setSelectedAgencyIds(
@@ -66,7 +67,7 @@ export default function CreditRatingAgency({ isLocked, stepData }) {
 
       if (response?.data?.success) {
         enqueueSnackbar('Request sent successfully', { variant: 'success' });
-       
+
       }
     } catch (error) {
       enqueueSnackbar('Failed to send request', { variant: 'error' });
@@ -92,7 +93,7 @@ export default function CreditRatingAgency({ isLocked, stepData }) {
           sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
         >
           <Iconify icon="solar:chart-bold" width={22} />
-          Credit Rating Agencies
+          Credit Rating Agency
         </Typography>
 
         <Button
@@ -126,16 +127,17 @@ export default function CreditRatingAgency({ isLocked, stepData }) {
                     ? '2px solid #1877F2'
                     : '1px solid #e0e0e0',
                   pointerEvents: isLocked ? 'none' : 'auto',
-                  opacity: isLocked ? 0.6 : 1,
                   transition: '0.2s',
                 }}
               >
-                <Checkbox
+                {checked ? (
+                  <Label sx={{ position: 'absolute', top: 8, right: 8 }} variant='soft' color='success'>Appointed</Label>
+                ) : (<Checkbox
                   checked={checked}
                   disabled={isLocked}
                   onChange={() => handleToggle(agency.id)}
                   sx={{ position: 'absolute', top: 8, right: 8 }}
-                />
+                />)}
 
                 <Box sx={{ height: 60, mb: 1.5 }}>
                   <Box

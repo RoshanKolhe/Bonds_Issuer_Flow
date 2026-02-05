@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Container, Grid, Typography, Box, Card } from '@mui/material';
+import { Container, Grid, Typography, Box, Card, Button } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useForm } from 'react-hook-form';
 import { enqueueSnackbar } from 'notistack';
@@ -11,6 +11,8 @@ import FormProvider, {
   RHFTextField,
 } from 'src/components/hook-form';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
+import { NewInformationMemorandum } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
+import { AutoFill } from 'src/forms-autofilled-script/autofill';
 
 export default function InformationMemorandum({
   currentData,
@@ -39,7 +41,7 @@ export default function InformationMemorandum({
     defaultValues,
   });
 
-  const { handleSubmit, watch, reset } = methods;
+  const { handleSubmit, watch, reset, setValue } = methods;
 
   const filingDateMemorandum = watch('filingDateMemorandum');
   const fileNameMemorandum = watch('fileNameMemorandum');
@@ -81,6 +83,11 @@ export default function InformationMemorandum({
     }
   }, [currentData, reset, setPercent, setProgress]);
 
+  const handleAutoFill = () => {
+    const data = NewInformationMemorandum();
+    AutoFill({ setValue, fields: data });
+  };
+
   /* ---------------- SUBMIT ---------------- */
   const onSubmit = (data) => {
     const payload = {
@@ -104,7 +111,7 @@ export default function InformationMemorandum({
       <Container>
         <Card sx={{ p: 3 }}>
           <Typography variant="h5" color='primary'  fontWeight= 'bold'  mb={2}>
-            Prospectus / Information Memorandum
+            Prospectus / Information Memorandum / KID
           </Typography>
 
           <Grid container spacing={3}>
@@ -142,7 +149,8 @@ export default function InformationMemorandum({
             </Grid>
           </Grid>
 
-          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+          <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+            <Button variant='contained' onClick={() => handleAutoFill()}>Autofill</Button>
             <LoadingButton type="submit" variant="contained">
               Save
             </LoadingButton>

@@ -8,6 +8,7 @@ import {
   Card,
   Alert,
   MenuItem,
+  Button,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useForm, Controller } from 'react-hook-form';
@@ -20,6 +21,8 @@ import FormProvider, {
   RHFTextField,
 } from 'src/components/hook-form';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
+import { NewInPrincipleApproval } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
+import { AutoFill } from 'src/forms-autofilled-script/autofill';
 
 export default function InPrincipleApproval({
   currentData,
@@ -57,7 +60,7 @@ export default function InPrincipleApproval({
     defaultValues,
   });
 
-  const { handleSubmit, control, watch, reset } = methods;
+  const { handleSubmit, control, watch, reset, setValue } = methods;
 
   const exchange = watch('exchange');
   const approvalNo = watch('inPrincipleApprovalNo');
@@ -90,6 +93,11 @@ export default function InPrincipleApproval({
       percent?.(100);
     }
   }, [currentData, reset, percent]);
+
+  const handleAutoFill = () => {
+    const data = NewInPrincipleApproval();
+    AutoFill({ setValue, fields: data });
+  };
 
   /* ---------------- SUBMIT ---------------- */
   const onSubmit = (data) => {
@@ -180,7 +188,8 @@ export default function InPrincipleApproval({
             </Grid>
           </Grid>
 
-          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+          <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+            <Button variant='contained' onClick={() => handleAutoFill()}>Autofill</Button>
             <LoadingButton type="submit" variant="contained">
               Save & Continue
             </LoadingButton>

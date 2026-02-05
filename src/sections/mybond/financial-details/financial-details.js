@@ -1,11 +1,13 @@
 /* eslint-disable no-useless-escape */
 import React, { useEffect, useMemo } from 'react';
-import { Box, Grid, Card, Typography } from '@mui/material';
+import { Box, Grid, Card, Typography, Button } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import FormProvider, { RHFPriceField, RHFTextField } from 'src/components/hook-form';
 import PropTypes from 'prop-types';
+import { NewFinancialRatios } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
+import { AutoFill } from 'src/forms-autofilled-script/autofill';
 
 export default function FinancialDetails({
   currentDetails,
@@ -47,6 +49,7 @@ export default function FinancialDetails({
     watch,
     handleSubmit,
     reset,
+    setValue,
     formState: { isSubmitting },
   } = methods;
 
@@ -85,6 +88,11 @@ export default function FinancialDetails({
       setPercent?.(50);
     }
   }, [currentDetails, reset, defaultValues, setProgress, setPercent]);
+
+  const handleAutoFill = () => {
+    const data = NewFinancialRatios();
+    AutoFill({ setValue, fields: data });
+  };
 
   return (
     <FormProvider methods={methods} >
@@ -129,6 +137,9 @@ export default function FinancialDetails({
               />
             </Grid>
           </Grid>
+          <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+            <Button variant='contained' onClick={() => handleAutoFill()}>Autofill</Button>
+          </Box>
         </Card>
       </Box>
     </FormProvider>

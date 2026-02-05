@@ -124,7 +124,7 @@ export default function DebentureTrusteeListView({ isLocked, stepData }) {
             sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
           >
             <Iconify icon="solar:shield-check-bold" width={22} />
-            Debenture Trustee's
+            Debenture Trustee
           </Typography>
           <Stack direction="row" spacing={2}>
             <Button
@@ -190,7 +190,7 @@ export default function DebentureTrusteeListView({ isLocked, stepData }) {
                 onSelectRow={handleSelectRow}
                 onView={() => handleView(row.id)}
                 onSendRequest={() => handleSendRequest(row.id)}
-                disabled={isLocked}
+                disabled={selected.includes(row.id)}
               />
             ))}
           </Grid>

@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Container, Grid, Typography, Box, Card } from '@mui/material';
+import { Container, Grid, Typography, Box, Card, Button } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useForm, Controller } from 'react-hook-form';
 import { enqueueSnackbar } from 'notistack';
@@ -9,6 +9,8 @@ import { DatePicker } from '@mui/x-date-pickers';
 import FormProvider, { RHFCustomFileUploadBox, RHFTextField } from 'src/components/hook-form';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
 import { useEffect } from 'react';
+import { NewTermSheet } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
+import { AutoFill } from 'src/forms-autofilled-script/autofill';
 
 export default function TermSheet({ currentData, saveStepData, setPercent, setProgress }) {
   const Schema = Yup.object().shape({
@@ -28,7 +30,7 @@ export default function TermSheet({ currentData, saveStepData, setPercent, setPr
     defaultValues,
   });
 
-  const { handleSubmit, control, watch, reset, getValues } = methods;
+  const { handleSubmit, control, watch, reset, getValues, setValue } = methods;
 
   const sebiApprovalNo = watch('sebiApprovalNo');
   const sebiDate = watch('sebiDate');
@@ -60,6 +62,11 @@ export default function TermSheet({ currentData, saveStepData, setPercent, setPr
       setProgress?.(true);
     }
   }, [currentData, reset, setPercent, setProgress]);
+
+  const handleAutoFill = () => {
+    const data = NewTermSheet();
+    AutoFill({ setValue, fields: data });
+  };
 
   const onSubmit = (data) => {
     const payload = {
@@ -121,7 +128,8 @@ export default function TermSheet({ currentData, saveStepData, setPercent, setPr
             </Grid>
           </Grid>
 
-          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+          <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+            <Button variant='contained' onClick={() => handleAutoFill()}>Autofill</Button>
             <LoadingButton type="submit" variant="contained">
               Save
             </LoadingButton>

@@ -22,6 +22,8 @@ import axiosInstance from 'src/utils/axios';
 import { useParams } from 'src/routes/hook';
 import { useSnackbar } from 'notistack';
 import { useGetBondApplicationStepData } from 'src/api/bondApplications';
+import { NewBorrowingDetails } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
+import { AutoFill } from 'src/forms-autofilled-script/autofill';
 
 const repaymentTerm = [
   { label: 'Monthly', value: 'monthly' },
@@ -126,6 +128,23 @@ export default function BorrowingDetails({ percent, setActiveStepId }) {
       monthlyPrincipal: '',
       monthlyInterest: '',
     });
+  };
+
+  const handleAutoFill = () => {
+    const data = NewBorrowingDetails();
+    // If no borrowings exist, add one with autofilled data
+    if (fields.length === 0) {
+      append(data);
+    } else {
+      // Autofill the first borrowing entry
+      Object.entries(data).forEach(([key, value]) => {
+        setValue(`borrowings[0].${key}`, value, {
+          shouldDirty: true,
+          shouldTouch: true,
+          shouldValidate: true,
+        });
+      });
+    }
   };
 
   const onSubmit = handleSubmit(async (data) => {
@@ -290,7 +309,21 @@ export default function BorrowingDetails({ percent, setActiveStepId }) {
             </Grid>
           </Card>
         ))}
-        <Box textAlign="center">
+        <Box textAlign="center" sx={{ display: 'flex', gap: 2, justifyContent: 'center', mt: 3 }}>
+          <Button
+            variant="contained"
+            onClick={handleAutoFill}
+            sx={{
+              color: '#fff',
+              fontWeight: 600,
+              px: 3,
+              py: 1,
+              borderRadius: 2,
+              textTransform: 'none',
+            }}
+          >
+            Autofill
+          </Button>
           <Button
             variant="contained"
             onClick={handleAddBorrowing}
@@ -300,7 +333,6 @@ export default function BorrowingDetails({ percent, setActiveStepId }) {
               fontWeight: 600,
               px: 3,
               py: 1,
-              mt: 3,
               borderRadius: 2,
               textTransform: 'none',
               '&:hover': {

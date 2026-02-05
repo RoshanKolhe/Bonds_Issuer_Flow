@@ -8,6 +8,9 @@ import PropTypes from 'prop-types';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
 import { useSnackbar } from 'notistack';
+import { NewProfitabilityDetails } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
+import { AutoFill } from 'src/forms-autofilled-script/autofill';
+import { Button } from '@mui/material';
 export default function ProfitabilityDetails({
   currentDetails,
   saveStepData,
@@ -39,6 +42,7 @@ export default function ProfitabilityDetails({
     watch,
     handleSubmit,
     reset,
+    setValue,
     formState: { isSubmitting },
   } = methods;
 
@@ -70,6 +74,11 @@ export default function ProfitabilityDetails({
       setPercent?.(50);
     }
   }, [currentDetails, reset, defaultValues, setProgress, setPercent]);
+
+  const handleAutoFill = () => {
+    const data = NewProfitabilityDetails();
+    AutoFill({ setValue, fields: data });
+  };
 
   const onSubmit = handleSubmit(async (data) => {
     try {
@@ -107,6 +116,10 @@ export default function ProfitabilityDetails({
               <RHFPriceField name="ebidta" label="Enter EBIDTA Amount" fullWidth />
             </Grid>
           </Grid>
+
+          <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+            <Button variant='contained' onClick={() => handleAutoFill()}>Autofill</Button>
+          </Box>
 
           {/* <Grid container justifyContent="flex-end" sx={{ mt: 3 }}>
             <Grid item xs={12} md={3} sx={{ display: 'flex', justifyContent: 'flex-end' }}>

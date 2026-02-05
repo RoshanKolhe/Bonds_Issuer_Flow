@@ -1,6 +1,7 @@
 import * as Yup from 'yup';
 import {
   Box,
+  Button,
   Card,
   CardContent,
   Grid,
@@ -21,6 +22,8 @@ import { useGetRedemptionTypes } from 'src/api/redemptionTypes';
 import axiosInstance from 'src/utils/axios';
 import { useParams } from 'src/routes/hook';
 import { useGetBondApplicationStepData } from 'src/api/bondApplications';
+import { NewIssueSetup } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
+import { AutoFill } from 'src/forms-autofilled-script/autofill';
 
 export default function IssueDetailsCard({
   setProgress,
@@ -161,6 +164,11 @@ export default function IssueDetailsCard({
       console.error(error);
     }
   });
+
+  const handleAutoFill = () => {
+    const data = NewIssueSetup();
+    AutoFill({setValue, fields:data});
+  }
 
   useEffect(() => {
     if (investorCtegories && !investorCtegoriesLoading) {
@@ -371,7 +379,8 @@ export default function IssueDetailsCard({
               <RHFPriceField name="minimumInvestmentPrice" label="Minimum Investment Price" placeholder="Auto calculated" disabled />
             </Grid>
           </Grid>
-          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+          <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+            <Button variant='contained' onClick={() => handleAutoFill()}>Autofill</Button>
             <LoadingButton type="submit" loading={isSubmitting} variant="contained">
               Save
             </LoadingButton>

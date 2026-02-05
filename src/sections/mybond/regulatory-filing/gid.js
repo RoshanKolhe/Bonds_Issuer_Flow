@@ -8,26 +8,26 @@ import { useEffect } from 'react';
 
 import FormProvider, { RHFCustomFileUploadBox, RHFTextField } from 'src/components/hook-form';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
-import { NewPAS4 } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
+import { NewGID } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
 import { AutoFill } from 'src/forms-autofilled-script/autofill';
 
-export default function PAS4({ currentData, saveStepData, setPercent, setProgress }) {
+export default function GID({ currentData, saveStepData, setPercent, setProgress }) {
   /* ---------------- SCHEMA ---------------- */
   const Schema = Yup.object().shape({
-    filingDatePas4: Yup.string().required('Filing Date is required'),
-    fileNamePas4: Yup.string().required('File Name is required'),
-    referenceNoPas4: Yup.string().required('Reference No is required'),
-    approvalNoPas4: Yup.string().required('Approval Number is required'),
-    pas4: Yup.mixed().required('PAS-4 upload is required'),
+    filingDateGid: Yup.string().required('Filing Date is required'),
+    fileNameGid: Yup.string().required('File Name is required'),
+    referenceNoGid: Yup.string().required('Reference No is required'),
+    approvalNoGid: Yup.string().required('Approval Number is required'),
+    gid: Yup.mixed().required('GID upload is required'),
   });
 
   /* ---------------- DEFAULT VALUES ---------------- */
   const defaultValues = {
-    filingDatePas4: '',
-    fileNamePas4: '',
-    referenceNoPas4: '',
-    approvalNoPas4: '',
-    pas4: null,
+    filingDateGid: '',
+    fileNameGid: '',
+    referenceNoGid: '',
+    approvalNoGid: '',
+    gid: null,
   };
 
   const methods = useForm({
@@ -37,32 +37,32 @@ export default function PAS4({ currentData, saveStepData, setPercent, setProgres
 
   const { handleSubmit, watch, reset, setValue } = methods;
 
-  const filingDatePas4 = watch('filingDatePas4');
-  const fileNamePas4 = watch('fileNamePas4');
-  const referenceNoPas4 = watch('referenceNoPas4');
-  const approvalNoPas4 = watch('approvalNoPas4');
-  const pas4 = watch('pas4');
+  const filingDateGid = watch('filingDateGid');
+  const fileNameGid = watch('fileNameGid');
+  const referenceNoGid = watch('referenceNoGid');
+  const approvalNoGid = watch('approvalNoGid');
+  const gid = watch('gid');
 
   /* ---------------- PERCENT LOGIC ---------------- */
   useEffect(() => {
     let completed = 0;
 
-    if (filingDatePas4) completed++;
-    if (fileNamePas4) completed++;
-    if (referenceNoPas4) completed++;
-    if (approvalNoPas4) completed++;
-    if (pas4) completed++;
+    if (filingDateGid) completed++;
+    if (fileNameGid) completed++;
+    if (referenceNoGid) completed++;
+    if (approvalNoGid) completed++;
+    if (gid) completed++;
 
     const pct = Math.round((completed / 5) * 35);
 
     setPercent?.(pct);
     setProgress?.(pct === 35);
   }, [
-    filingDatePas4,
-    fileNamePas4,
-    referenceNoPas4,
-    approvalNoPas4,
-    pas4,
+    filingDateGid,
+    fileNameGid,
+    referenceNoGid,
+    approvalNoGid,
+    gid,
     setPercent,
     setProgress,
   ]);
@@ -80,26 +80,27 @@ export default function PAS4({ currentData, saveStepData, setPercent, setProgres
     }
   }, [currentData, reset, setPercent, setProgress]);
 
+  /* ---------------- AUTOFILL ---------------- */
   const handleAutoFill = () => {
-    const data = NewPAS4();
+    const data = NewGID();
     AutoFill({ setValue, fields: data });
   };
 
   /* ---------------- SUBMIT ---------------- */
   const onSubmit = (data) => {
     const payload = {
-      filingDatePas4: data.filingDatePas4,
-      fileNamePas4: data.fileNamePas4,
-      referenceNoPas4: data.referenceNoPas4,
-      approvalNoPas4: data.approvalNoPas4,
-      pas4: data.pas4,
+      filingDateGid: data.filingDateGid,
+      fileNameGid: data.fileNameGid,
+      referenceNoGid: data.referenceNoGid,
+      approvalNoGid: data.approvalNoGid,
+      gid: data.gid,
     };
 
     saveStepData?.(payload);
     setPercent?.(20);
     setProgress?.(true);
 
-    enqueueSnackbar('PAS-4 saved successfully!', {
+    enqueueSnackbar('GID saved successfully!', {
       variant: 'success',
     });
   };
@@ -108,39 +109,42 @@ export default function PAS4({ currentData, saveStepData, setPercent, setProgres
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Container>
         <Card sx={{ p: 3 }}>
-          <Typography variant="h5" color='primary' fontWeight='bold' mb={2}>
-            PAS-4
+          <Typography variant="h5" color="primary" fontWeight="bold" mb={2}>
+            GID
           </Typography>
 
           <Grid container spacing={3}>
             <Grid item xs={12} md={3}>
-              <RHFTextField name="filingDatePas4" label="Filing Date" fullWidth />
+              <RHFTextField name="filingDateGid" label="Filing Date" fullWidth />
             </Grid>
 
             <Grid item xs={12} md={3}>
-              <RHFTextField name="fileNamePas4" label="File Name" fullWidth />
+              <RHFTextField name="fileNameGid" label="File Name" fullWidth />
             </Grid>
 
             <Grid item xs={12} md={3}>
-              <RHFTextField name="referenceNoPas4" label="Reference No" fullWidth />
+              <RHFTextField name="referenceNoGid" label="Reference No" fullWidth />
             </Grid>
 
             <Grid item xs={12} md={3}>
-              <RHFTextField name="approvalNoPas4" label="Approval Number" fullWidth />
+              <RHFTextField name="approvalNoGid" label="Approval Number" fullWidth />
             </Grid>
 
             <Grid item xs={12}>
               <RHFCustomFileUploadBox
-                name="pas4"
-                label="Upload PAS-4"
+                name="gid"
+                label="Upload GID"
                 icon="mdi:file-document-outline"
               />
-              <YupErrorMessage name="pas4" />
+              <YupErrorMessage name="gid" />
             </Grid>
           </Grid>
 
           <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-            <Button variant='contained' onClick={() => handleAutoFill()}>Autofill</Button>
+            <Button variant="contained" onClick={handleAutoFill}>
+              Autofill
+            </Button>
+
             <LoadingButton type="submit" variant="contained">
               Save
             </LoadingButton>

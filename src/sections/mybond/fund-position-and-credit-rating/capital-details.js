@@ -11,6 +11,9 @@ import { useSnackbar } from 'notistack';
 import { useParams } from 'src/routes/hook';
 import { useGetBondApplicationStepData } from 'src/api/bondApplications';
 import axiosInstance from 'src/utils/axios';
+import { NewCapitalDetails } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
+import { AutoFill } from 'src/forms-autofilled-script/autofill';
+import { Button } from '@mui/material';
 
 export default function CapitalDetails({
   setPercent,
@@ -97,6 +100,11 @@ export default function CapitalDetails({
     }
   });
 
+  const handleAutoFill = () => {
+    const data = NewCapitalDetails();
+    AutoFill({ setValue, fields: data });
+  }
+
   useEffect(() => {
     if (stepData && !stepDataLoading) {
       setCapitalDetailsData(stepData);
@@ -161,13 +169,12 @@ export default function CapitalDetails({
               />
             </Grid>
           </Grid>
-          <Grid container justifyContent="flex-end" sx={{ mt: 3 }}>
-            <Grid item xs={12} md={3} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <LoadingButton type="submit" variant="contained" sx={{ color: '#fff' }}>
-                Save
-              </LoadingButton>
-            </Grid>
-          </Grid>
+          <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+            <Button variant='contained' onClick={() => handleAutoFill()}>Autofill</Button>
+            <LoadingButton type="submit" variant="contained" sx={{ color: '#fff' }}>
+              Save
+            </LoadingButton>
+          </Box>
         </Card>
       </Box>
     </FormProvider>

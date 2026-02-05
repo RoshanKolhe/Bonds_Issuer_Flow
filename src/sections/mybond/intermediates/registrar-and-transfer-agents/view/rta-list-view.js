@@ -105,7 +105,7 @@ export default function RtaListView({ isLocked, stepData }) {
             color="primary"
             sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Iconify icon="solar:document-text-bold" width={20} />
-            RTA'S
+            Registrar and Transfer Agent
           </Typography>
           <Stack direction={'row'} spacing={2}>
             <Button
@@ -140,7 +140,7 @@ export default function RtaListView({ isLocked, stepData }) {
                 onSelectRow={handleSelectRow}
                 onView={() => handleView(row.id)}
                 onSendRequest={() => handleSendRequest(row.id)}
-                disabled={isLocked}
+                disabled={selected.includes(row.id)}
               />
             ))}
           </Grid>

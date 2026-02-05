@@ -37,7 +37,7 @@ const TABS = [
   },
   {
     value: 'rta',
-    label: 'RTA',
+    label: 'Registrar and Transfer Agent',
     icon: <Iconify icon="solar:document-text-bold" width={22} />,
   },
   // {

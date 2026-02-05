@@ -9,6 +9,7 @@ import {
   Box,
   Alert,
   MenuItem,
+  Button,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { LoadingButton } from '@mui/lab';
@@ -19,6 +20,8 @@ import FormProvider, {
   RHFTextField,
 } from 'src/components/hook-form';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
+import { NewISINActivation } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
+import { AutoFill } from 'src/forms-autofilled-script/autofill';
 
 /* ---------------- SCHEMA ---------------- */
 
@@ -60,7 +63,7 @@ export default function IsinActivationFinalization({
     defaultValues,
   });
 
-  const { handleSubmit, control, watch, reset } = methods;
+  const { handleSubmit, control, watch, reset, setValue } = methods;
 
   const watched = watch([
     'depository',
@@ -96,6 +99,11 @@ export default function IsinActivationFinalization({
       setProgress?.(true);
     }
   }, [currentIsin, reset, setPercent, setProgress]);
+
+  const handleAutoFill = () => {
+    const data = NewISINActivation();
+    AutoFill({ setValue, fields: data });
+  };
 
   /* ---------------- SUBMIT ---------------- */
   const onSubmit = (data) => {
@@ -190,7 +198,8 @@ export default function IsinActivationFinalization({
 
           {/* ACTION */}
           <Grid item xs={12}>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+              <Button variant='contained' onClick={() => handleAutoFill()}>Autofill</Button>
               <LoadingButton
                 type="submit"
                 variant="contained"

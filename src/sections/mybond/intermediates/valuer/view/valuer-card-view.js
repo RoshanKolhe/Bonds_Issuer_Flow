@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 
 import Iconify from 'src/components/iconify';
+import Label from 'src/components/label';
 
 export default function ValuerCardView({
   row,
@@ -27,7 +28,6 @@ export default function ValuerCardView({
           border: selected ? '2px solid #1877F2' : '1px solid #e0e0e0',
           transition: '0.2s',
           pointerEvents: isLocked ? 'none' : 'auto',
-          opacity: isLocked ? 0.6 : 1,
         }}
       >
         {/* ACTION BAR */}
@@ -41,17 +41,17 @@ export default function ValuerCardView({
           }}
         >
 
-          <Checkbox
+          {selected ? (
+            <Label variant='soft' color='success'>Appointed</Label>
+          ) : (<Checkbox
             checked={selected}
             disabled={isLocked}
-            onChange={() => {
-              if(isLocked) return;
-              onSelectRow(row.id)
-            }}
-            sx={{
-              p: 0.5,
-            }}
-          />
+            onChange={
+              () => {
+                if (isLocked) return;
+                onSelectRow(row.id);
+              }}
+          />)}
           {/* RIGHT → Actions */}
           <Stack direction="row" spacing={0.5}>
             <Tooltip title="View">
@@ -60,7 +60,7 @@ export default function ValuerCardView({
               </IconButton>
             </Tooltip>
 
-            <Tooltip title="Send Request">
+            {!isLocked && <Tooltip title="Send Request">
               <IconButton
                 size="small"
                 sx={{ p: 0.5 }}
@@ -69,7 +69,7 @@ export default function ValuerCardView({
               >
                 <Iconify icon="mdi:email-send" />
               </IconButton>
-            </Tooltip>
+            </Tooltip>}
           </Stack>
         </Stack>
 

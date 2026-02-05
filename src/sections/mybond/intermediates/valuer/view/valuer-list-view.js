@@ -119,7 +119,7 @@ export default function ValuerListView({ isLocked, stepData }) {
             color="primary"
             sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Iconify icon="solar:calculator-bold" width={22} />
-            Valuer's
+            Valuer
           </Typography>
           <Stack direction={'row'} spacing={2}>
             <Button
@@ -152,7 +152,7 @@ export default function ValuerListView({ isLocked, stepData }) {
                 onSelectRow={handleSelectRow}
                 onView={() => handleView(row.id)}
                 onSendRequest={() => handleSendRequest(row.id)}
-                isLocked={isLocked}
+                isLocked={selected.includes(row.id)}
               />
             ))}
           </Grid>
