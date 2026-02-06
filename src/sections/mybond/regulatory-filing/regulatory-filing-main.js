@@ -1,154 +1,106 @@
+import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Grid, Box } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useSnackbar } from 'src/components/snackbar';
-import PropTypes from 'prop-types';
-import PAS4 from './pas4';
-import TermSheet from './term-sheet';
-import InformationMemorandum from './information-memorandum';
-import InPrincipleApproval from './in-principle';
-import TrusteeDueDiligence from './trustee-due-diligence';
-import PAS5 from './pas5';
-import GID from './gid';
+import { useGetBondRegulatoryFilingDocuments } from 'src/api/bond-regulatory-filing';
+import { useGetBondApplicationStepData } from 'src/api/bondApplications';
+import { useParams } from 'src/routes/hook';
+import RegulatoryFilingCard from './regulatory-filing-card';
 
 export default function RegulatoryFilingMain({
-  currentPAS4Regulatory,
-  currentPAS5Regulatory,
-  currentGIDRegulatory,
-  currentTermSheetRegulatory,
-  currentInformationMemorandumRegulatory,
-  currentInPrincipleRegulatory,
-  currentTrusteeDueDiligenceRegulatory,
-  saveStepData,
   percent,
   setActiveStepId,
 }) {
+  const params = useParams();
+  const { applicationId } = params;
   const { enqueueSnackbar } = useSnackbar();
-
-  /* ---------------- SECTION PERCENTS ---------------- */
-  const [pas4Percent, setPas4Percent] = useState(0);
-  const [pas5Percent, setPas5Percent] = useState(0);
-  const [gidPercent, setGidPercent] = useState(0);
-  const [termSheetPercent, setTermSheetPercent] = useState(0);
-  const [memorandumPercent, setMemorandumPercent] = useState(0);
-
-  /* ---------------- COMPLETION FLAGS ---------------- */
-  const [pas4Completed, setPas4Completed] = useState(false);
-  const [pas5Completed, setPas5Completed] = useState(false);
-  const [gidCompleted, setGidCompleted] = useState(false);
-  const [termSheetCompleted, setTermSheetCompleted] = useState(false);
-  const [memorandumCompleted, setMemorandumCompleted] = useState(false);
+  const { documents, documentsLoading } = useGetBondRegulatoryFilingDocuments(applicationId);
+  const { stepData, stepDataLoading } = useGetBondApplicationStepData(applicationId, 'regulatory_filings');
+  const [documentValues, setDocumentValues] = useState([]);
+  const [documentList, setDocumentList] = useState([]);
+  const [documentCompletionStatus, setDocumentCompletionStatus] = useState({});
 
   /* ---------------- TOTAL PERCENT ---------------- */
   useEffect(() => {
-    const total =
-      pas4Percent +
-      pas5Percent +
-      gidPercent +
-      termSheetPercent +
-      memorandumPercent;
 
-    percent?.(Math.round(total));
-  }, [
-    pas4Percent,
-    pas5Percent,
-    gidPercent,
-    termSheetPercent,
-    memorandumPercent,
-  ]);
+    const totalDocs = Object.keys(documentCompletionStatus).length;
+
+    if (totalDocs === 0) return;
+
+    const completedDocs = Object.values(documentCompletionStatus)
+      .filter(status => status === true).length;
+
+    const percentValue = Math.round(
+      (completedDocs / totalDocs) * 100
+    );
+
+    percent?.(percentValue);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [documentCompletionStatus]);
 
   /* ---------------- NEXT ---------------- */
   const handleNextClick = () => {
-    if (!termSheetCompleted) {
-      enqueueSnackbar('Please complete Term Sheet section', {
-        variant: 'warning',
-      });
+
+    const totalDocs = Object.keys(documentCompletionStatus).length;
+
+    if (!totalDocs) {
+      enqueueSnackbar('No documents found', { variant: 'warning' });
       return;
     }
 
-    if (!pas4Completed) {
-      enqueueSnackbar('Please complete PAS-4 section', {
-        variant: 'warning',
-      });
-      return;
-    }
+    const incompleteDocs = Object.values(documentCompletionStatus)
+      .filter(status => status === false);
 
-    if (!pas5Completed) {
-      enqueueSnackbar('Please complete PAS-5 section', {
-        variant: 'warning',
-      });
-      return;
-    }
-
-    if (!gidCompleted) {
-      enqueueSnackbar('Please complete GID section', {
-        variant: 'warning',
-      });
-      return;
-    }
-
-    if (!memorandumCompleted) {
+    if (incompleteDocs.length > 0) {
       enqueueSnackbar(
-        'Please complete Prospectus / Information Memorandum section',
+        'Please upload all required documents before continuing',
         { variant: 'warning' }
       );
       return;
     }
 
+    // All done ✅
     setActiveStepId?.('trustee_due_diligence');
   };
 
+  useEffect(() => {
+    if (documents && !documentsLoading) {
+      setDocumentList(documents);
+      if (documents.length > 0) {
+        const completetionStatus = documents.reduce((acc, doc) => {
+          acc[doc.id] = false;
+          return acc;
+        }, {});
+
+        setDocumentCompletionStatus(completetionStatus);
+      }
+    }
+  }, [documents, documentsLoading, setDocumentCompletionStatus]);
+
+  useEffect(() => {
+    if(stepData && !stepDataLoading){
+      setDocumentValues(stepData);
+    }
+  }, [stepData, stepDataLoading]);
+
+  console.log('documentValues', documentValues);
+
   return (
     <Grid container spacing={3}>
-      {/* ---------------- TERM SHEET ---------------- */}
-      <Grid item xs={12}>
-        <TermSheet
-          currentData={currentTermSheetRegulatory}
-          setPercent={setTermSheetPercent}
-          setProgress={setTermSheetCompleted}
-          saveStepData={(data) => saveStepData({ sebiApprovals: data })}
-        />
-      </Grid>
-
-      {/* ---------------- PAS-4 ---------------- */}
-      <Grid item xs={12}>
-        <PAS4
-          currentData={currentPAS4Regulatory}
-          setPercent={setPas4Percent}
-          setProgress={setPas4Completed}
-          saveStepData={(data) => saveStepData({ pas4: data })}
-        />
-      </Grid>
-
-      {/* ---------------- PAS-5 ---------------- */}
-      <Grid item xs={12}>
-        <PAS5
-          currentData={currentPAS5Regulatory}
-          setPercent={setPas5Percent}
-          setProgress={setPas5Completed}
-          saveStepData={(data) => saveStepData({ pas5: data })}
-        />
-      </Grid>
-
-      {/* ---------------- GID ---------------- */}
-      <Grid item xs={12}>
-        <GID
-          currentData={currentGIDRegulatory}
-          setPercent={setGidPercent}
-          setProgress={setGidCompleted}
-          saveStepData={(data) => saveStepData({ gid: data })}
-        />
-      </Grid>
-
-      {/* ---------------- INFORMATION MEMORANDUM ---------------- */}
-      <Grid item xs={12}>
-        <InformationMemorandum
-          currentData={currentInformationMemorandumRegulatory}
-          setPercent={setMemorandumPercent}
-          setProgress={setMemorandumCompleted}
-          saveStepData={(data) => saveStepData({ memorandum: data })}
-        />
-      </Grid>
+      {/* ---------------- Documents ---------------- */}
+      {
+        documentList.map((doc) => (
+          <Grid item xs={12}>
+            <RegulatoryFilingCard
+              document={doc}
+              setStatus={() => setDocumentCompletionStatus((prev) => ({ ...prev, [doc.id]: true }))}
+              currentValue={documentValues.find((innerDoc) => innerDoc?.documentId === doc.id)?.document || null}
+            />
+          </Grid>
+        ))
+      }
 
       {/* ---------------- NEXT BUTTON ---------------- */}
       <Grid item xs={12}>

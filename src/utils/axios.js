@@ -123,6 +123,7 @@ export const endpoints = {
   bondFlowDocuments: {
     documentList: (status) => `/bonds-pre-issue/fetch-documents/${status}`
   },
+  bondRegulatoryFilingDocuments: (applicationId) => `/bonds-pre-issue/regulatory-filings/fetch-document-requirements/${applicationId}`,
   fieldOptions: {
     chargeTypes: '/charge-types',
     ownershipTypes: '/ownership-types',
