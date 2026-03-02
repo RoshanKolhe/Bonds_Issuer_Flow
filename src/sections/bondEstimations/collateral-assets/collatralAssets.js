@@ -184,11 +184,7 @@ export default function CollateralAssets({
 
             if (response?.data?.success) {
                 enqueueSnackbar('Collateral assets submitted', { variant: 'success' });
-                // setApprovalScreen(true);
-                // setActiveStepId('financial_details');
-                // estimationReport();
-                estimationReport(applicationId);
-
+                setActiveStepId();
             }
         } catch (error) {
             console.error('Error while submitting collateral assets form :', error);
@@ -413,8 +409,8 @@ export default function CollateralAssets({
                                         label="Security Document"
                                         accept={{
                                             'application/pdf': ['.pdf'],
-                                            'image/png': ['.png'],
-                                            'image/jpeg': ['.jpg', '.jpeg'],
+                                            'application/msword': ['.doc'],
+                                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
                                         }}
                                     />
                                     <YupErrorMessage name={`collateralAssets.${index}.securityDocument`} />

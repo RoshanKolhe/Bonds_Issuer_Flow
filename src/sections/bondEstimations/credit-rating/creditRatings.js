@@ -8,23 +8,18 @@ import {
   Box,
   Grid,
   Typography,
-  Radio,
-  FormControlLabel,
-  MenuItem,
-  Card,
   Button,
+  Card,
   TableContainer,
   Table,
   TableHead,
   TableRow,
   TableCell,
   TableBody,
-  TextField,
 } from '@mui/material';
 import { useSnackbar } from 'src/components/snackbar';
-import FormProvider, { RHFAutocomplete, RHFCustomFileUploadBox, RHFSelect } from 'src/components/hook-form';
+import FormProvider, { RHFAutocomplete, RHFCustomFileUploadBox } from 'src/components/hook-form';
 import axiosInstance from 'src/utils/axios';
-import RHFFileUploadBox from 'src/components/custom-file-upload/file-upload';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
 import { DatePicker } from '@mui/x-date-pickers';
 import { Icon } from '@iconify/react';
@@ -33,7 +28,7 @@ import { useGetCreditRatingAgencies, useGetCreditRatings } from 'src/api/creditR
 import { useParams } from 'src/routes/hook';
 import { format } from 'date-fns';
 
-export default function CreditRating({ currentCreditRatings, setPercent, setProgress }) {
+export default function CreditRating({ currentCreditRatings, percent, setActiveStepId }) {
   const params = useParams();
   const { applicationId } = params;
   const [agenciesData, setAgenciesData] = useState([]);
@@ -53,12 +48,15 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
     creditRatingLetter: Yup.mixed().required('Credit rating letter required'),
   });
 
-  const defaultValues = useMemo(() => ({
-    selectedAgency: null,
-    selectedRating: null,
-    validFrom: '',
-    creditRatingLetter: null,
-  }), []);
+  const defaultValues = useMemo(
+    () => ({
+      selectedAgency: null,
+      selectedRating: null,
+      validFrom: '',
+      creditRatingLetter: null,
+    }),
+    []
+  );
 
   const methods = useForm({
     resolver: yupResolver(newCreditRatingSchema),
@@ -71,7 +69,7 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
     setValue,
     reset,
     handleSubmit,
-    formState: { isSubmitting }
+    formState: { isSubmitting },
   } = methods;
 
   const values = watch();
@@ -81,7 +79,7 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
       agency: data.selectedAgency,
       rating: data.selectedRating,
       validFrom: data.validFrom,
-      creditRatingLetter: data.creditRatingLetter
+      creditRatingLetter: data.creditRatingLetter,
     };
 
     if (isEditing) {
@@ -101,28 +99,6 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
     setRatingList(ratingList.filter((_, i) => i !== index));
   };
 
-  const handleFileUpload = async (file) => {
-    try {
-      if (!file) return;
-
-      enqueueSnackbar('Uploading File...', { variant: 'info' });
-
-      const uploadFormData = new FormData();
-      uploadFormData.append('file', file);
-
-      const uploadRes = await axiosInstance.post('/files', uploadFormData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-
-      setValue('creditRatingLetter', uploadRes?.data?.files[0], { shouldValidate: true });
-
-    } catch (err) {
-      enqueueSnackbar(
-        err?.error?.message || 'Domething went wrong while saving credit rating ', {variant: 'error'}
-      );
-    }
-  };
-
   const onSubmit = async () => {
     try {
       setIsApiSubmitting(true);
@@ -137,17 +113,16 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
           creditRatingsId: rating.rating.id,
           creditRatingAgenciesId: rating.agency.id,
           ratingLetterId: rating.creditRatingLetter.id,
-          isActive: true
-        }))
+          isActive: true,
+        })),
       };
 
       const response = await axiosInstance.patch(`/bond-estimations/credit-ratings/${applicationId}`, payload);
 
       if (response.data?.success) {
-        setProgress(true);
+        setActiveStepId(true);
         enqueueSnackbar('Credit ratings updated', { variant: 'success' });
       }
-
     } catch (error) {
       console.error('error while submitting credit ratings :', error);
     } finally {
@@ -157,7 +132,7 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
 
   const calculatePercent = () => {
     if (!ratingList.length) {
-      setPercent?.(0);
+      percent?.(0);
       return;
     }
 
@@ -170,8 +145,8 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
     if (latest.creditRatingLetter) completed++;
     if (ratingList.length > 0) completed++;
 
-    const percentVal = (completed / 5) * 50;
-    setPercent?.(percentVal);
+    const percentVal = (completed / 5) * 100;
+    percent?.(percentVal);
   };
 
   useEffect(() => {
@@ -196,22 +171,21 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
         agency: rating.creditRatingAgencies,
         rating: rating.creditRatings,
         validFrom: rating.validFrom,
-        creditRatingLetter: rating.ratingLetter
+        creditRatingLetter: rating.ratingLetter,
       }));
 
       setRatingList(newRatingList);
-      setProgress(true);
     }
-  }, [currentCreditRatings, setProgress])
+  }, [currentCreditRatings]);
 
   return (
     <FormProvider methods={methods} onSubmit={handleAddRating}>
       <Card sx={{ p: 4, borderRadius: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', mb: 4 }}>
-        <Typography variant="h5" color='primary' fontWeight='bold'  sx={{ mb: 3}}>
+        <Typography variant="h5" color="primary" fontWeight="bold" sx={{ mb: 3 }}>
           Credit Ratings Available
         </Typography>
 
-        <Grid container spacing={4}  mb={2}>
+        <Grid container spacing={4} mb={2}>
           <Grid item xs={12} md={6}>
             <RHFAutocomplete
               name="selectedAgency"
@@ -228,7 +202,7 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
           </Grid>
 
           <Grid item xs={12} md={6}>
-             <RHFAutocomplete
+            <RHFAutocomplete
               name="selectedRating"
               label="Credit Rating"
               options={ratingsData || []}
@@ -240,24 +214,6 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
                 </li>
               )}
             />
-            {/* <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
-              Rating
-            </Typography>
-            <Grid container spacing={2}>
-              {ratingsData.map((rating) => (
-                <Grid item xs={4} key={rating.id}>
-                  <FormControlLabel
-                    control={
-                      <Radio
-                        checked={values.selectedRating?.id === rating?.id}
-                        onChange={() => setValue('selectedRating', rating, { shouldValidate: true })}
-                      />
-                    }
-                    label={rating.name}
-                  />
-                </Grid>
-              ))}
-            </Grid> */}
             <YupErrorMessage name="selectedRating" />
           </Grid>
         </Grid>
@@ -270,13 +226,7 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
               sx={{ mb: 2 }}
               {...field}
               label="Valid From"
-              value={
-                field.value
-                  ? field.value instanceof Date
-                    ? field.value
-                    : new Date(field.value)
-                  : null
-              }
+              value={field.value ? (field.value instanceof Date ? field.value : new Date(field.value)) : null}
               onChange={(newValue) => field.onChange(newValue)}
               format="dd/MM/yyyy"
               slotProps={{
@@ -290,34 +240,25 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
           )}
         />
 
-        {/* <RHFFileUploadBox
+        <RHFCustomFileUploadBox
           name="creditRatingLetter"
           label="Upload Credit Rating Letter"
           icon="mdi:file-document-outline"
-          maxSizeMB={2}
-          onDrop={async (files) => handleFileUpload(files[0])}
-        /> */}
-        
-                    <RHFCustomFileUploadBox
-                      name="creditRatingLetter"
-                      label="Upload Credit Rating Letter"
-                      icon="mdi:file-document-outline"
-                    accept={{
-                      'application/pdf': ['.pdf'],
-                      'application/msword': ['.doc'],
-                      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
-                    }}
-                    />
+          accept={{
+            'application/pdf': ['.pdf'],
+            'application/msword': ['.doc'],
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+          }}
+        />
 
         <YupErrorMessage name="creditRatingLetter" />
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1, mt: 2 }}>
-          <LoadingButton type='submit' variant='contained' loading={isSubmitting}>
+          <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
             {isEditing ? 'Update Rating' : 'Add Rating'}
           </LoadingButton>
         </Box>
 
-        {/* Rating Table */}
         {ratingList.length > 0 && (
           <Box sx={{ mt: 4 }}>
             <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
@@ -343,11 +284,7 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
                       <TableCell>{row.rating?.name}</TableCell>
                       <TableCell>{row.validFrom ? format(new Date(row.validFrom), 'dd/MM/yyyy') : 'NA'}</TableCell>
                       <TableCell>
-                        <Button
-                          variant="text"
-                          color="primary"
-                          onClick={() => window.open(row.creditRatingLetter?.fileUrl, '_blank')}
-                        >
+                        <Button variant="text" color="primary" onClick={() => window.open(row.creditRatingLetter?.fileUrl, '_blank')}>
                           Preview
                         </Button>
                       </TableCell>
@@ -358,8 +295,8 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
                           width="20"
                           style={{ cursor: 'pointer', marginRight: 12 }}
                           onClick={() => {
-                            setValue('selectedAgency', agenciesData.find((a) => a.id === row.agency));
-                            setValue('selectedRating', ratingsData.find((r) => r.id === row.rating));
+                            setValue('selectedAgency', agenciesData.find((a) => a.id === row.agency?.id));
+                            setValue('selectedRating', ratingsData.find((r) => r.id === row.rating?.id));
                             setValue('validFrom', row.validFrom);
                             setValue('additionalRating', row.additionalRating);
                             setValue('creditRatingLetter', row.creditRatingLetter);
@@ -395,7 +332,6 @@ export default function CreditRating({ currentCreditRatings, setPercent, setProg
 
 CreditRating.propTypes = {
   currentCreditRatings: PropTypes.array,
-  setPercent: PropTypes.func,
-  setProgress: PropTypes.func
-}
-
+  percent: PropTypes.func,
+  setActiveStepId: PropTypes.func,
+};

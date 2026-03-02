@@ -21,18 +21,12 @@ export default function ProfitabilityDetails({ currentProfitabilityDetails, setP
   const profitableSchema = Yup.object().shape({
     netProfit: Yup.number()
       .required('Net Profit is required')
-      .typeError('Net Profit must be a number')
-    ,
-    EBIDTA: Yup.number()
-      .typeError('EBIDTA must be a number')
-      .min(1000000, 'Minimum 10 lakh required')
-      .required('EBIDTA amount is required'),
+      .typeError('Net Profit must be a number'),
   });
 
   const defaultValues = useMemo(
     () => ({
       netProfit: currentProfitabilityDetails?.netProfit || '',
-      EBIDTA: currentProfitabilityDetails?.EBIDTA || '',
 
     }),
     [currentProfitabilityDetails]
@@ -67,12 +61,10 @@ export default function ProfitabilityDetails({ currentProfitabilityDetails, setP
 
   const calculateCompletion = () => {
     const np = methods.watch('netProfit');
-    const eb = methods.watch('EBIDTA');
 
     let score = 0;
 
-    if (np || np === 0) score += 15;
-    if (eb || eb === 0) score += 15;
+    if (np || np === 0) score += 30;
 
     const percentValue = Math.min(30, score);
     setPercent(percentValue);
@@ -113,14 +105,6 @@ export default function ProfitabilityDetails({ currentProfitabilityDetails, setP
               <RHFPriceField
                 name="netProfit"
                 label="Net Profit"
-                fullWidth
-              />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <RHFPriceField
-                name="EBIDTA"
-                label="Enter EBIDTA Amount"
                 fullWidth
               />
             </Grid>

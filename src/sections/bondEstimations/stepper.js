@@ -1,66 +1,66 @@
 import { useEffect, useState } from 'react';
 import { Box, Stack } from '@mui/material';
-import FundAndCreditForm from './fund-position-and-credit-rating/fundAndCreditForm';
 import { useGetBondEstimation } from 'src/api/bondEstimations';
 import { useParams } from 'src/routes/hook';
 import NotFoundPage from 'src/pages/404';
 import AuditedFinancialDocument from './audited-financial/audited-financial-document';
-import MainFile from './borrowing-and-capital-details/main';
-import FinancialDetails from './financial-ratios/financial-details';
+import MainFile from './borrowing-details/main';
+import FinancialDetailsMain from './financial-details/main';
 import ProgressStepper from 'src/components/progress-stepper/ProgressStepper';
 import { AnimatePresence } from 'framer-motion';
 import { m } from 'framer-motion';
-import PriliminaryAndCollateralView from './preliminary-requirements-and collatral-details/priliminaryAndCollateralView';
-import CollateralAssets from './collatral-assets/collatralAssets';
+import CollateralAssets from './collateral-assets/collatralAssets';
+import PreliminaryRequirements from './preliminary-requirements/preliminaryRequirements';
+import CreditRating from './credit-rating/creditRatings';
 
 export default function Stepper() {
-  const params = useParams()
+  const params = useParams();
   const { applicationId } = params;
-  const [activeStepId, setActiveStepId] = useState('fund_position_and_credit_ratings');
+  const [activeStepId, setActiveStepId] = useState('bond_priliminary_requirements');
   const [estimationData, setEstimationData] = useState(null);
   const { bondEstimation, bondEstimationLoading, auditedFinancials } = useGetBondEstimation(applicationId);
   const [dataInitialized, setDataInitialized] = useState(false);
 
   const steps = [
     {
-      id: 'fund_position_and_credit_ratings',
+      id: 'bond_priliminary_requirements',
       number: 1,
-      lines: ['Fund Position and', 'Credit Rating'],
+      lines: ['Preliminary', 'Requirements'],
     },
     {
-      id: 'audited_financial',
+      id: 'credit_ratings',
       number: 2,
-      lines: ['Audited', 'Financials'],
+      lines: ['Credit Rating'],
     },
+    // {
+    //   id: 'audited_financial',
+    //   number: 3,
+    //   lines: ['Audited', 'Financials'],
+    // },
     {
       id: 'borrowing_details',
       number: 3,
       lines: ['Borrowing', 'Details'],
     },
     {
-      id: 'financial_details',
-      number: 4,
-      lines: ['Financial', 'Details'],
-    },
-    {
-      id: 'bond_priliminary_requirements',
-      number: 5,
-      lines: ['Preliminary', 'Requirements'],
-    },
-    {
       id: 'collateral_assets',
-      number: 6,
+      number: 4,
       lines: ['Collatral', 'Assets'],
+    },
+    {
+      id: 'financial_details',
+      number: 5,
+      lines: ['Financial', 'Details'],
     },
   ];
 
   const [stepsProgress, setStepsProgress] = useState({
-    fund_position_and_credit_ratings: { percent: 0 },
+    bond_priliminary_requirements: { percent: 0 },
+    credit_ratings: { percent: 0 },
     audited_financial: { percent: 0 },
     borrowing_details: { percent: 0 },
+    collateral_assets: { percent: 0 },
     financial_details: { percent: 0 },
-    bond_priliminary_requirements: { percent: 0 },
-    collateral_assets: { percent: 0 }
   });
 
   const updateStepPercent = (stepId, percent) => {
@@ -71,7 +71,6 @@ export default function Stepper() {
   };
 
   const handleStepClick = (stepId) => {
-    // Prevent jumping forward if previous step is incomplete
     const stepIndex = steps.findIndex((s) => s.id === stepId);
 
     for (let i = 0; i < stepIndex; i++) {
@@ -83,58 +82,61 @@ export default function Stepper() {
 
   const renderForm = () => {
     switch (activeStepId) {
-      case 'fund_position_and_credit_ratings':
+      case 'bond_priliminary_requirements':
         return (
-          <FundAndCreditForm
-            percent={(p) => updateStepPercent('fund_position_and_credit_ratings', p)}
-            setActiveStepId={() => setActiveStepId('audited_financial')}
-            currentFundPosition={estimationData ? estimationData?.fundPosition : null}
+          <PreliminaryRequirements
+            percent={(p) => updateStepPercent('bond_priliminary_requirements', p)}
+            setActiveStepId={() => setActiveStepId('credit_ratings')}
+            currentPrliminaryRequirements={estimationData ? estimationData?.estimationPriliminaryBondRequirements : null}
+          />
+        );
+
+      case 'credit_ratings':
+        return (
+          <CreditRating
+            percent={(p) => updateStepPercent('credit_ratings', p)}
+            setActiveStepId={() => setActiveStepId('borrowing_details')}
             currentCreditRatings={estimationData ? estimationData?.estimationCreditRatings : null}
           />
         );
 
-      case 'audited_financial':
-        return (
-          <AuditedFinancialDocument
-            percent={(p) => updateStepPercent('audited_financial', p)}
-            setActiveStepId={() => setActiveStepId('borrowing_details')}
-            currentAuditedFinancials={estimationData ? estimationData?.auditedFinancials : null}
-          />
-        );
+      // case 'audited_financial':
+      //   return (
+      //     <AuditedFinancialDocument
+      //       percent={(p) => updateStepPercent('audited_financial', p)}
+      //       setActiveStepId={() => setActiveStepId('borrowing_details')}
+      //       currentAuditedFinancials={estimationData ? estimationData?.auditedFinancials : null}
+      //     />
+      //   );
 
       case 'borrowing_details':
         return (
           <MainFile
             percent={(p) => updateStepPercent('borrowing_details', p)}
-            setActiveStepId={() => setActiveStepId('financial_details')}
-            currentBorrowingDetails={estimationData ? estimationData?.estimationBorrowingDetails : null}
-            currentCapitalDetails={estimationData ? estimationData?.capitalDetails : null}
-            currentProfitabilityDetails={estimationData ? estimationData?.profitabilityDetails : null}
-          />
-        );
-
-      case 'financial_details':
-        return (
-          <FinancialDetails
-            percent={(p) => updateStepPercent('financial_details', p)}
-            setActiveStepId={() => setActiveStepId('bond_priliminary_requirements')}
-            currentFinancialRatios={estimationData ? estimationData?.financialRatios : null}
-          />
-        );
-
-      case 'bond_priliminary_requirements':
-        return (
-          <PriliminaryAndCollateralView
-            percent={(p) => updateStepPercent('bond_priliminary_requirements', p)}
             setActiveStepId={() => setActiveStepId('collateral_assets')}
-            currentPrliminaryRequirements={estimationData ? estimationData?.estimationPriliminaryBondRequirements : null}
+            currentBorrowingDetails={estimationData ? estimationData?.estimationBorrowingDetails : null}
           />
         );
+
       case 'collateral_assets':
         return (
           <CollateralAssets
             percent={(p) => updateStepPercent('collateral_assets', p)}
             currentCollateralAssets={estimationData ? estimationData?.bondEstimationCollateralAssets : null}
+            setActiveStepId={() => setActiveStepId('financial_details')}
+          />
+        );
+
+      case 'financial_details':
+        return (
+          <FinancialDetailsMain
+            percent={(p) => updateStepPercent('financial_details', p)}
+            currentFinancialRatios={estimationData ? estimationData?.financialRatios : null}
+            currentCapitalDetails={estimationData ? estimationData?.capitalDetails : null}
+            currentProfitabilityDetails={estimationData ? estimationData?.profitabilityDetails : null}
+            currentFundPosition={estimationData ? estimationData?.fundPosition : null}
+            currentBorrowingDetails={estimationData ? estimationData?.estimationBorrowingDetails : null}
+            currentFinancialStatements={estimationData ? estimationData?.financialDetails?.financialStatements : null }
           />
         );
 
@@ -145,46 +147,43 @@ export default function Stepper() {
 
   useEffect(() => {
     if (bondEstimation && !bondEstimationLoading && !dataInitialized) {
-
       setEstimationData({ ...bondEstimation, auditedFinancials });
-      let currentStep = 'fund_position_and_credit_ratings';
+      let currentStep = 'bond_priliminary_requirements';
 
-      if (
-        bondEstimation.currentProgress.includes('fund_position') &&
-        bondEstimation.currentProgress.includes('credit_ratings')
-      ) {
-        updateStepPercent('fund_position_and_credit_ratings', 100);
-        currentStep = 'audited_financial';
+      if (bondEstimation.currentProgress.includes('bond_priliminary_requirements')) {
+        updateStepPercent('bond_priliminary_requirements', 100);
+        currentStep = 'credit_ratings';
       }
 
-      if (bondEstimation.currentProgress.includes('audited_financials')) {
-        updateStepPercent('audited_financial', 100);
+      if (bondEstimation.currentProgress.includes('credit_ratings')) {
+        updateStepPercent('credit_ratings', 100);
         currentStep = 'borrowing_details';
       }
 
-      if (
-        bondEstimation.currentProgress.includes('profitability_details') &&
-        bondEstimation.currentProgress.includes('capital_details') &&
-        bondEstimation.currentProgress.includes('borrowing_details')
-      ) {
+      // if (bondEstimation.currentProgress.includes('audited_financials')) {
+      //   updateStepPercent('audited_financial', 100);
+      //   currentStep = 'borrowing_details';
+      // }
+
+      if (bondEstimation.currentProgress.includes('borrowing_details')) {
         updateStepPercent('borrowing_details', 100);
+        currentStep = 'collateral_assets';
+      }
+
+      if (bondEstimation.currentProgress.includes('collateral_assets')) {
+        updateStepPercent('collateral_assets', 100);
         currentStep = 'financial_details';
       }
 
       if (bondEstimation.currentProgress.includes('financial_details')) {
         updateStepPercent('financial_details', 100);
-        currentStep = 'bond_priliminary_requirements';
-      }
-      if (bondEstimation.currentProgress.includes('bond_priliminary_requirements')) {
-        updateStepPercent('bond_priliminary_requirements', 100);
-        currentStep = 'collateral_assets';
+        currentStep = 'financial_details';
       }
 
       setActiveStepId(currentStep);
-
       setDataInitialized(true);
     }
-  }, [bondEstimation, bondEstimationLoading, dataInitialized]);
+  }, [bondEstimation, bondEstimationLoading, dataInitialized, auditedFinancials]);
 
   return (
     <Box sx={{ p: 3 }}>

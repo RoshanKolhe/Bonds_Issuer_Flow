@@ -11,7 +11,7 @@ import FormProvider, { RHFPriceField, RHFSelect, RHFTextField } from 'src/compon
 import axiosInstance from 'src/utils/axios';
 import * as Yup from 'yup';
 
-export default function PreliminaryRequirements({ currentPriliminaryRequirements, setPercent, setProgress }) {
+export default function PreliminaryRequirements({ currentPrliminaryRequirements, percent, setActiveStepId }) {
     const { enqueueSnackbar } = useSnackbar();
     const params = useParams();
     const { applicationId } = params;
@@ -48,13 +48,13 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
     });
 
     const defaultValues = useMemo(() => ({
-        issueAmount: currentPriliminaryRequirements?.issueAmount || '',
-        security: currentPriliminaryRequirements?.security || true,
-        tenure: currentPriliminaryRequirements?.tenure || '',
-        preferedInvestorCategory: currentPriliminaryRequirements?.investorCategoryId || '',
-        preferedPaymentCycle: currentPriliminaryRequirements?.preferedPaymentCycle || 0,
-        roi: currentPriliminaryRequirements?.roi || ''
-    }), [currentPriliminaryRequirements]);
+        issueAmount: currentPrliminaryRequirements?.issueAmount || '',
+        security: currentPrliminaryRequirements?.security || true,
+        tenure: currentPrliminaryRequirements?.tenure || '',
+        preferedInvestorCategory: currentPrliminaryRequirements?.investorCategoryId || '',
+        preferedPaymentCycle: currentPrliminaryRequirements?.preferedPaymentCycle || 0,
+        roi: currentPrliminaryRequirements?.roi || ''
+    }), [currentPrliminaryRequirements]);
 
     const methods = useForm({
         resolver: yupResolver(newPreliminaryRequirementsSchema),
@@ -83,7 +83,7 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
             };
             const response = await axiosInstance.patch(`/bond-estimations/priliminary-requirements/${applicationId}`, payload);
             if (response.data.success) {
-                setProgress(true);
+                setActiveStepId?.();
                 enqueueSnackbar('Priliminary requirements saved', { variant: 'success' });
             }
         } catch (error) {
@@ -105,7 +105,7 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
 
         const percentVal = (completed / 6) * 100;
 
-        setPercent?.(percentVal);
+        percent?.(percentVal);
     };
 
     useEffect(() => {
@@ -114,10 +114,10 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
     }, [values.issueAmount, values.preferedInvestorCategory, values.preferedPaymentCycle, values.security, values.tenure, values.roi]);
 
     useEffect(() => {
-        if (currentPriliminaryRequirements) {
+        if (currentPrliminaryRequirements) {
             reset(defaultValues);
         }
-    }, [currentPriliminaryRequirements, reset, defaultValues]);
+    }, [currentPrliminaryRequirements, reset, defaultValues]);
 
     useEffect(() => {
         if (investorCtegories && !investorCtegoriesLoading) {
@@ -279,7 +279,7 @@ export default function PreliminaryRequirements({ currentPriliminaryRequirements
 }
 
 PreliminaryRequirements.propTypes = {
-    currentPriliminaryRequirements: PropTypes.object,
-    setPercent: PropTypes.func,
-    setProgress: PropTypes.func
+    currentPrliminaryRequirements: PropTypes.object,
+    percent: PropTypes.func,
+    setActiveStepId: PropTypes.func
 }

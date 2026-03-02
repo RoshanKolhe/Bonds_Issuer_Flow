@@ -135,7 +135,7 @@ export default function BorrowingDetails({ currentBorrowingDetails, setPercent, 
 
             if (response?.data?.success) {
                 enqueueSnackbar('Borrowing details submitted', { variant: 'success' });
-                setProgress(true);
+                setProgress();
             }
         } catch (error) {
             enqueueSnackbar(error?.error?.message || 'Error while submitting borrowing details form :', { variant: 'error' })
@@ -148,7 +148,6 @@ export default function BorrowingDetails({ currentBorrowingDetails, setPercent, 
 
         if (!borrowings.length) {
             setPercent(0);
-            setProgress(false);
             return;
         }
 
@@ -166,7 +165,7 @@ export default function BorrowingDetails({ currentBorrowingDetails, setPercent, 
             if (allFilled) validCount++;
         });
 
-        const percentage = Math.round((validCount / borrowings.length) * 40);
+        const percentage = Math.round((validCount / borrowings.length) * 100);
 
         setPercent(percentage);
     };
@@ -181,9 +180,8 @@ export default function BorrowingDetails({ currentBorrowingDetails, setPercent, 
     useEffect(() => {
         if (currentBorrowingDetails && currentBorrowingDetails?.length > 0) {
             reset(defaultValues);
-            setProgress(true);
         }
-    }, [currentBorrowingDetails, reset, defaultValues, setProgress]);
+    }, [currentBorrowingDetails, reset, defaultValues]);
 
 
     return (
