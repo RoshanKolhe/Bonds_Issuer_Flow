@@ -4,7 +4,6 @@ import { Box, Card, Stack, Typography } from '@mui/material';
 import MainFile from './borrowing/main';
 import LaunchIssue from './launch-issue';
 import AuditedFinancialDocument from './audited-financial/audited-financial-document';
-import FundAndCreditForm from './fund-position-and-credit-rating/fundAndCreditForm';
 import ProgressStepper from 'src/components/progress-stepper/ProgressStepper';
 import ExecuteDocument from './execute-documents/execute-documents';
 import IsinActivationMain from './isin-activation/isin-activation-main';
@@ -19,6 +18,8 @@ import RegulatoryFilingMain from './regulatory-filing/regulatory-filing-main';
 import BorrowingDetails from './borrowing/borrowing-details';
 import TrusteeDueDiligence from './regulatory-filing/trustee-due-diligence';
 import InPrincipleApproval from './regulatory-filing/in-principle';
+import IsinApplication from './ISIN-flow/isin-application';
+import EscrowAccountConfirmation from './escrow-account';
 
 export default function MybondStepper() {
   const params = useParams()
@@ -33,7 +34,6 @@ export default function MybondStepper() {
   const [activeStepId, setActiveStepId] = useState('my_bond_new_issue');
   const [formData, setFormData] = useState({
     my_bond_new_issue: {},
-    fund_position: {},
     intermediaries: {},
     execute_document: {},
     audited_financial: {},
@@ -45,6 +45,8 @@ export default function MybondStepper() {
     isin_activation: {},
     launch_issue: {},
     credit_rating: {},
+    isin_application: {},
+    escrow_account: {}
   });
 
   const steps = [
@@ -59,82 +61,88 @@ export default function MybondStepper() {
       lines: ['Intermediaries'],
     },
     {
-      id: 'fund_position',
-      number: 3,
-      lines: ['Fund', 'Position'],
-    },
-    {
       id: 'audited_financial',
-      number: 4,
+      number: 3,
       lines: ['Audited', 'Financials'],
     },
     {
       id: 'borrowing_details',
-      number: 5,
+      number: 4,
       lines: ['Borrowing', 'Details'],
     },
     {
       id: 'collateral_assets',
-      number: 6,
+      number: 5,
       lines: ['Collateral', 'Assets'],
     },
     {
       id: 'financial_details',
-      number: 7,
+      number: 6,
       lines: ['Financial', 'Details'],
     },
     {
       id: 'credit_rating',
-      number: 8,
+      number: 7,
       lines: ['Credit Rating'],
     },
     {
       id: 'regulatory_filing',
-      number: 9,
+      number: 8,
       lines: ['Regulatory', 'Filing'],
     },
     {
       id: 'trustee_due_diligence',
-      number: 10,
+      number: 9,
       lines: ['Trustee', 'Due Diligence'],
     },
     {
       id: 'principle_listing_approval',
-      number: 11,
-      lines: ['Principle', 'Listing Approval'],
+      number: 10,
+      lines: ['In Principle', 'Listing Approval'],
     },
     {
-      id: 'isin_activation',
-      number: 12,
-      lines: ['ISIN', 'Activation'],
+      id: 'isin_application',
+      number: 11,
+      lines: ['ISIN', 'Application'],
     },
     {
       id: 'execute_document',
-      number: 13,
+      number: 12,
       lines: ['Execute', 'Document'],
     },
     {
-      id: 'launch_issue',
+      id: 'escrow_account',
+      number: 13,
+      lines: ['Escrow', 'Account'],
+    },
+    {
+      id: 'isin_activation',
       number: 14,
+      lines: ['ISIN', 'Activation'],
+    },
+    {
+      id: 'launch_issue',
+      number: 15,
       lines: ['Launch', 'Issue'],
     },
   ];
 
   const [stepsProgress, setStepsProgress] = useState({
     my_bond_new_issue: { percent: 0 },
-    fund_position: { percent: 0 },
     intermediaries: { percent: 0 },
     audited_financial: { percent: 0 },
     borrowing_details: { percent: 0 },
-    financial_details: { percent: 0 },
     collateral_assets: { percent: 0 },
-    regulatory_filing: { percent: 0 },
-    isin_activation: { percent: 0 },
-    execute_document: { percent: 0 },
-    launch_issue: { percent: 0 },
+    financial_details: { percent: 0 },
     credit_rating: { percent: 0 },
+    regulatory_filing: { percent: 0 },
     trustee_due_diligence: { percent: 0 },
-    principle_listing_approval: { percent: 0 }
+    principle_listing_approval: { percent: 0 },
+    isin_application: { percent: 0 },
+    execute_document: { percent: 0 },
+    escrow_account: { percent: 0 },
+    isin_activation: { percent: 0 },
+    launch_issue: { percent: 0 },
   });
 
   useEffect(() => {
@@ -142,7 +150,9 @@ export default function MybondStepper() {
     const savedForm = localStorage.getItem('formData');
     const savedProgress = localStorage.getItem('stepsProgress');
 
-    if (savedStep) setActiveStepId(savedStep);
+    if (savedStep) {
+      setActiveStepId(savedStep === 'fund_position' ? 'audited_financial' : savedStep);
+    }
     if (savedForm) {
       setFormData(JSON.parse(savedForm))
     };
@@ -214,14 +224,6 @@ export default function MybondStepper() {
         completedStepCodes.includes('intermediary_appointments_success')
       ) {
         updateStepPercent('intermediaries', 100);
-        currentStep = 'fund_position';
-      }
-
-      if (
-        completedStepCodes.includes('fund_position') &&
-        completedStepCodes.includes('capital_details')
-      ) {
-        updateStepPercent('fund_position', 100);
         currentStep = 'audited_financial';
       }
 
@@ -283,14 +285,6 @@ export default function MybondStepper() {
         return (
           <IntermediariesView
             percent={(p) => updateStepPercent('intermediaries', p)}
-            setActiveStepId={setActiveStepId}
-          />
-        );
-
-      case 'fund_position':
-        return (
-          <FundAndCreditForm
-            percent={(p) => updateStepPercent('fund_position', p)}
             setActiveStepId={setActiveStepId}
           />
         );
@@ -386,15 +380,13 @@ export default function MybondStepper() {
           />
         );
 
-      case 'isin_activation':
+      case 'isin_application':
         return (
-          <IsinActivationMain
-            currentIsin={formData.isin_activation?.isin_activation || {}}
-            currentDemat={formData.isin_activation?.demat_credit_details || {}}
-            currentTrusteeApproval={formData.isin_activation?.trustee_sebi_approval || {}}
-            percent={(p) => updateStepPercent('isin_activation', p)}
+          <IsinApplication
+            currentData={formData.isin_application || {}}
+            percent={(p) => updateStepPercent('isin_application', p)}
             setActiveStepId={setActiveStepId}
-            saveStepData={(section, data) => saveStepData('isin_activation', { [section]: data })}
+            saveStepData={(data) => saveStepData('isin_application', data)}
           />
         );
 
@@ -407,6 +399,29 @@ export default function MybondStepper() {
             saveStepData={(data) => saveStepData('execute_document', data)}
           />
         );
+
+      case 'escrow_account':
+        return (
+          <EscrowAccountConfirmation
+            currentEscrow={formData.escrow_account}
+            percent={(p) => updateStepPercent('escrow_account', p)}
+            setActiveStepId={setActiveStepId}
+            saveStepData={(data) => saveStepData('escrow_account', data)}
+          />
+        );
+
+      case 'isin_activation':
+        return (
+          <IsinActivationMain
+            currentIsin={formData.isin_activation?.isin_activation || {}}
+            currentDemat={formData.isin_activation?.demat_credit_details || {}}
+            currentTrusteeApproval={formData.isin_activation?.trustee_sebi_approval || {}}
+            percent={(p) => updateStepPercent('isin_activation', p)}
+            setActiveStepId={setActiveStepId}
+            saveStepData={(section, data) => saveStepData('isin_activation', { [section]: data })}
+          />
+        );
+
       case 'launch_issue':
         return (
           <LaunchIssue

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -8,6 +8,7 @@ import {
   Typography,
   Box,
   Alert,
+  Link,
   MenuItem,
   Button,
 } from '@mui/material';
@@ -22,6 +23,7 @@ import FormProvider, {
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
 import { NewISINActivation } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
 import { AutoFill } from 'src/forms-autofilled-script/autofill';
+import InstructionModal from 'src/components/instruction-modal/instruction-modal';
 
 /* ---------------- SCHEMA ---------------- */
 
@@ -50,6 +52,8 @@ export default function IsinActivationFinalization({
   setPercent,
   setProgress,
 }) {
+  const [openInstructions, setOpenInstructions] = useState(false);
+
   /* ---------------- DEFAULT VALUES ---------------- */
   const defaultValues = {
     depository: '',
@@ -71,6 +75,14 @@ export default function IsinActivationFinalization({
     'activationDate',
     'isinLetter',
   ]);
+
+  const instructionTitle = 'ISIN Activation Flow';
+  const instructionItems = [
+    "If needed, click 'Generate Activation Draft' and submit it to NSDL/CDSL as applicable.",
+    'Once ISIN is activated by the depository, capture the final ISIN and activation date here.',
+    'Upload the ISIN confirmation letter received from the depository.',
+    'Save this step to continue with listing and issue launch activities.',
+  ];
 
   /* ---------------- PERCENT LOGIC (BINARY) ---------------- */
   useEffect(() => {
@@ -122,19 +134,52 @@ export default function IsinActivationFinalization({
     });
   };
 
+  const handleGenerateDraft = () => {};
+
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Card sx={{ p: 3, mb: 3 }}>
-       <Typography variant="h5" color='primary'  fontWeight= 'bold'  mb={2}>
+        <Typography variant="h5" color='primary' fontWeight='bold' mb={2}>
           ISIN Activation & Finalization
         </Typography>
 
         {/* INFO MESSAGE */}
         <Alert severity="info" sx={{ mb: 3 }}>
-          ISIN is issued by depositories (NSDL or CDSL) and is mandatory before
-          allotment and settlement of bonds. Please upload the official ISIN
-          confirmation letter issued by the depository.
+          ISIN activation enables the allotted ISIN to be used for allotment,
+          demat credit and listing of the bonds. Activation is permitted only
+          after execution of debenture trust deed and security documents.{' '}
+          <Link
+            component="button"
+            type="button"
+            underline="always"
+            onClick={() => setOpenInstructions(true)}
+            sx={{ fontWeight: 600 }}
+          >
+            View flow instructions
+          </Link>
         </Alert>
+
+        <Card
+          variant="outlined"
+          sx={{ mb: 3, p: 2, backgroundColor: '#fafafa' }}
+        >
+          <Typography fontWeight={600} mb={1}>
+            Generated Drafts
+          </Typography>
+
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography>ISIN Activation Request Letter</Typography>
+            <Button variant="outlined" onClick={handleGenerateDraft}>
+              Generate Activation Draft
+            </Button>
+          </Box>
+
+          <Typography variant="caption" color="text.secondary">
+            This draft is generated for submission by the Issuer / RTA to the
+            depository for ISIN activation.
+          </Typography>
+        </Card>
+
 
         <Grid container spacing={3}>
           {/* DEPOSITORY */}
@@ -210,6 +255,13 @@ export default function IsinActivationFinalization({
           </Grid>
         </Grid>
       </Card>
+
+      <InstructionModal
+        open={openInstructions}
+        onClose={() => setOpenInstructions(false)}
+        title={instructionTitle}
+        instructions={instructionItems}
+      />
     </FormProvider>
   );
 }

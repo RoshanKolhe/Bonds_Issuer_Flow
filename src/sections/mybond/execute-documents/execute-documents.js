@@ -8,6 +8,8 @@ import { enqueueSnackbar } from 'notistack';
 
 import FormProvider, { RHFCustomFileUploadBox } from 'src/components/hook-form';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
+import { AutoFill } from 'src/forms-autofilled-script/autofill';
+import { NewExecuteDocuments } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
 
 /* ---------------- SCHEMA ---------------- */
 
@@ -45,6 +47,7 @@ export default function ExecuteDocument({
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { isSubmitting },
   } = methods;
 
@@ -77,6 +80,11 @@ export default function ExecuteDocument({
     }
   }, [currentExecuteDocument, reset, percent]);
 
+  const handleAutoFill = () => {
+    const data = NewExecuteDocuments();
+    AutoFill({ setValue, fields: data });
+  };
+
   /* ---------------- SUBMIT ---------------- */
   const onSubmit = (data) => {
     saveStepData?.(data);
@@ -85,19 +93,18 @@ export default function ExecuteDocument({
       variant: 'success',
     });
 
-    setActiveStepId?.('launch_issue');
+    setActiveStepId?.('escrow_account');
   };
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Card sx={{ p: 3, mb: 4 }}>
-         <Typography variant="h5" color='primary'  fontWeight= 'bold'  mb={2}>
+        <Typography variant="h5" color='primary' fontWeight='bold' mb={2}>
           Execute Documents
         </Typography>
 
         <Alert severity="info" sx={{ mb: 3 }}>
-          These documents are executed after ISIN activation and must be
-          signed before opening the issue for subscription.
+          These documents must be executed BEFORE ISIN activation and are mandatory prior to opening the issue for subscription.
         </Alert>
 
         <Grid container spacing={3}>
@@ -132,7 +139,14 @@ export default function ExecuteDocument({
           </Grid>
         </Grid>
 
-        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+          <LoadingButton
+            type="button"
+            variant="contained"
+            onClick={handleAutoFill}
+          >
+            Autofill
+          </LoadingButton>
           <LoadingButton
             type="submit"
             variant="contained"

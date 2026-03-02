@@ -217,10 +217,10 @@ export default function LaunchIssue({
               </Typography>
             </Grid>
             <Grid item xs={12} md={6}>
-              <RHFDateTimePicker name="subscriptionStartDateTime" label="Start Date & Time*" />
+              <RHFDateTimePicker format='dd/MM/yyyy' name="subscriptionStartDateTime" label="Start Date & Time*" />
             </Grid>
             <Grid item xs={12} md={6}>
-              <RHFDateTimePicker name="subscriptionEndDateTime" label="End Date & Time*" />
+              <RHFDateTimePicker format='dd/MM/yyyy' name="subscriptionEndDateTime" label="End Date & Time*" />
             </Grid>
             <Grid item xs={12}>
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 0 }}>

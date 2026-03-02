@@ -55,7 +55,7 @@ export default function BondApplicationsTableRow({ row, selected, onViewRow, onS
             variant="soft"
             color={getColor()}
           >
-            {(!currentStatus || currentStatus?.code === 'credit_rating_approval') ? localStatusMapper?.find((status) => status.code === localStorage.getItem('activeStepId'))?.label : currentStatus?.label}
+            {(!currentStatus || currentStatus?.code === 'Regulatory Filing') ? localStatusMapper?.find((status) => status.code === localStorage.getItem('activeStepId'))?.label : currentStatus?.label}
           </Label>
         </TableCell>
 

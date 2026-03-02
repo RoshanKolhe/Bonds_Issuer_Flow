@@ -6,10 +6,14 @@ import {
   Grid,
   Tooltip,
   IconButton,
+  Box,
 } from '@mui/material';
+import { useSnackbar } from 'notistack';
 
 import Iconify from 'src/components/iconify';
 import Label from 'src/components/label';
+import { useParams } from 'src/routes/hook';
+import axiosInstance from 'src/utils/axios';
 
 export default function DebentureTrusteeCardView({
   row,
@@ -20,6 +24,58 @@ export default function DebentureTrusteeCardView({
   disabled
 
 }) {
+  const { enqueueSnackbar } = useSnackbar();
+  const params = useParams();
+  const { applicationId } = params;
+
+  const downloadDocx = (blobData, filename) => {
+    const url = window.URL.createObjectURL(
+      new Blob([blobData], {
+        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      })
+    );
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', filename);
+
+    document.body.appendChild(link);
+    link.click();
+
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const onDownload = async (id) => {
+    try {
+      const contextKeys = [
+        { contextKey: "id", value: "860d941d-4cc9-451e-8342-df5a981f042e" },
+        { contextKey: "bondIssueApplicationId", value: applicationId },
+        { contextKey: "identifierId", value: "474d694f-2a0e-41c2-b6d5-8cde2a7c5e71" },
+        { contextKey: "roleValue", value: "company" },
+        { contextKey: "addressType", value: "registered" },
+        { contextKey: "trusteeProfilesId", value: "f2b9e823-228e-4941-ac43-360a1329c838" }
+      ];
+
+      const response = await axiosInstance.post(
+        '/document-drafting/auto/generate-document',
+        {
+          documentValue: 'debenture-trust-appointment-letter',
+          contextKeys,
+        },
+        {
+          responseType: 'blob',
+        }
+      );
+
+      downloadDocx(response.data, 'appointment-letter.docx');
+      enqueueSnackbar('Document generated successfully', { variant: 'success' });
+    } catch (error) {
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to fetch data';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    }
+  };
+
   return (
     <Grid item xs={12} md={6} lg={4}>
       <Card
@@ -42,7 +98,11 @@ export default function DebentureTrusteeCardView({
         >
 
           {selected ? (
-            <Label variant='soft' color='success'>Appointed</Label>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Label variant="soft" color="success">
+                Appointed
+              </Label>
+            </Box>
           ) : (<Checkbox
             checked={selected}
             disabled={disabled}
@@ -55,6 +115,15 @@ export default function DebentureTrusteeCardView({
 
           {/* RIGHT → Actions */}
           <Stack direction="row" spacing={0.5}>
+            {selected && <Tooltip title="Appointment letter">
+              <IconButton
+                size="small"
+                onClick={() => onDownload(row.id)}
+              >
+                <Iconify icon="mdi:download" width={18} />
+              </IconButton>
+            </Tooltip>}
+
             <Tooltip title="View">
               <IconButton size="small" sx={{ p: 0.5 }} onClick={onView}>
                 <Iconify icon="solar:eye-bold" />

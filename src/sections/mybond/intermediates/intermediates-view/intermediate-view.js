@@ -162,7 +162,7 @@ export default function IntermediariesView({ setActiveStepId, percent }) {
 
 
       <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-        <Button variant="contained" onClick={() => setActiveStepId('fund_position')}>
+        <Button variant="contained" onClick={() => setActiveStepId('audited_financial')}>
           Next
         </Button>
       </Box>

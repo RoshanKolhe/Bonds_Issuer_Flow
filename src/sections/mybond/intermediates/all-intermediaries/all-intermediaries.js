@@ -46,7 +46,7 @@ export default function AllIntermediariesView({ setActiveStepId, setCurrentTab, 
     }
 
     enqueueSnackbar('All intermediaries appointed', { variant: 'success' });
-    setActiveStepId('fund_position');
+    setActiveStepId('audited_financial');
   };
 
   useEffect(() => {

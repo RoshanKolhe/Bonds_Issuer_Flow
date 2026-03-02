@@ -41,7 +41,7 @@ export default function IsinActivationMain({
     //   return;
     // }
 
-    setActiveStepId('execute_document');
+    setActiveStepId('launch_issue');
   };
 
   /* ---------------- STEP PERCENT ---------------- */

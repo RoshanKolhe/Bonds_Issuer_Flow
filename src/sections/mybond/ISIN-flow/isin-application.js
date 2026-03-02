@@ -22,33 +22,32 @@ import FormProvider, {
   RHFTextField,
 } from 'src/components/hook-form';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
-import { NewInPrincipleApproval } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
 import { AutoFill } from 'src/forms-autofilled-script/autofill';
-import axiosInstance from 'src/utils/axios';
-import { useParams } from 'src/routes/hook';
+import { NewISINApplication } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
 import InstructionModal from 'src/components/instruction-modal/instruction-modal';
 
 /* ---------------- SCHEMA ---------------- */
 
 const Schema = Yup.object().shape({
-  exchange: Yup.string()
-    .oneOf(['BSE', 'NSE'])
-    .required('Stock exchange is required'),
+  depository: Yup.string()
+    .oneOf(['NSDL', 'CDSL'])
+    .required('Depository is required'),
 
-  inPrincipleApprovalNo: Yup.string()
-    .required('Approval number is required'),
-
-  inPrincipleApprovalDate: Yup.date()
+  isinApplicationDate: Yup.date()
     .nullable()
-    .required('Approval date is required'),
+    .required('ISIN application date is required'),
 
-  inPrincipleApprovalLetter: Yup.mixed()
-    .required('In-principle approval letter is required'),
+  isinCode: Yup.string()
+    .required('ISIN is required')
+    .matches(/^INE[0-9A-Z]{10}$/, 'Enter a valid ISIN'),
+
+  isinAllotmentLetter: Yup.mixed()
+    .required('ISIN allotment letter is required'),
 });
 
 /* ---------------- COMPONENT ---------------- */
 
-export default function InPrincipleApproval({
+export default function IsinApplication({
   currentData,
   saveStepData,
   percent,
@@ -56,15 +55,13 @@ export default function InPrincipleApproval({
 }) {
   const [openInstructions, setOpenInstructions] = useState(false);
 
-  const params = useParams();
-  const { applicationId } = params;
   /* ---------------- DEFAULT VALUES ---------------- */
 
   const defaultValues = {
-    exchange: '',
-    inPrincipleApprovalNo: '',
-    inPrincipleApprovalDate: null,
-    inPrincipleApprovalLetter: null,
+    depository: '',
+    isinApplicationDate: null,
+    isinCode: '',
+    isinAllotmentLetter: null,
   };
 
   const methods = useForm({
@@ -74,26 +71,26 @@ export default function InPrincipleApproval({
 
   const { handleSubmit, control, watch, reset, setValue } = methods;
 
-  const exchange = watch('exchange');
-  const approvalNo = watch('inPrincipleApprovalNo');
-  const approvalDate = watch('inPrincipleApprovalDate');
-  const approvalLetter = watch('inPrincipleApprovalLetter');
+  const depository = watch('depository');
+  const applicationDate = watch('isinApplicationDate');
+  const isinCode = watch('isinCode');
+  const allotmentLetter = watch('isinAllotmentLetter');
 
-  const instructionTitle = 'In-Principle Approval Flow';
+  const instructionTitle = 'ISIN Application Flow';
   const instructionItems = [
-    "If you do not have the draft, click 'Generate Application Draft' to download it.",
-    'Submit the generated application draft to your selected exchange (NSE or BSE).',
-    'After you receive in-principle approval from the exchange, upload the approval letter here.',
-    'Enter approval number and approval date, then click Save & Continue to move ahead.',
+    "If you do not have the document pack, click 'Generate ISIN Application Draft'.",
+    'Submit the generated ISIN application to the selected depository (NSDL or CDSL).',
+    'After ISIN allotment, capture the allotted ISIN and application date here.',
+    'Upload the ISIN allotment letter and save to proceed to the next step.',
   ];
 
   /* ---------------- PERCENT (BINARY) ---------------- */
 
   useEffect(() => {
     percent?.(
-      exchange && approvalNo && approvalDate && approvalLetter ? 100 : 0
+      depository && applicationDate && isinCode && allotmentLetter ? 100 : 0
     );
-  }, [exchange, approvalNo, approvalDate, approvalLetter, percent]);
+  }, [depository, applicationDate, isinCode, allotmentLetter, percent]);
 
   /* ---------------- PREFILL (EDIT MODE) ---------------- */
 
@@ -102,86 +99,46 @@ export default function InPrincipleApproval({
       reset({
         ...defaultValues,
         ...currentData,
-        inPrincipleApprovalDate: currentData.inPrincipleApprovalDate
-          ? new Date(currentData.inPrincipleApprovalDate)
+        isinApplicationDate: currentData.isinApplicationDate
+          ? new Date(currentData.isinApplicationDate)
           : null,
       });
       percent?.(100);
     }
   }, [currentData, reset, percent]);
 
-  /* ---------------- AUTOFILL ---------------- */
-
-  const handleAutoFill = () => {
-    const data = NewInPrincipleApproval();
-    AutoFill({ setValue, fields: data });
-  };
-
   /* ---------------- GENERATE DRAFT ---------------- */
 
-  const downloadDocx = (blobData, filename) => {
-    const url = window.URL.createObjectURL(
-      new Blob([blobData], {
-        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      })
-    );
-
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', filename);
-
-    document.body.appendChild(link);
-    link.click();
-
-    link.remove();
-    window.URL.revokeObjectURL(url);
+  const handleGenerateDraft = () => {
+    // Later: backend call / PDF / Excel generator
+    enqueueSnackbar('ISIN application data pack generated successfully', {
+      variant: 'success',
+    });
   };
 
-  const handleGenerateDraft = async () => {
-    try {
-      const contextKeys = [
-        { contextKey: "id", value: "860d941d-4cc9-451e-8342-df5a981f042e" },
-        { contextKey: "bondIssueApplicationId", value: applicationId },
-        { contextKey: "identifierId", value: "474d694f-2a0e-41c2-b6d5-8cde2a7c5e71" },
-        { contextKey: "roleValue", value: "company" }
-      ];
-
-      const response = await axiosInstance.post(
-        '/document-drafting/auto/generate-document',
-        {
-          documentValue: 'in-principle-listing-approval-application',
-          contextKeys,
-        },
-        {
-          responseType: 'blob',
-        }
-      );
-
-      downloadDocx(response.data, 'in-principle-listing-approval-application.docx');
-      enqueueSnackbar('Document generated successfully', { variant: 'success' });
-    } catch (error) {
-      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to fetch data';
-      enqueueSnackbar(errorMessage, { variant: 'error' });
-    }
+  const handleAutoFill = () => {
+    const data = NewISINApplication();
+    AutoFill({ setValue, fields: data });
   };
 
   /* ---------------- SUBMIT ---------------- */
 
   const onSubmit = (data) => {
     const payload = {
-      exchange: data.exchange,
-      inPrincipleApprovalNo: data.inPrincipleApprovalNo,
-      inPrincipleApprovalDate: data.inPrincipleApprovalDate,
-      inPrincipleApprovalLetter: data.inPrincipleApprovalLetter,
+      depository: data.depository,
+      isinApplicationDate: data.isinApplicationDate,
+      isinCode: data.isinCode,
+      isinAllotmentLetter: data.isinAllotmentLetter,
+      isinStatus: 'ALLOTTED',
     };
 
     saveStepData?.(payload);
     percent?.(100);
 
-    // ✅ CORRECT NEXT STEP
-    setActiveStepId?.('isin_application');
+    // ✅ NEXT STEP: EXECUTE DOCUMENT
+    setActiveStepId?.('execute_document');
 
-    enqueueSnackbar('In-Principle Listing Approval saved successfully', {
+    enqueueSnackbar('ISIN application details saved successfully', {
       variant: 'success',
     });
   };
@@ -191,13 +148,14 @@ export default function InPrincipleApproval({
       <Container>
         <Card sx={{ p: 3 }}>
           <Typography variant="h5" color="primary" fontWeight="bold" mb={2}>
-            In-Principle Listing Approval
+            ISIN Application & Allotment
           </Typography>
 
           {/* INFO MESSAGE */}
           <Alert severity="info" sx={{ mb: 3 }}>
-            In-principle listing approval is issued by the stock exchange
-            (BSE/NSE) and is mandatory before ISIN application and activation.{' '}
+            ISIN application is made to the depository (NSDL/CDSL) and the ISIN
+            is allotted. Activation will be permitted only after execution of
+            debenture trust deed and security documents.{' '}
             <Link
               component="button"
               type="button"
@@ -212,10 +170,10 @@ export default function InPrincipleApproval({
           {/* GENERATED DRAFT SECTION */}
           <Card
             variant="outlined"
-            sx={{ mb: 3, p: 2, backgroundColor: '#f0f0f0' }}
+            sx={{ mb: 3, p: 2, backgroundColor: '#fafafa' }}
           >
             <Typography fontWeight={600} mb={1}>
-              Generated Drafts
+              Generated Drafts / Data Pack
             </Typography>
 
             <Box
@@ -227,55 +185,46 @@ export default function InPrincipleApproval({
               }}
             >
               <Typography>
-                In-Principle Listing Application (Draft)
+                ISIN Application Data Pack (Depository Format)
               </Typography>
 
               <Button
                 variant="outlined"
                 onClick={handleGenerateDraft}
               >
-                Generate Application Draft
+                Generate ISIN Application Draft
               </Button>
             </Box>
 
             <Typography variant="caption" color="text.secondary">
-              This draft is system-generated for submission by the Issuer /
-              Merchant Banker to the stock exchange.
+              This data pack is system-generated for submission by the Issuer /
+              RTA to the depository.
             </Typography>
           </Card>
 
           {/* FORM */}
           <Grid container spacing={3}>
-            {/* EXCHANGE */}
+            {/* DEPOSITORY */}
             <Grid item xs={12} md={4}>
               <RHFTextField
-                name="exchange"
-                label="Stock Exchange"
+                name="depository"
+                label="Depository"
                 select
                 fullWidth
               >
-                <MenuItem value="BSE">BSE</MenuItem>
-                <MenuItem value="NSE">NSE</MenuItem>
+                <MenuItem value="NSDL">NSDL</MenuItem>
+                <MenuItem value="CDSL">CDSL</MenuItem>
               </RHFTextField>
             </Grid>
 
-            {/* APPROVAL NUMBER */}
-            <Grid item xs={12} md={4}>
-              <RHFTextField
-                name="inPrincipleApprovalNo"
-                label="Approval Number"
-                fullWidth
-              />
-            </Grid>
-
-            {/* APPROVAL DATE */}
+            {/* APPLICATION DATE */}
             <Grid item xs={12} md={4}>
               <Controller
-                name="inPrincipleApprovalDate"
+                name="isinApplicationDate"
                 control={control}
                 render={({ field, fieldState }) => (
                   <DatePicker
-                    label="Approval Date"
+                    label="ISIN Application Date"
                     value={field.value}
                     onChange={field.onChange}
                     slotProps={{
@@ -290,14 +239,24 @@ export default function InPrincipleApproval({
               />
             </Grid>
 
-            {/* APPROVAL LETTER */}
+            {/* ISIN CODE */}
+            <Grid item xs={12} md={4}>
+              <RHFTextField
+                name="isinCode"
+                label="Allotted ISIN"
+                placeholder="INE1234567890"
+                fullWidth
+              />
+            </Grid>
+
+            {/* ISIN ALLOTMENT LETTER */}
             <Grid item xs={12}>
               <RHFCustomFileUploadBox
-                name="inPrincipleApprovalLetter"
-                label="Upload In-Principle Approval Letter"
+                name="isinAllotmentLetter"
+                label="Upload ISIN Allotment Letter"
                 icon="mdi:file-document-outline"
               />
-              <YupErrorMessage name="inPrincipleApprovalLetter" />
+              <YupErrorMessage name="isinAllotmentLetter" />
             </Grid>
           </Grid>
 
@@ -313,7 +272,6 @@ export default function InPrincipleApproval({
             <Button variant="contained" onClick={handleAutoFill}>
               Autofill
             </Button>
-
             <LoadingButton type="submit" variant="contained">
               Save & Continue
             </LoadingButton>

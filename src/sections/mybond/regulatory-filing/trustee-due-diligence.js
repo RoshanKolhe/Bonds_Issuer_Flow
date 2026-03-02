@@ -21,6 +21,8 @@ import FormProvider, {
   RHFTextField,
 } from 'src/components/hook-form';
 import YupErrorMessage from 'src/components/error-field/yup-error-messages';
+import { AutoFill } from 'src/forms-autofilled-script/autofill';
+import { NewTrusteeDueDiligence } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
 
 export default function TrusteeDueDiligence({
   currentData,
@@ -47,7 +49,7 @@ export default function TrusteeDueDiligence({
     defaultValues,
   });
 
-  const { handleSubmit, watch, reset } = methods;
+  const { handleSubmit, watch, reset, setValue } = methods;
 
   const trusteeApproved = watch('trusteeApproved');
 
@@ -64,6 +66,11 @@ export default function TrusteeDueDiligence({
       percent?.(100);
     }
   }, [currentData, reset, percent]);
+
+  const handleAutoFill = () => {
+    const data = NewTrusteeDueDiligence();
+    AutoFill({ setValue, fields: data });
+  };
 
   const onSubmit = (data) => {
     const payload = {
@@ -147,7 +154,14 @@ export default function TrusteeDueDiligence({
             </Grid>
           </Grid>
 
-          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+            <LoadingButton
+              type="button"
+              variant="contained"
+              onClick={handleAutoFill}
+            >
+              Autofill
+            </LoadingButton>
             <LoadingButton
               type="submit"
               variant="contained"
