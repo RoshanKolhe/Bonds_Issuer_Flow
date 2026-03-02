@@ -4,7 +4,7 @@ import { TextField, InputAdornment, Tooltip, IconButton } from "@mui/material";
 import Iconify from "src/components/iconify";
 import PropTypes from "prop-types";
 
-export default function RHFDateTimePicker({ name, label, tooltip }) {
+export default function RHFDateTimePicker({ name, label, tooltip, ...other }) {
   const { control } = useFormContext();
 
   return (
@@ -33,6 +33,7 @@ export default function RHFDateTimePicker({ name, label, tooltip }) {
               // },
             },
           }}
+          {...other}
         />
       )}
     />

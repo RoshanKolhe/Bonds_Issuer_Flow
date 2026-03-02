@@ -7,6 +7,7 @@ import { useResponsive } from 'src/hooks/use-responsive';
 import { useSettingsContext } from 'src/components/settings';
 //
 import { HEADER, NAV } from '../config-layout';
+import DashboardFooter from './footer';
 
 // ----------------------------------------------------------------------
 
@@ -38,6 +39,7 @@ export default function Main({ children, sx, ...other }) {
         }}
       >
         {children}
+        <DashboardFooter />
       </Box>
     );
   }
@@ -64,6 +66,7 @@ export default function Main({ children, sx, ...other }) {
       {...other}
     >
       {children}
+      <DashboardFooter />
     </Box>
   );
 }
