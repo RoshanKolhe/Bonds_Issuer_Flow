@@ -11,24 +11,26 @@ import { useSnackbar } from 'notistack';
 import { NewProfitabilityDetails } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
 import { AutoFill } from 'src/forms-autofilled-script/autofill';
 import { Button } from '@mui/material';
+import axiosInstance from 'src/utils/axios';
+import { useParams } from 'react-router';
 export default function ProfitabilityDetails({
   currentDetails,
   saveStepData,
   setPercent,
   setProgress,
 }) {
+  const params = useParams();
+  const { applicationId } = params;
   const { enqueueSnackbar } = useSnackbar();
   const profitableSchema = Yup.object().shape({
     netProfit: Yup.number()
       .typeError('Net Profit must be a number')
       .required('Net Profit is required'),
-    ebidta: Yup.number().typeError('EBIDTA must be a number').required('EBIDTA amount is required'),
   });
 
   const defaultValues = useMemo(
     () => ({
       netProfit: currentDetails?.netProfit || '',
-      ebidta: currentDetails?.EBIDTA || '',
     }),
     [currentDetails]
   );
@@ -48,7 +50,7 @@ export default function ProfitabilityDetails({
 
   const values = watch();
 
-  const REQUIRED_FIELDS = ['netProfit', 'ebidta'];
+  const REQUIRED_FIELDS = ['netProfit'];
 
   // 🔹 SAME percent logic pattern (50% weight)
   const calculatePercent = () => {
@@ -82,13 +84,17 @@ export default function ProfitabilityDetails({
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      console.log('Form Submitted Data:', data);
-      saveStepData(data);
-      setProgress?.(true);
-      setPercent?.(50);
-      enqueueSnackbar('Fund position saved (Mocked)', { variant: 'success' });
+      const response = await axiosInstance.patch(
+        `/bonds-pre-issue/profitability-details/${applicationId}`,
+        data
+      );
+
+      if (response.data.success) {
+        enqueueSnackbar('Profitability details saved successfully', { variant: 'success' });
+        setProgress?.(true);
+      }
     } catch (error) {
-      console.error('Mocked submit error:', error);
+      console.error('Error while submitting profitability details:', error);
     }
   });
 
@@ -109,25 +115,18 @@ export default function ProfitabilityDetails({
 
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} md={6}>
-              <RHFPriceField name="netProfit" label="Net Profit" fullWidth  />
+              <RHFPriceField name="netProfit" label="Net Profit" fullWidth />
             </Grid>
 
-            <Grid item xs={12} md={6}>
-              <RHFPriceField name="ebidta" label="Enter EBIDTA Amount" fullWidth />
-            </Grid>
           </Grid>
 
           <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
             <Button variant='contained' onClick={() => handleAutoFill()}>Autofill</Button>
+            <LoadingButton loading={isSubmitting} type="submit" variant="contained" sx={{ color: '#fff' }}>
+              Save
+            </LoadingButton>
           </Box>
 
-          {/* <Grid container justifyContent="flex-end" sx={{ mt: 3 }}>
-            <Grid item xs={12} md={3} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <LoadingButton type="submit" variant="contained" sx={{ color: '#fff' }}>
-                Save
-              </LoadingButton>
-            </Grid>
-          </Grid> */}
         </Card>
       </Box>
     </FormProvider>

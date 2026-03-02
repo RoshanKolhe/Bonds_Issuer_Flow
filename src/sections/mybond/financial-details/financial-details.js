@@ -1,17 +1,18 @@
 /* eslint-disable no-useless-escape */
 import React, { useEffect, useMemo } from 'react';
-import { Box, Grid, Card, Typography, Button } from '@mui/material';
+import { Box, Grid, Card, Typography } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import FormProvider, { RHFPriceField, RHFTextField } from 'src/components/hook-form';
+import FormProvider, { RHFTextField } from 'src/components/hook-form';
 import PropTypes from 'prop-types';
-import { NewFinancialRatios } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
-import { AutoFill } from 'src/forms-autofilled-script/autofill';
 
 export default function FinancialDetails({
   currentDetails,
-  saveStepData,
+  currentCapitalDetails,
+  currentProfitabilityDetails,
+  currentFundPosition,
+  currentBorrowingDetails,
   setPercent,
   setProgress,
 }) {
@@ -22,124 +23,129 @@ export default function FinancialDetails({
     quickRatio: Yup.string().required('Quick ratio is required'),
     returnOnEquity: Yup.string().required('Return on equity is required'),
     returnOnAssets: Yup.string().required('Return on Assets (ROA) is required'),
-    debtServiceCoverageRatio: Yup.string().required('DSCR is required'),
   });
 
-  const randomRatio = (min, max) => (Math.random() * (max - min) + min).toFixed(2);
+  const toNumber = (value) => {
+    const numericValue = parseFloat(value);
+    return Number.isFinite(numericValue) ? numericValue : 0;
+  };
+
+  const formatRatio = (value) => {
+    if (!Number.isFinite(value)) return '';
+    return value.toFixed(2);
+  };
+
+  const calculatedRatios = useMemo(() => {
+    const netWorth = toNumber(currentCapitalDetails?.netWorth);
+    const totalDebt = (currentBorrowingDetails || []).reduce(
+      (sum, item) => sum + toNumber(item?.lenderAmount),
+      0
+    );
+
+    const cashBalance = toNumber(currentFundPosition?.cashBalance);
+    const bankBalance = toNumber(currentFundPosition?.bankBalance);
+    const cashAndBankBalance = toNumber(currentFundPosition?.cashAndBankBalance);
+    const currentAssets = toNumber(currentFundPosition?.currentAssets) || (cashBalance + bankBalance) || cashAndBankBalance;
+    const quickAssets = toNumber(currentFundPosition?.quickAssets) || cashAndBankBalance || currentAssets;
+    const currentLiabilities = toNumber(currentFundPosition?.currentLiabilitiesAmount);
+
+    const netProfit = toNumber(currentProfitabilityDetails?.netProfit);
+    return {
+      debtEquityRatio: netWorth > 0 && totalDebt > 0 ? formatRatio(totalDebt / netWorth) : '',
+      currentRatio:
+        currentLiabilities > 0 && currentAssets > 0 ? formatRatio(currentAssets / currentLiabilities) : '',
+      netWorth: netWorth > 0 ? formatRatio(netWorth) : '',
+      quickRatio:
+        currentLiabilities > 0 && quickAssets > 0 ? formatRatio(quickAssets / currentLiabilities) : '',
+      returnOnEquity:
+        netWorth > 0 && netProfit !== 0 ? formatRatio((netProfit / netWorth) * 100) : '',
+      returnOnAssets:
+        currentAssets > 0 && netProfit !== 0 ? formatRatio((netProfit / currentAssets) * 100) : '',
+    };
+  }, [currentCapitalDetails, currentBorrowingDetails, currentFundPosition, currentProfitabilityDetails]);
 
   const defaultValues = useMemo(
     () => ({
-      debtEquityRatio: currentDetails?.debtEquityRatio || randomRatio(0.2, 3),
-      currentRatio: currentDetails?.currentRatio || randomRatio(0.5, 2.5),
-      netWorth: currentDetails?.netWorth || randomRatio(1, 500), // crores/lakhs depending on unit
-      quickRatio: currentDetails?.quickRatio || randomRatio(0.3, 2),
-      returnOnEquity: currentDetails?.returnOnEquity || randomRatio(5, 25), // %
-      returnOnAssets: currentDetails?.returnOnAssets || randomRatio(2, 15), // %
-      debtServiceCoverageRatio: currentDetails?.debtServiceCoverageRatio || randomRatio(0.5, 2),
+      debtEquityRatio: calculatedRatios.debtEquityRatio || currentDetails?.debtEquityRatio || '',
+      currentRatio: calculatedRatios.currentRatio || currentDetails?.currentRatio || '',
+      netWorth: calculatedRatios.netWorth || currentDetails?.netWorth || '',
+      quickRatio: calculatedRatios.quickRatio || currentDetails?.quickRatio || '',
+      returnOnEquity: calculatedRatios.returnOnEquity || currentDetails?.returnOnEquity || '',
+      returnOnAssets: calculatedRatios.returnOnAssets || currentDetails?.returnOnAssets || '',
     }),
-    [currentDetails]
+    [calculatedRatios, currentDetails]
   );
 
   const methods = useForm({
     resolver: yupResolver(MainSchema),
     defaultValues,
+    mode: 'onChange',
   });
 
-  const {
-    watch,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { isSubmitting },
-  } = methods;
-
+  const { watch, reset } = methods;
   const values = watch();
 
-  const requiredFields = [
+  const REQUIRED_FIELDS = [
     'debtEquityRatio',
     'currentRatio',
     'netWorth',
     'quickRatio',
     'returnOnEquity',
     'returnOnAssets',
-    'debtServiceCoverageRatio',
   ];
 
-  const calculatePercent = () => {
+  useEffect(() => {
     let completed = 0;
 
-    requiredFields.forEach((field) => {
-      if (values[field]) completed++;
+    REQUIRED_FIELDS.forEach((field) => {
+      if (values[field]) completed += 1;
     });
 
-    const percentVal = (completed / requiredFields.length) * 50; // 50% weight
-    setPercent?.(percentVal);
-  };
+    const percentVal = Math.round((completed / REQUIRED_FIELDS.length) * 100);
+    setPercent?.(percentVal / 2);
+    setProgress?.(percentVal === 100);
+  }, [values, setPercent, setProgress]);
 
   useEffect(() => {
-    calculatePercent();
-  }, [values]);
-
-  useEffect(() => {
-    if (currentDetails && Object.keys(currentDetails).length > 0) {
-      reset(defaultValues);
-
-      setProgress?.(true);
-      setPercent?.(50);
-    }
-  }, [currentDetails, reset, defaultValues, setProgress, setPercent]);
-
-  const handleAutoFill = () => {
-    const data = NewFinancialRatios();
-    AutoFill({ setValue, fields: data });
-  };
+    reset(defaultValues);
+  }, [reset, defaultValues]);
 
   return (
-    <FormProvider methods={methods} >
+    <FormProvider methods={methods}>
       <Box display="flex" flexDirection="column" gap={3}>
         <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
-            <Typography variant="h5" color="primary" fontWeight='bold'>
+          <Typography variant="h5" color="primary" fontWeight="bold">
             Financial Ratios
           </Typography>
           <Typography variant="body2" mb={3}>
-            Provide your companies key financial ratios to assess financial health
+            Auto-calculated ratios based on financial details entered above
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
-              <RHFTextField name="debtEquityRatio" label="Debt-Equity Ratio (DER)" fullWidth />
+              <RHFTextField name="debtEquityRatio" label="Debt-Equity Ratio (DER)" fullWidth InputProps={{ readOnly: true }} />
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <RHFTextField name="currentRatio" label="Current Ratio" fullWidth />
+              <RHFTextField name="currentRatio" label="Current Ratio" fullWidth InputProps={{ readOnly: true }} />
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <RHFPriceField name="netWorth" label="Net Worth" fullWidth />
+              <RHFTextField name="netWorth" label="Net Worth" fullWidth InputProps={{ readOnly: true }} />
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <RHFTextField name="quickRatio" label="Quick Ratio" fullWidth />
+              <RHFTextField name="quickRatio" label="Quick Ratio" fullWidth InputProps={{ readOnly: true }} />
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <RHFTextField name="returnOnEquity" label="Return on Equity (ROE)" fullWidth />
+              <RHFTextField name="returnOnEquity" label="Return on Equity (ROE)" fullWidth InputProps={{ readOnly: true }} />
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <RHFTextField name="returnOnAssets" label="Return on Assets (ROA)" fullWidth />
+              <RHFTextField name="returnOnAssets" label="Return on Assets (ROA)" fullWidth InputProps={{ readOnly: true }} />
             </Grid>
 
-            <Grid item xs={12} md={6}>
-              <RHFTextField
-                name="debtServiceCoverageRatio"
-                label="Debt Service Coverage Ratio (DSCR)"
-                fullWidth
-              />
-            </Grid>
           </Grid>
-          <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-            <Button variant='contained' onClick={() => handleAutoFill()}>Autofill</Button>
-          </Box>
         </Card>
       </Box>
     </FormProvider>
@@ -147,8 +153,11 @@ export default function FinancialDetails({
 }
 
 FinancialDetails.propTypes = {
-  setActiveStep: PropTypes.func,
   currentDetails: PropTypes.object,
-  onSave: PropTypes.func,
-  percent: PropTypes.func,
+  currentCapitalDetails: PropTypes.object,
+  currentProfitabilityDetails: PropTypes.object,
+  currentFundPosition: PropTypes.object,
+  currentBorrowingDetails: PropTypes.array,
+  setPercent: PropTypes.func,
+  setProgress: PropTypes.func,
 };

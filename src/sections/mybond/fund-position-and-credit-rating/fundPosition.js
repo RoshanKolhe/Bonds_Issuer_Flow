@@ -95,7 +95,6 @@ export default function FundPosition({
     setPercent?.(percentVal);
   };
 
-
   const handleAutoFill = () => {
     const data = NewFundPosition();
     AutoFill({ setValue, fields: data });
