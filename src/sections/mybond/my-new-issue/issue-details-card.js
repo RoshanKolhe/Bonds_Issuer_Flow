@@ -47,12 +47,28 @@ export default function IssueDetailsCard({
   const Schema = Yup.object().shape({
     issueType: Yup.string().required('Issure type is required'),
     securityType: Yup.string().required('Please select security type'),
-    issueSize: Yup.number()
+    baseIssueSize: Yup.number()
       .typeError('Issue size is required')
       .positive('Must be positive')
       .required('Issue size is required')
       .min(10000000, 'Issue size minimum 1 Cr')
       .max(50000000000, 'Issue size maximum 5000 Cr'),
+    greenShoeSize: Yup.number()
+      .typeError('Green Shoe size is required')
+      .positive('Must be positive')
+      .required('Green Shoe size is required'),
+    totalIssueSize: Yup.number()
+      .typeError('Total Issue size is required')
+      .positive('Must be positive')
+      .required('Total Issue size is required')
+      .min(10000000, 'Total Issue size minimum 1 Cr')
+      .max(50000000000, 'Total Issue size maximum 5000 Cr'),
+    minimumSubscriptionPercent: Yup.number()
+      .typeError('Subscription target is required')
+      .positive('Must be positive')
+      .required('Subscription target is required')
+      .min(10, 'Subscription target percent minimum 10%')
+      .max(100, 'Subscription target percent minimum 100%'),
     tenureYears: Yup.number()
       .typeError('Tenure must be a number')
       .required('Tenure is required')
@@ -78,7 +94,10 @@ export default function IssueDetailsCard({
   const defaultValues = useMemo(() => ({
     issueType: issueDetailsData?.placementType ?? 'public',
     securityType: issueDetailsData?.securityType ?? 'secured',
-    issueSize: issueDetailsData?.issueSize ?? '',
+    baseIssueSize: issueDetailsData?.baseIssueSize ?? '',
+    greenShoeSize: issueDetailsData?.greenShoeSize ?? '',
+    totalIssueSize: issueDetailsData?.totalIssueSize ?? '',
+    minimumSubscriptionPercent: issueDetailsData?.minimumSubscriptionPercent ?? 75,
     tenureYears: issueDetailsData?.tenure ?? '',
     couponRate: issueDetailsData?.couponRate ?? '',
     minimumInvestmentPrice: issueDetailsData?.minimumInvestment ?? '',
@@ -109,13 +128,16 @@ export default function IssueDetailsCard({
   const requiredFields = [
     'issueType',
     'securityType',
-    'issueSize',
+    'baseIssueSize',
     'tenureYears',
     'couponRate',
     'minimumInvestmentPrice',
     'redemptionType',
     'minimumPurchaseUnit',
     'totalUnit',
+    'greenShoeSize',
+    'totalIssueSize',
+    'minimumSubscriptionPercent',
   ];
 
   const issueType = watch('issueType');
@@ -139,9 +161,13 @@ export default function IssueDetailsCard({
         bondIssueApplicationId: applicationId,
         redemptionTypeId: data.redemptionType,
         totalUnits: Number(data.totalUnit),
-        issueSize: Number(data.issueSize),
+        baseIssueSize: Number(data.baseIssueSize),
+        greenShoeSize: Number(data.greenShoeSize),
+        totalIssueSize: Number(data.totalIssueSize),
+        minimumSubscriptionPercent: Number(data.minimumSubscriptionPercent),
         couponRate: Number(data.couponRate),
         securityType: data.securityType,
+        issueSizeHealthStatus: 'safe'
       };
 
       if (data.issueType === 'private') {
@@ -167,7 +193,7 @@ export default function IssueDetailsCard({
 
   const handleAutoFill = () => {
     const data = NewIssueSetup();
-    AutoFill({setValue, fields:data});
+    AutoFill({ setValue, fields: data });
   }
 
   useEffect(() => {
@@ -231,7 +257,7 @@ export default function IssueDetailsCard({
   }, [issueDetailsData, reset, setProgress, defaultValues]);
 
   useEffect(() => {
-    const size = parseFloat(values.issueSize);
+    const size = parseFloat(values.baseIssueSize);
     const units = parseFloat(values.totalUnit);
     const minUnit = parseFloat(values.minimumPurchaseUnit);
 
@@ -243,7 +269,7 @@ export default function IssueDetailsCard({
     } else {
       setValue('minimumInvestmentPrice', '', { shouldValidate: false });
     }
-  }, [values.issueSize, values.totalUnit, values.minimumPurchaseUnit, setValue]);
+  }, [values.baseIssueSize, values.totalUnit, values.minimumPurchaseUnit, setValue]);
 
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
@@ -254,6 +280,8 @@ export default function IssueDetailsCard({
           </Typography>
 
           <Grid container spacing={3}>
+
+            {/* Issue Type */}
             <Grid item xs={12} sm={4}>
               <RHFSelect name="issueType" label="Issue Type *">
                 <MenuItem value="">Select issue type</MenuItem>
@@ -261,10 +289,16 @@ export default function IssueDetailsCard({
                 <MenuItem value="private">Private</MenuItem>
               </RHFSelect>
             </Grid>
+
+            {/* Investor Category (Private Only) */}
             {issueType === 'private' && (
               <Grid item xs={12} sm={4}>
-                <RHFSelect name="preferedInvestorCategory" label="Prefered Investor Category*">
+                <RHFSelect
+                  name="preferedInvestorCategory"
+                  label="Prefered Investor Category*"
+                >
                   <MenuItem value="">Select category</MenuItem>
+
                   {investorCategoriesData?.length > 0 ? (
                     investorCategoriesData.map((cat) => (
                       <MenuItem key={cat.id} value={cat.id}>
@@ -278,18 +312,23 @@ export default function IssueDetailsCard({
               </Grid>
             )}
 
+            {/* Tenure */}
             <Grid item xs={12} sm={4}>
               <RHFTextField
                 name="tenureYears"
                 label="Tenure (Years)*"
                 inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-                onInput={(e) => (e.target.value = e.target.value.replace(/[^0-9.]/g, ''))}
+                onInput={(e) =>
+                  (e.target.value = e.target.value.replace(/[^0-9]/g, ''))
+                }
               />
             </Grid>
 
+            {/* Redemption Type */}
             <Grid item xs={12} sm={4}>
-              <RHFSelect name="redemptionType" label=" Redemption Type*">
+              <RHFSelect name="redemptionType" label="Redemption Type*">
                 <MenuItem value="">Select Redemption</MenuItem>
+
                 {redemptionType?.length > 0 ? (
                   redemptionType.map((red) => (
                     <MenuItem key={red.id} value={red.id}>
@@ -302,6 +341,7 @@ export default function IssueDetailsCard({
               </RHFSelect>
             </Grid>
 
+            {/* Security Type */}
             <Grid item xs={12} sm={4}>
               <RHFSelect name="securityType" label="Security Type*">
                 <MenuItem value="">Select security type</MenuItem>
@@ -309,9 +349,15 @@ export default function IssueDetailsCard({
                 <MenuItem value="unsecured">Unsecured</MenuItem>
               </RHFSelect>
             </Grid>
+
+            {/* Interest Cycle */}
             <Grid item xs={12} sm={4}>
-              <RHFSelect name="preferedPaymentCycle" label="Interest Payment Cycle*">
+              <RHFSelect
+                name="preferedPaymentCycle"
+                label="Interest Payment Cycle*"
+              >
                 <MenuItem value="">Select Interest Payment Cycle</MenuItem>
+
                 {paymentCycleOptions.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
@@ -319,29 +365,26 @@ export default function IssueDetailsCard({
                 ))}
               </RHFSelect>
             </Grid>
+
+            {/* Coupon Rate */}
             <Grid item xs={12} sm={4}>
               <RHFTextField
                 name="couponRate"
-                label="Coupon Rate(%)*"
+                label="Coupon Rate (%)*"
                 placeholder="e.g., 5.25"
                 onInput={(e) => {
-                  let value = e.target.value;
+                  let value = e.target.value.replace(/[^0-9.]/g, '');
 
-                  // Allow only digits and at most one decimal
-                  value = value.replace(/[^0-9.]/g, '');
-
-                  // Prevent more than one decimal point
                   const parts = value.split('.');
+
                   if (parts.length > 2) {
                     value = parts[0] + '.' + parts[1];
                   }
 
-                  // Max 2 digits before decimal
                   if (parts[0].length > 2) {
                     parts[0] = parts[0].slice(0, 2);
                   }
 
-                  // Max 2 digits after decimal
                   if (parts[1]?.length > 2) {
                     parts[1] = parts[1].slice(0, 2);
                   }
@@ -350,35 +393,82 @@ export default function IssueDetailsCard({
                 }}
               />
             </Grid>
+
+            {/* Base Issue Size */}
             <Grid item xs={12} sm={4}>
               <RHFPriceField
-                name="issueSize"
-                label="Issue Size*"
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <RHFTextField
-                name="totalUnit"
-                label="Total Units"
-                placeholder="e.g., 5.25"
-                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-                onInput={(e) => (e.target.value = e.target.value.replace(/[^0-9.]/g, ''))}
+                name="baseIssueSize"
+                label="Base Issue Size*"
               />
             </Grid>
 
+            {/* Green Shoe Size */}
+            <Grid item xs={12} sm={4}>
+              <RHFPriceField
+                name="greenShoeSize"
+                label="Green Shoe Size*"
+              />
+            </Grid>
+
+            {/* Total Issue Size */}
+            <Grid item xs={12} sm={4}>
+              <RHFPriceField
+                name="totalIssueSize"
+                label="Total Issue Size*"
+              />
+            </Grid>
+
+            {/* Minimum Subscription % */}
+            <Grid item xs={12} sm={4}>
+              <RHFTextField
+                name="minimumSubscriptionPercent"
+                label="Minimum Subscription (%) *"
+                inputProps={{
+                  inputMode: 'numeric',
+                  pattern: '[0-9]*',
+                }}
+                onInput={(e) =>
+                  (e.target.value = e.target.value.replace(/[^0-9]/g, ''))
+                }
+              />
+            </Grid>
+
+            {/* Total Units */}
+            <Grid item xs={12} sm={4}>
+              <RHFTextField
+                name="totalUnit"
+                label="Total Units*"
+                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                onInput={(e) =>
+                  (e.target.value = e.target.value.replace(/[^0-9]/g, ''))
+                }
+              />
+            </Grid>
+
+            {/* Minimum Purchase Unit */}
             <Grid item xs={12} sm={4}>
               <RHFTextField
                 name="minimumPurchaseUnit"
-                label=" Minimum Purchase Unit*"
-                placeholder="e.g., 5.25"
+                label="Minimum Purchase Unit*"
                 inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-                onInput={(e) => (e.target.value = e.target.value.replace(/[^0-9.]/g, ''))}
+                onInput={(e) =>
+                  (e.target.value = e.target.value.replace(/[^0-9]/g, ''))
+                }
               />
             </Grid>
+
+            {/* Auto Calculated Investment */}
             <Grid item xs={12} sm={4}>
-              <RHFPriceField name="minimumInvestmentPrice" label="Minimum Investment Price" placeholder="Auto calculated" disabled />
+              <RHFPriceField
+                name="minimumInvestmentPrice"
+                label="Minimum Investment Price"
+                disabled
+                placeholder="Auto calculated"
+              />
             </Grid>
+
           </Grid>
+
           <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
             <Button variant='contained' onClick={() => handleAutoFill()}>Autofill</Button>
             <LoadingButton type="submit" loading={isSubmitting} variant="contained">

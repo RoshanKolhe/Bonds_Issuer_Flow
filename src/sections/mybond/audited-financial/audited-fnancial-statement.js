@@ -20,6 +20,7 @@ import { RHFTextField } from 'src/components/hook-form';
 import { useParams } from 'src/routes/hook';
 import axiosInstance from 'src/utils/axios';
 import { useSnackbar } from 'notistack';
+import { NewFinancialStatements } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
 
 export default function AuditedFinancialStatement({
   currentBaseYear,
@@ -253,6 +254,29 @@ export default function AuditedFinancialStatement({
     }
   };
 
+  const handleAutoFill = () => {
+    const data = NewFinancialStatements();
+
+    setDocuments((prev) =>
+      prev.map((d) => {
+        const key = d.id;
+
+        // If matching key exists in API data
+        if (data[key]) {
+          return {
+            ...d,
+            file: data[key],
+            status: 'Uploaded',
+            reportDate: new Date()
+          };
+        }
+
+        // Otherwise keep as it is
+        return d;
+      })
+    );
+  };
+
   // -----------------------------
   // Render
   // -----------------------------
@@ -410,6 +434,7 @@ export default function AuditedFinancialStatement({
                     <DatePicker
                       value={toValidDate(doc.reportDate)}
                       onChange={(newValue) => handleDateChange(newValue, doc.id)}
+                      format='dd/MM/yyyy'
                       renderInput={({ inputRef, inputProps, InputProps }) => (
                         <Box
                           sx={{
@@ -647,15 +672,8 @@ export default function AuditedFinancialStatement({
             ))}
           </Box>
         </Grid>
-        <Box
-          sx={{
-            mt: 3,
-            display: 'flex',
-            justifyContent: 'flex-end',
-            gap: 2,
-            width: '100%',
-          }}
-        >
+        <Box sx={{ width: '100%', mt: 3, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+          <Button variant='contained' onClick={() => handleAutoFill()}>Autofill</Button>
           <Button
             variant="contained"
             sx={{ color: '#fff' }}

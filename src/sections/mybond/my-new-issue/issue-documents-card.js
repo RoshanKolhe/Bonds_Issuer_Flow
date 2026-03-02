@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Box, Card, Grid, Typography } from '@mui/material';
+import { Box, Button, Card, Grid, Stack, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -11,6 +11,10 @@ import { useGetBondFlowDocuments } from 'src/api/bond-documents';
 import axiosInstance from 'src/utils/axios';
 import { useParams } from 'src/routes/hook';
 import { useGetBondApplicationStepData } from 'src/api/bondApplications';
+import { NewIssueDocuments } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
+import { AutoFill } from 'src/forms-autofilled-script/autofill';
+import { useNavigate } from 'react-router';
+import { paths } from 'src/routes/paths';
 
 // ------------------------------------------------------------
 
@@ -21,6 +25,7 @@ export default function IssueDocumentsCard({
   const param = useParams();
   const { applicationId } = param;
   const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
   const { documents, documentsLoading } = useGetBondFlowDocuments('document_upload');
   const { stepData, stepDataLoading } = useGetBondApplicationStepData(applicationId, 'document_upload');
 
@@ -33,6 +38,8 @@ export default function IssueDocumentsCard({
       label: d.documents.name,
       description: d.documents.description,
       isMandatory: d.isMandatory,
+      isDraftable: d?.isDraftable,
+      draftDocumentValue: d?.draftDocumentValue
     }));
   }, [documents]);
 
@@ -64,6 +71,7 @@ export default function IssueDocumentsCard({
 
   const {
     watch,
+    setValue,
     handleSubmit,
     formState: { isSubmitting },
   } = methods;
@@ -129,6 +137,11 @@ export default function IssueDocumentsCard({
     return values;
   };
 
+  const handleAutoFill = () => {
+    const data = NewIssueDocuments();
+    AutoFill({ setValue, fields: data });
+  }
+
   useEffect(() => {
     if (!normalizedDocuments.length) return;
 
@@ -176,25 +189,52 @@ export default function IssueDocumentsCard({
         <Grid container spacing={3}>
           {normalizedDocuments.map((doc) => (
             <Grid item xs={12} key={doc.id}>
-              <RHFCustomFileUploadBox
-                name={doc.code}
-                label={doc.label}
-                accept={{
-                  'application/pdf': ['.pdf'],
-                  'application/msword': ['.doc'],
-                  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
-                }}
-              />
+              <Stack>
+                {doc?.isDraftable && <Card
+                  variant="outlined"
+                  sx={{ mb: 3, p: 2, backgroundColor: '#f0f0f0' }}
+                >
+                  <Typography fontWeight={600} mb={1}>
+                    Generated Drafts
+                  </Typography>
+
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: 2,
+                    }}
+                  >
+                    <Typography>
+                      {doc.label} (Draft)
+                    </Typography>
+
+                    <Button
+                      variant="outlined"
+                      onClick={() => { navigate(paths.dashboard.documentDrafting.view(doc?.draftDocumentValue)) }}
+                    >
+                      Generate Document Draft
+                    </Button>
+                  </Box>
+                </Card>}
+                <RHFCustomFileUploadBox
+                  name={doc.code}
+                  label={doc.label}
+                  accept={{
+                    'application/pdf': ['.pdf'],
+                    'application/msword': ['.doc'],
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+                  }}
+                />
+              </Stack>
             </Grid>
           ))}
         </Grid>
 
-        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-          <LoadingButton
-            type="submit"
-            loading={isSubmitting}
-            variant="contained"
-          >
+        <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+          <Button variant='contained' onClick={() => handleAutoFill()}>Autofill</Button>
+          <LoadingButton type="submit" loading={isSubmitting} variant="contained">
             Save
           </LoadingButton>
         </Box>

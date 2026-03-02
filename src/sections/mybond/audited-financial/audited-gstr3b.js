@@ -25,6 +25,7 @@ import { fDate } from 'src/utils/format-time';
 import { RadioGroup, FormControlLabel, Radio, FormControl, FormLabel, Button, Select, MenuItem } from '@mui/material';
 import { useParams } from 'src/routes/hook';
 import { useSnackbar } from 'notistack';
+import { NewGST3B } from 'src/forms-autofilled-script/issue-setup/newIssueSetup';
 
 // ----------------------------------------------------------------------
 
@@ -286,6 +287,12 @@ export default function AuditedGST3B({ currentBaseYear, currentData, setPercent,
     }
   };
 
+  const handleAutoFill = () => {
+    const data = NewGST3B();
+    setAuditorName(data.auditorName);
+    setDocuments(data.documents);
+  };
+
   useEffect(() => {
     calculateCompletion();
   }, [auditorName, documents]);
@@ -500,6 +507,7 @@ export default function AuditedGST3B({ currentBaseYear, currentData, setPercent,
                     <DatePicker
                       value={toValidDate(doc.reportDate)}
                       onChange={(newValue) => handleDateChange(newValue, doc.id)}
+                      format='dd/MM/yyyy'
                       renderInput={({ inputRef, inputProps, InputProps }) => (
                         <Box
                           sx={{
@@ -654,6 +662,7 @@ export default function AuditedGST3B({ currentBaseYear, currentData, setPercent,
                     <DatePicker
                       value={toValidDate(doc.reportDate)}
                       onChange={(newValue) => handleDateChange(newValue, doc.id)}
+                      format='dd/MM/yyyy'
                       renderInput={({ inputRef, inputProps, InputProps }) => (
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           {InputProps?.endAdornment}
@@ -753,6 +762,14 @@ export default function AuditedGST3B({ currentBaseYear, currentData, setPercent,
             onClick={() => handleAddRow()}
           >
             + Add row
+          </Button>
+
+          <Button
+            variant="contained"
+            sx={{ color: '#fff' }}
+            onClick={handleAutoFill}
+          >
+            Autofill
           </Button>
 
           <Button
