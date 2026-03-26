@@ -31,6 +31,7 @@ export const paths = {
 
 
   // kycCompanyDetails: '/kyc/kyc-company-details',
+  personalIdentityKyc: `/kyc/identity-kyc`,
   kycAddressInfo: '/kyc/kyc-address-info',
   comingSoon: '/coming-soon',
   maintenance: '/maintenance',
@@ -173,6 +174,14 @@ export const paths = {
       edit: (id) => `${ROOTS.DASHBOARD}/signatories/${id}/edit`,
       details: (id) => `${ROOTS.DASHBOARD}/signatories/${id}`,
     },
+    ubo: {
+      root: `${ROOTS.DASHBOARD}/ubo`,
+      new: `${ROOTS.DASHBOARD}/ubo/new`,
+      list: `${ROOTS.DASHBOARD}/ubo/list`,
+      details: (id) => `${ROOTS.DASHBOARD}/ubo/${id}`,
+    },
+    personalIdentityKycVerification: `${ROOTS.DASHBOARD}/identity-kyc/verification`,
+    personalIdentityKycVideo: `${ROOTS.DASHBOARD}/identity-kyc/video-kyc`,
     bankDetails: {
       details: (id) => `${ROOTS.DASHBOARD}/bankDetails/${id}`,
     },
